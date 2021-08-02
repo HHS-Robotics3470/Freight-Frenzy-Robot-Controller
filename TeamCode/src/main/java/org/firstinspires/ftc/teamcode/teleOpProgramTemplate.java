@@ -9,7 +9,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 @Disabled //this line disables the teleop from appearing on the driver station, remove it for your code
 public class teleOpProgramTemplate extends LinearOpMode {
     /*declare OpMode members, initialize some classes*/
-    Hardware robot          = new Hardware();
+    HardwareOutreach robot  = new HardwareOutreach();
     ElapsedTime runtime     = new ElapsedTime();
 
     //this is the control loop, basically the equivalent of a main function almost

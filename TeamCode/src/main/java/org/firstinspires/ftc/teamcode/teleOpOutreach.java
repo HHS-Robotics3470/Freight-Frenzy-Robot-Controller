@@ -26,11 +26,10 @@ public class teleOpOutreach  extends LinearOpMode {
     int ringsLeft = 5; //TODO update this
     int gameLengthSeconds = 5*60; //give them 5 minutes to play
 
-    //variables for the elevation iteration algorithm
-    double elevationStep = 1;
-    MathContext elevationMC = new MathContext(16);
-    BigDecimal elevationLastGuessDegrees = new BigDecimal("00.0000", elevationMC);
-    double elevationGuessOffset = 1;
+    //button locks
+    boolean aButtonCurPressed;
+    boolean aButtonPrevPressed=false;
+
 
     //this is the control loop, basically the equivalent of a main function almost
     @Override
@@ -71,25 +70,51 @@ public class teleOpOutreach  extends LinearOpMode {
             */
             //////ABXY bindings/////
             //fire turret
-            if (gamepad1.a) {
+            aButtonCurPressed = gamepad1.a;
+            if (aButtonCurPressed && !aButtonPrevPressed) {
+                //turn on the fly wheels
 
+                //make the launch servo push the ring into the fly wheels
+
+                //turn off the fly wheels
+
+                //put the launch servo back to ready the next shot
             }
+            aButtonPrevPressed = aButtonCurPressed;
 
             //////D-Pad bindings/////
-            //elevate and lower
-            if (gamepad1.dpad_up) {
-
+            //elevate and lower (max is 40degrees, min is 0)
+            currentTurretPitch=robot.turretElevator.getCurrentPosition() * robot.GO_BILDA_RADIANS_PER_COUNTS;
+            if (gamepad1.dpad_up && currentTurretHeading < Math.toRadians(40)) {
+                //elevate turret (+ power)
+                robot.turretElevator.setPower(0.5);
             }
-            else if (gamepad1.dpad_down) {
-
+            else if (gamepad1.dpad_down && currentTurretHeading > Math.toRadians(0)) {
+                //lower turret (- power)
+                robot.turretElevator.setPower(-0.5);
             }
-            //rotate
-            if (gamepad1.dpad_left) {
-
+            else {
+                //stop elevation
+                robot.turretElevator.setPower(0);
             }
-            else if (gamepad1.dpad_right) {
 
+            //rotate (max is 180, min is -180 (basically, don't let then wrap up the wires by repeatedly rotating the turret in one direction
+            currentTurretHeading=robot.turretRotator.getCurrentPosition() * robot.CORE_HEX_RADIANS_PER_COUNTS;
+            if (gamepad1.dpad_left && currentTurretHeading > -Math.PI) {
+                //rotate the turret to the left (- power), if that wouldn't put it past the max distance
+                robot.turretRotator.setPower(-0.5);
             }
+            else if (gamepad1.dpad_right && currentTurretHeading < Math.PI) {
+                //rotate the turret to the right (+ power)
+                robot.turretRotator.setPower(0.5);
+            }
+            else {
+                //stop the rotation
+                robot.turretRotator.setPower(0);
+            }
+
+            //////thumbstick bindings/////
+            tankControls(gamepad1.right_stick_y, gamepad1.left_stick_y);
 
             //tell the user how many rings, and how much time they have remaining
             telemetry.addData("rings remaining: ", ringsLeft);
@@ -98,106 +123,29 @@ public class teleOpOutreach  extends LinearOpMode {
         }
 
         ////////////after driver presses stop////////////
+        //tell the user that the game is over
         telemetry.clearAll();
         telemetry.addLine("GAME OVER");
         telemetry.addLine("thanks for playing :D");
         telemetry.update();
 
+        //put all the turret stuff back to default positions
+        robot.runMotorToPosition(robot.turretRotator, 0, 0.25);
+        robot.runMotorToPosition(robot.turretElevator,0,0.25);
+
+        //sleep for 5 seconds
         sleep(5000);
     }
 
     ////////////other methods and whatnot below here////////////
-    /**
-     * modification of the other rotateTurret method, this one disregards the robots heading
-     * given the angle relative to the robot, move the turret to that angle
-     * @param angle angle relative to robot
-     * @return if the target angle in in a dead zone, it returns -1, otherwise it returns 0 and rotates the turret to the needed position
-     */
-    public int rotateTurretTo(double angle) {
-        double targetPosition;
+    public void tankControls(double left, double right){
+        //only care about the tenths digit (ex: if left = 0.9742, after this it'll equal 0.9)
+        left -= left % 0.1;
+        right -= right % 0.1;
 
-        //heading relative to field -> heading relative to the robot
-        targetPosition = angle;
-        //check if heading rel. to robot is in the deadzone, if so, return -1
-        if (targetPosition > Math.toRadians(60) || targetPosition < -Math.toRadians(45)) {rotateTurretTo(0); return -1;}
-        currentTurretHeading = Math.toDegrees(targetPosition);
-        //convert the heading rel. to robot into the needed encoder counts
-        targetPosition /= robot.CORE_HEX_RADIANS_PER_COUNTS;
-        //make sure that the robot rotates the best direction to reach goal
-
-        //rotate to that position and return 0
-        robot.runMotorToPosition(robot.turretRotator, (int) targetPosition, 0.5);
-        return 0;
+        //assign movement
+        robot.leftDrive.setPower(-left); //negative bc the y-axis of the thumbsticks is inverted
+        robot.rightDrive.setPower(-right);
     }
-
-
-    /**
-     * given the angle relative to the horizontal, move the turret to elevate to that pitch
-     * @param angle desired angle of pitch
-     * @return if the target angle in in a dead zone, it returns -1, otherwise it returns 0 and elevates the turret to the needed position
-     */
-    public double elevateTurretTo(double angle) {
-        /* basic layout
-        -return -1 if something went wrong, or the desired angle is impossible
-        -elevate to position
-        -return 0, to show that nothing went wrong
-
-        more detail
-        -get the needed pitch to the target from the AimManager
-        -calculate what position the elevation servo needs to rotate to in order the acheive that pitch (trig)
-        -if that position is a deadzone, would be blocked by other parts of the robot, or is otherwise not safe to move toward, return -1, terminating this process
-        -if that position is able to be rotated to, then do that, and return 0
-         */
-        /*
-        2 options, find a function to calculate the required angle, or use iteration https://www.desmos.com/calculator/omowmwxgj2
-         */
-        //iteration
-        //reset the global values that control the iteration
-        elevationStep = 1;
-        elevationLastGuessDegrees = BigDecimal.ZERO;
-        elevationGuessOffset = 1;
-        //logic statement to make sure that the given target angle of the turret is possible, code in when range of motion is known (if (out of bounds) return -1;
-        if (angle > Math.toRadians(40) || angle < 0) {elevateTurretTo(0); return -1;} // if the angle is greater than 40 degrees, or less than zero, stop, reset and return -1,
-
-        //iterate and save
-        BigDecimal targetPos = elevationCalculationIteration(angle); // in radians
-        currentTurretPitch = Math.toDegrees(angle);
-        //convert the target pos to a value in encoder counts
-        targetPos = targetPos.divide(BigDecimal.valueOf(robot.GO_BILDA_RADIANS_PER_COUNTS), elevationMC); // in encoder counts
-
-        robot.runMotorToPosition(robot.turretElevator, targetPos.intValue(), 0.5);
-        return 0;
-    }
-    /**
-     * this function uses iteration to find the optimal position to move the elevator motor to in order to elevate the turret to a given angle,
-     * this function works best when working with degrees so it takes an input and gives an output in radians, while using degrees for internal calculations
-     * @param targetAngle the angle, in radians
-     * @return the angle to move the elevator to, in radians
-     */
-    public BigDecimal elevationCalculationIteration (double targetAngle) {
-        while (elevationGuessOffsetCalculation(-targetAngle, Math.toRadians(-elevationLastGuessDegrees.doubleValue())) > 0) { //convert the target angle, and the guess, to radians in the call to the elevationGuessOffsetCalculation() method, this is because trig in java is done in radians
-            elevationLastGuessDegrees = elevationLastGuessDegrees.add(BigDecimal.valueOf(elevationStep), elevationMC);
-        }
-        elevationLastGuessDegrees = elevationLastGuessDegrees.subtract(BigDecimal.valueOf(elevationStep), elevationMC);
-
-        if (!(Math.abs(elevationGuessOffset) < 0.00001 || elevationStep < 0.0001)) { //skip iteration if the offset is close enough to zero, or it has iterated past 4 decimal places
-            elevationStep /= 10;
-            elevationCalculationIteration(targetAngle);
-        }
-
-        return (elevationLastGuessDegrees.multiply(BigDecimal.valueOf(Math.PI), elevationMC)).divide(BigDecimal.valueOf(180), elevationMC);
-    }
-    public double elevationGuessOffsetCalculation (double targetAngle, double currentGuess) {
-        double x1 = Math.sin(targetAngle) * .02;
-        double y1 = Math.cos(targetAngle) * .02;
-        double x2 = Math.sin(currentGuess) * .02 + 0.0762;
-        double y2 = Math.cos(currentGuess) * .02;
-        double x3 = Math.cos(currentGuess) * .09525 + x2;
-        double y3 = -Math.sin(currentGuess) * .09525 + y2;
-
-        elevationGuessOffset = (y1 / x1) + ((x1-x3) / (y1-y3));
-        return elevationGuessOffset;
-    }
-
 }
 

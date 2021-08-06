@@ -72,48 +72,54 @@ public class teleOpOutreach  extends LinearOpMode {
             //fire turret
             aButtonCurPressed = gamepad1.a;
             if (aButtonCurPressed && !aButtonPrevPressed) {
+                //reload
+                robot.turretLauncher.setPosition(0.4);
+
+                sleep(300);
+
                 //turn on the fly wheels
                 robot.flyWheel1.setPower(0.5);
                 robot.flyWheel2.setPower(0.5);
 
-                sleep(500);
+                sleep(900);
                 //make the launch servo push the ring into the fly wheels
                 robot.turretLauncher.setPosition(1);
+                sleep(300);
 
                 //turn off the fly wheels
-                robot.flyWheel1.setPower(0.5);
-                robot.flyWheel2.setPower(0.5);
+                robot.flyWheel1.setPower(0);
+                robot.flyWheel2.setPower(0);
 
-                //put the launch servo back to ready the next shot
-                robot.turretLauncher.setPosition(0.4);
+
             }
             aButtonPrevPressed = aButtonCurPressed;
 
             //////D-Pad bindings/////
-            //elevate and lower (max is 40degrees, min is 0)
+            //elevate and lower (max is 30degrees, min is 0)
+            //30 degrees for the turret may need to be 55 degrees for the elevator
             currentTurretPitch=robot.turretElevator.getCurrentPosition() * robot.GO_BILDA_RADIANS_PER_COUNTS;
-            if (gamepad1.dpad_up && currentTurretHeading < Math.toRadians(40)) {
+            if (gamepad1.dpad_up && currentTurretHeading < Math.toRadians(30)) {
                 //elevate turret (+ power)
-                robot.turretElevator.setPower(0.5);
+                robot.turretElevator.setPower(0.25);
             }
             else if (gamepad1.dpad_down && currentTurretHeading > Math.toRadians(0)) {
                 //lower turret (- power)
-                robot.turretElevator.setPower(-0.5);
+                robot.turretElevator.setPower(-0.25);
             }
             else {
                 //stop elevation
                 robot.turretElevator.setPower(0);
             }
 
-            //rotate (max is 180, min is -180 (basically, don't let then wrap up the wires by repeatedly rotating the turret in one direction
+            //rotate (max is 135, min is -135 (basically, don't let then wrap up the wires by repeatedly rotating the turret in one direction
             currentTurretHeading=robot.turretRotator.getCurrentPosition() * robot.CORE_HEX_RADIANS_PER_COUNTS;
-            if (gamepad1.dpad_left && currentTurretHeading > -Math.PI) {
+            if (gamepad1.dpad_left && currentTurretHeading > -0.75 * Math.PI) {
                 //rotate the turret to the left (- power), if that wouldn't put it past the max distance
-                robot.turretRotator.setPower(-0.5);
+                robot.turretRotator.setPower(-0.25);
             }
-            else if (gamepad1.dpad_right && currentTurretHeading < Math.PI) {
+            else if (gamepad1.dpad_right && currentTurretHeading < 0.75 * Math.PI) {
                 //rotate the turret to the right (+ power)
-                robot.turretRotator.setPower(0.5);
+                robot.turretRotator.setPower(0.25);
             }
             else {
                 //stop the rotation

@@ -217,7 +217,7 @@ public class HardwareOutreach{
         turretLauncher = hwMap.get(Servo.class, "turretLaunchServo");
         // Set start positions for ALL installed servos
         //1 = firing position; 0.4 = reload
-        turretLauncher.setPosition(0.4);
+        turretLauncher.setPosition(1);
 
     }
     //sensors

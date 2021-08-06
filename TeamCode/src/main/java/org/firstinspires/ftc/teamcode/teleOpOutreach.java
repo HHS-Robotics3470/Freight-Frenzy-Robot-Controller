@@ -73,12 +73,19 @@ public class teleOpOutreach  extends LinearOpMode {
             aButtonCurPressed = gamepad1.a;
             if (aButtonCurPressed && !aButtonPrevPressed) {
                 //turn on the fly wheels
+                robot.flyWheel1.setPower(0.5);
+                robot.flyWheel2.setPower(0.5);
 
+                sleep(500);
                 //make the launch servo push the ring into the fly wheels
+                robot.turretLauncher.setPosition(1);
 
                 //turn off the fly wheels
+                robot.flyWheel1.setPower(0.5);
+                robot.flyWheel2.setPower(0.5);
 
                 //put the launch servo back to ready the next shot
+                robot.turretLauncher.setPosition(0.4);
             }
             aButtonPrevPressed = aButtonCurPressed;
 
@@ -132,6 +139,8 @@ public class teleOpOutreach  extends LinearOpMode {
         //put all the turret stuff back to default positions
         robot.runMotorToPosition(robot.turretRotator, 0, 0.25);
         robot.runMotorToPosition(robot.turretElevator,0,0.25);
+        robot.turretLauncher.setPosition(0.4);
+        tankControls(0,0);
 
         //sleep for 5 seconds
         sleep(5000);

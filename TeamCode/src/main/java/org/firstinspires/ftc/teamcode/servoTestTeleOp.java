@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-@TeleOp(name="servo tester", group="opmode group goes here" )
+@TeleOp(name="servo tester", group="testing" )
 @Disabled
 //this line disables the teleop from appearing on the driver station, remove it for your code
 public class servoTestTeleOp extends LinearOpMode {
@@ -70,5 +70,5 @@ public class servoTestTeleOp extends LinearOpMode {
     }
 
     ////////////other methods and whatnot below here////////////
-    
+
 }

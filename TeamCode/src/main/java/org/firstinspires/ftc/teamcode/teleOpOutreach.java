@@ -131,11 +131,11 @@ public class teleOpOutreach  extends LinearOpMode {
             //////thumbstick bindings/////
             tankControls(gamepad1.right_stick_y, gamepad1.left_stick_y);
 
-            //temp diagnostics
+            /*//temp diagnostics
             telemetry.addData("turret heading", Math.toDegrees(currentTurretHeading));
             telemetry.addData("turret pitch", Math.toDegrees(currentTurretPitch));
             telemetry.addData("elevation encoder count", robot.turretElevator.getCurrentPosition());
-
+            */
 
             //tell the user how many rings, and how much time they have remaining
             telemetry.addData("rings remaining: ", ringsLeft);

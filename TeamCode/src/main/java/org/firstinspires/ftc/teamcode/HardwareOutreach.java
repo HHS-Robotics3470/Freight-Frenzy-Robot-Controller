@@ -30,7 +30,7 @@ import java.io.File;
         for the robot, heading of 0 means that it's facing to the right (POV: you're looking toward the far side of the field (far side meaning the side opposite to the side the robot starts on))
         for the horiz odometry, + change should mean turning CCW
                                 - change should mean turning CW
-    for the robots turret, negative headings mean port-side, positive are starboard-side
+    for the robots turret, negative headings mean port-side, positive are starboard-side, 0 is towards the front, the front is the side with the large 3470
     Coords format: x,y,z
     * origin (0,0,0) : defined (for now) as where the robot starts, once we know what the event will be the origin will be set to the middle of the field
     *      field x bounds []
@@ -216,8 +216,8 @@ public class HardwareOutreach{
         // Define and initialize ALL installed servos.
         turretLauncher = hwMap.get(Servo.class, "turretLaunchServo");
         // Set start positions for ALL installed servos
-        //1 = firing position; 0.4 = reload
-        turretLauncher.setPosition(1);
+        //.7 = firing position; 0.4 = reload
+        turretLauncher.setPosition(.7);
 
     }
     //sensors

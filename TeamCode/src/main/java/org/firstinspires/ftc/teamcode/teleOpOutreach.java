@@ -37,7 +37,10 @@ public class teleOpOutreach  extends LinearOpMode {
     {
         ////////////before driver presses play////////////
         //Variables
-
+        //these variables control the max power of various components
+        double flywheelSpeed = 0.75;
+        double elevatorSpeed = 0.25;
+        double rotationSpeed = 0.25;
 
         /* Initialize the hardware variables.
          * The init() method of the hardware class does all the work here
@@ -75,22 +78,21 @@ public class teleOpOutreach  extends LinearOpMode {
                 //reload
                 robot.turretLauncher.setPosition(0.4);
 
-                sleep(300);
-
                 //turn on the fly wheels
-                robot.flyWheel1.setPower(0.5);
-                robot.flyWheel2.setPower(0.5);
+                robot.flyWheel1.setPower(flywheelSpeed);
+                robot.flyWheel2.setPower(flywheelSpeed);
+                sleep(700);
 
-                sleep(900);
                 //make the launch servo push the ring into the fly wheels
-                robot.turretLauncher.setPosition(1);
+                robot.turretLauncher.setPosition(0.7);
                 sleep(300);
 
                 //turn off the fly wheels
                 robot.flyWheel1.setPower(0);
                 robot.flyWheel2.setPower(0);
 
-
+                //update ring count
+                ringsLeft --;
             }
             aButtonPrevPressed = aButtonCurPressed;
 
@@ -98,13 +100,13 @@ public class teleOpOutreach  extends LinearOpMode {
             //elevate and lower (max is 30degrees, min is 0)
             //30 degrees for the turret may need to be 55 degrees for the elevator
             currentTurretPitch=robot.turretElevator.getCurrentPosition() * robot.GO_BILDA_RADIANS_PER_COUNTS;
-            if (gamepad1.dpad_up && currentTurretHeading < Math.toRadians(30)) {
+            if (gamepad1.dpad_up && currentTurretPitch < Math.toRadians(50)) {
                 //elevate turret (+ power)
-                robot.turretElevator.setPower(0.25);
+                robot.turretElevator.setPower(elevatorSpeed);
             }
-            else if (gamepad1.dpad_down && currentTurretHeading > Math.toRadians(0)) {
+            else if (gamepad1.dpad_down && currentTurretPitch > 0) {
                 //lower turret (- power)
-                robot.turretElevator.setPower(-0.25);
+                robot.turretElevator.setPower(-elevatorSpeed);
             }
             else {
                 //stop elevation
@@ -115,11 +117,11 @@ public class teleOpOutreach  extends LinearOpMode {
             currentTurretHeading=robot.turretRotator.getCurrentPosition() * robot.CORE_HEX_RADIANS_PER_COUNTS;
             if (gamepad1.dpad_left && currentTurretHeading > -0.75 * Math.PI) {
                 //rotate the turret to the left (- power), if that wouldn't put it past the max distance
-                robot.turretRotator.setPower(-0.25);
+                robot.turretRotator.setPower(-rotationSpeed);
             }
             else if (gamepad1.dpad_right && currentTurretHeading < 0.75 * Math.PI) {
                 //rotate the turret to the right (+ power)
-                robot.turretRotator.setPower(0.25);
+                robot.turretRotator.setPower(rotationSpeed);
             }
             else {
                 //stop the rotation
@@ -128,6 +130,12 @@ public class teleOpOutreach  extends LinearOpMode {
 
             //////thumbstick bindings/////
             tankControls(gamepad1.right_stick_y, gamepad1.left_stick_y);
+
+            //temp diagnostics
+            telemetry.addData("turret heading", Math.toDegrees(currentTurretHeading));
+            telemetry.addData("turret pitch", Math.toDegrees(currentTurretPitch));
+            telemetry.addData("elevation encoder count", robot.turretElevator.getCurrentPosition());
+
 
             //tell the user how many rings, and how much time they have remaining
             telemetry.addData("rings remaining: ", ringsLeft);
@@ -145,7 +153,7 @@ public class teleOpOutreach  extends LinearOpMode {
         //put all the turret stuff back to default positions
         robot.runMotorToPosition(robot.turretRotator, 0, 0.25);
         robot.runMotorToPosition(robot.turretElevator,0,0.25);
-        robot.turretLauncher.setPosition(0.4);
+        robot.turretLauncher.setPosition(0.7);
         tankControls(0,0);
 
         //sleep for 5 seconds

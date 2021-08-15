@@ -119,6 +119,9 @@ public class HardwareOutreach{
     public final double GO_BILDA_DRIVE_GEAR_REDUCTION   = 1; // This is < 1.0 if geared UP
     public final double GO_BILDA_RADIANS_PER_COUNTS     = (2 * Math.PI) / (GO_BILDA_COUNTS_PER_MOTOR_REV * GO_BILDA_DRIVE_GEAR_REDUCTION); //  radians per rotation / effective counts per rotation
 
+    // positions for the servo
+    public final double LAUNCHER_RELOAD_POS = 0.7;
+    public final double LAUNCHER_FIRE_POS = 1;
 
     ////////////////////////////// Constructors and init method //////////////////////////////
     /* --Constructors-- */
@@ -216,8 +219,7 @@ public class HardwareOutreach{
         // Define and initialize ALL installed servos.
         turretLauncher = hwMap.get(Servo.class, "turretLaunchServo");
         // Set start positions for ALL installed servos
-        //.7 = firing position; 0.4 = reload
-        turretLauncher.setPosition(.7);
+        turretLauncher.setPosition(LAUNCHER_FIRE_POS);
 
     }
     //sensors

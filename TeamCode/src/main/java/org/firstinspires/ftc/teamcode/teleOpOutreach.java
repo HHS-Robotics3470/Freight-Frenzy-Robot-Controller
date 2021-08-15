@@ -23,8 +23,8 @@ public class teleOpOutreach  extends LinearOpMode {
     double currentTurretPitch   = 0;
 
     //game control variables
-    int ringsLeft = 5; //TODO update this
-    int gameLengthSeconds = 5*60; //give them 5 minutes to play
+    int ringsLeft = 4; //TODO update this
+    int gameLengthSeconds = 3*60; //give them 3 minutes to play
 
     //button locks
     boolean aButtonCurPressed;
@@ -38,15 +38,15 @@ public class teleOpOutreach  extends LinearOpMode {
         ////////////before driver presses play////////////
         //Variables
         //these variables control the max power of various components
-        double flywheelSpeed = 0.75;
+        double flywheelSpeed = 1.0;
         double elevatorSpeed = 0.25;
         double rotationSpeed = 0.25;
+        double drivePowerMultiplier = 0.5;
 
         /* Initialize the hardware variables.
          * The init() method of the hardware class does all the work here
          */
         robot.init(hardwareMap);
-
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
@@ -76,7 +76,27 @@ public class teleOpOutreach  extends LinearOpMode {
             aButtonCurPressed = gamepad1.a;
             if (aButtonCurPressed && !aButtonPrevPressed) {
                 //reload
-                robot.turretLauncher.setPosition(0.4);
+                robot.turretLauncher.setPosition(robot.LAUNCHER_RELOAD_POS);
+
+                //if above stable elevation, go to neutral to allow it to reload properly
+                if (currentTurretPitch < Math.toRadians(30)) {
+                    //move to neutral elevation
+                    robot.runMotorToPosition(
+                            robot.turretElevator,
+                            0,
+                            elevatorSpeed
+                    );
+
+                    //wait, then go back to normal
+                    sleep(200);
+
+                    //move back
+                    robot.runMotorToPosition(
+                            robot.turretElevator,
+                            (int)(currentTurretPitch/robot.GO_BILDA_RADIANS_PER_COUNTS),
+                            elevatorSpeed
+                    );
+                }
 
                 //turn on the fly wheels
                 robot.flyWheel1.setPower(flywheelSpeed);
@@ -84,7 +104,7 @@ public class teleOpOutreach  extends LinearOpMode {
                 sleep(700);
 
                 //make the launch servo push the ring into the fly wheels
-                robot.turretLauncher.setPosition(0.7);
+                robot.turretLauncher.setPosition(robot.LAUNCHER_FIRE_POS);
                 sleep(300);
 
                 //turn off the fly wheels
@@ -93,6 +113,7 @@ public class teleOpOutreach  extends LinearOpMode {
 
                 //update ring count
                 ringsLeft --;
+
             }
             aButtonPrevPressed = aButtonCurPressed;
 
@@ -129,8 +150,10 @@ public class teleOpOutreach  extends LinearOpMode {
             }
 
             //////thumbstick bindings/////
-            tankControls(gamepad1.right_stick_y, gamepad1.left_stick_y);
-
+            tankControls(
+                    gamepad1.right_bumper ? -0.2 : Math.pow(gamepad1.right_trigger,3),//-gamepad1.right_stick_y * drivePowerMultiplier,//negative bc the y-axis of the thumbsticks is inverted
+                    gamepad1.left_bumper ? -0.2 : Math.pow(gamepad1.left_trigger,3)//-gamepad1.left_stick_y * drivePowerMultiplier//negative bc the y-axis of the thumbsticks is inverted
+            );
             /*//temp diagnostics
             telemetry.addData("turret heading", Math.toDegrees(currentTurretHeading));
             telemetry.addData("turret pitch", Math.toDegrees(currentTurretPitch));
@@ -151,9 +174,9 @@ public class teleOpOutreach  extends LinearOpMode {
         telemetry.update();
 
         //put all the turret stuff back to default positions
-        robot.runMotorToPosition(robot.turretRotator, 0, 0.25);
-        robot.runMotorToPosition(robot.turretElevator,0,0.25);
-        robot.turretLauncher.setPosition(0.7);
+        robot.runMotorToPosition(robot.turretRotator, 0, rotationSpeed);
+        robot.runMotorToPosition(robot.turretElevator,0, elevatorSpeed);
+        robot.turretLauncher.setPosition(robot.LAUNCHER_FIRE_POS);
         tankControls(0,0);
 
         //sleep for 5 seconds
@@ -162,13 +185,13 @@ public class teleOpOutreach  extends LinearOpMode {
 
     ////////////other methods and whatnot below here////////////
     public void tankControls(double left, double right){
-        //only care about the tenths digit (ex: if left = 0.9742, after this it'll equal 0.9)
-        left -= left % 0.1;
-        right -= right % 0.1;
+        //only care about the hundreths digit (ex: if left = 0.9742, after this it'll equal 0.97)
+        left -= left % 0.01;
+        right -= right % 0.01;
 
         //assign movement
-        robot.leftDrive.setPower(-left); //negative bc the y-axis of the thumbsticks is inverted
-        robot.rightDrive.setPower(-right);
+        robot.leftDrive.setPower(left);
+        robot.rightDrive.setPower(right);
     }
 }
 

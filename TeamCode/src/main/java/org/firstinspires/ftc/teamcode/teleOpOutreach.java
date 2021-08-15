@@ -55,7 +55,6 @@ public class teleOpOutreach  extends LinearOpMode {
         ////////////after driver presses play////////////
         //maybe some other set up stuff depending on how we want to do this
 
-
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive() && ringsLeft > 0 && (int)runtime.seconds() <= gameLengthSeconds) {
             //controls
@@ -69,7 +68,8 @@ public class teleOpOutreach  extends LinearOpMode {
                 d-pad left  - rotate turret CCW
                 d-pad right - rotate turret CW
 
-            thumbsticks will control movement
+            right/left trigger/bumper control left/right forward/backward movement respectively
+            //thumbsticks will control movement
             */
             //////ABXY bindings/////
             //fire turret
@@ -151,14 +151,18 @@ public class teleOpOutreach  extends LinearOpMode {
 
             //////thumbstick bindings/////
             tankControls(
-                    gamepad1.right_bumper ? -0.2 : Math.pow(gamepad1.right_trigger,3),//-gamepad1.right_stick_y * drivePowerMultiplier,//negative bc the y-axis of the thumbsticks is inverted
-                    gamepad1.left_bumper ? -0.2 : Math.pow(gamepad1.left_trigger,3)//-gamepad1.left_stick_y * drivePowerMultiplier//negative bc the y-axis of the thumbsticks is inverted
+                    gamepad1.right_bumper ? -0.2 : gamepad1.right_trigger,//Math.pow(gamepad1.right_trigger,3),//-gamepad1.right_stick_y * drivePowerMultiplier,//negative bc the y-axis of the thumbsticks is inverted
+                    gamepad1.left_bumper ? -0.2 : gamepad1.left_trigger//Math.pow(gamepad1.left_trigger,3)//-gamepad1.left_stick_y * drivePowerMultiplier//negative bc the y-axis of the thumbsticks is inverted
             );
             /*//temp diagnostics
             telemetry.addData("turret heading", Math.toDegrees(currentTurretHeading));
             telemetry.addData("turret pitch", Math.toDegrees(currentTurretPitch));
             telemetry.addData("elevation encoder count", robot.turretElevator.getCurrentPosition());
             */
+
+            //if the user presses the back button, end the loop
+            if (gamepad1.back) break;
+
 
             //tell the user how many rings, and how much time they have remaining
             telemetry.addData("rings remaining: ", ringsLeft);

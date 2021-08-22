@@ -151,8 +151,8 @@ public class teleOpOutreach  extends LinearOpMode {
 
             //////thumbstick bindings/////
             tankControls(
-                    gamepad1.right_bumper ? -0.2 : gamepad1.right_trigger,//Math.pow(gamepad1.right_trigger,3),//-gamepad1.right_stick_y * drivePowerMultiplier,//negative bc the y-axis of the thumbsticks is inverted
-                    gamepad1.left_bumper ? -0.2 : gamepad1.left_trigger//Math.pow(gamepad1.left_trigger,3)//-gamepad1.left_stick_y * drivePowerMultiplier//negative bc the y-axis of the thumbsticks is inverted
+                    -gamepad1.right_stick_y * drivePowerMultiplier,//negative bc the y-axis of the thumbsticks is inverted//gamepad1.right_bumper ? -0.2 : gamepad1.right_trigger,//Math.pow(gamepad1.right_trigger,3),
+                    -gamepad1.left_stick_y * drivePowerMultiplier//negative bc the y-axis of the thumbsticks is inverted//gamepad1.left_bumper ? -0.2 : gamepad1.left_trigger//Math.pow(gamepad1.left_trigger,3)
             );
             /*//temp diagnostics
             telemetry.addData("turret heading", Math.toDegrees(currentTurretHeading));
@@ -196,6 +196,7 @@ public class teleOpOutreach  extends LinearOpMode {
         //assign movement
         robot.leftDrive.setPower(left);
         robot.rightDrive.setPower(right);
+
     }
 }
 

@@ -150,9 +150,13 @@ public class teleOpOutreach  extends LinearOpMode {
             }
 
             //////thumbstick bindings/////
+            /*tankControls(
+                    -gamepad1.right_stick_y * drivePowerMultiplier,//negative bc the y-axis of the thumbsticks is inverted//gamepad1.right_bumper ? -0.2 : gamepad1.right_trigger,
+                    -gamepad1.left_stick_y * drivePowerMultiplier//negative bc the y-axis of the thumbsticks is inverted//gamepad1.left_bumper ? -0.2 : gamepad1.left_trigger
+            );*/
             tankControls(
-                    -gamepad1.right_stick_y * drivePowerMultiplier,//negative bc the y-axis of the thumbsticks is inverted//gamepad1.right_bumper ? -0.2 : gamepad1.right_trigger,//Math.pow(gamepad1.right_trigger,3),
-                    -gamepad1.left_stick_y * drivePowerMultiplier//negative bc the y-axis of the thumbsticks is inverted//gamepad1.left_bumper ? -0.2 : gamepad1.left_trigger//Math.pow(gamepad1.left_trigger,3)
+                     -drivePowerMultiplier*( (gamepad1.right_stick_y>0) ? ( (Math.pow(4,gamepad1.right_stick_y)-1)/3.0 ) : ( -(Math.pow(4,-gamepad1.right_stick_y)-1)/3.0) ),
+                    -drivePowerMultiplier*( (gamepad1.left_stick_y >0) ? ( (Math.pow(4,gamepad1.left_stick_y )-1)/3.0 ) : ( -(Math.pow(4,-gamepad1.left_stick_y )-1)/3.0) )
             );
             /*//temp diagnostics
             telemetry.addData("turret heading", Math.toDegrees(currentTurretHeading));
@@ -189,9 +193,9 @@ public class teleOpOutreach  extends LinearOpMode {
 
     ////////////other methods and whatnot below here////////////
     public void tankControls(double left, double right){
-        //only care about the hundreths digit (ex: if left = 0.9742, after this it'll equal 0.97)
-        left -= left % 0.01;
-        right -= right % 0.01;
+        //only care about the tenths digit (ex: if left = 0.9742, after this it'll equal 0.9)
+        left -= left % 0.1;
+        right -= right % 0.1;
 
         //assign movement
         robot.leftDrive.setPower(left);

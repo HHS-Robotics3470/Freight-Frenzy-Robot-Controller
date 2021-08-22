@@ -38,9 +38,9 @@ public class teleOpOutreach  extends LinearOpMode {
         ////////////before driver presses play////////////
         //Variables
         //these variables control the max power of various components
-        double flywheelSpeed = 1.0;
+        double flywheelSpeed = .75;
         double elevatorSpeed = 0.25;
-        double rotationSpeed = 0.25;
+        double rotationSpeed = 0.1;
         double drivePowerMultiplier = 0.5;
 
         /* Initialize the hardware variables.
@@ -78,25 +78,22 @@ public class teleOpOutreach  extends LinearOpMode {
                 //reload
                 robot.turretLauncher.setPosition(robot.LAUNCHER_RELOAD_POS);
 
-                //if above stable elevation, go to neutral to allow it to reload properly
-                if (currentTurretPitch < Math.toRadians(30)) {
-                    //move to neutral elevation
-                    robot.runMotorToPosition(
-                            robot.turretElevator,
-                            0,
-                            elevatorSpeed
-                    );
+                //move to neutral elevation
+                robot.runMotorToPosition(
+                        robot.turretElevator,
+                        0,
+                        elevatorSpeed
+                );
 
-                    //wait, then go back to normal
-                    sleep(200);
+                //wait, then go back to normal
+                sleep(200);
 
-                    //move back
-                    robot.runMotorToPosition(
-                            robot.turretElevator,
-                            (int)(currentTurretPitch/robot.GO_BILDA_RADIANS_PER_COUNTS),
-                            elevatorSpeed
-                    );
-                }
+                //move back
+                robot.runMotorToPosition(
+                        robot.turretElevator,
+                        (int)(currentTurretPitch/robot.GO_BILDA_RADIANS_PER_COUNTS),
+                        elevatorSpeed
+                );
 
                 //turn on the fly wheels
                 robot.flyWheel1.setPower(flywheelSpeed);

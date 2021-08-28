@@ -1,19 +1,11 @@
 package org.firstinspires.ftc.teamcode;
 
-import android.app.Activity;
-import android.graphics.Color;
-import android.view.View;
-
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import java.math.BigDecimal;
-import java.math.MathContext;
-
 @TeleOp(name="TeleOP For Internal Testing", group="Outreach")
-public class teleOpOutreach  extends LinearOpMode {
+public class teleOpOutreachInternal extends LinearOpMode {
     /*declare OpMode members, initialize some classes*/
     HardwareOutreach robot          = new HardwareOutreach();
     ElapsedTime runtime     = new ElapsedTime();
@@ -24,7 +16,7 @@ public class teleOpOutreach  extends LinearOpMode {
 
     //game control variables
     int ringsLeft = 4; //TODO update this
-    int gameLengthSeconds = 3*60; //give them 3 minutes to play
+    int gameLengthSeconds = 300*60; //give them 3 minutes to play
 
     //button locks
     boolean aButtonCurPressed;
@@ -109,7 +101,7 @@ public class teleOpOutreach  extends LinearOpMode {
                 robot.flyWheel2.setPower(0);
 
                 //update ring count
-                ringsLeft --;
+//                ringsLeft --;
 
             }
             aButtonPrevPressed = aButtonCurPressed;

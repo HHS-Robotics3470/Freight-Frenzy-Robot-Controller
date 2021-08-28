@@ -12,7 +12,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import java.math.BigDecimal;
 import java.math.MathContext;
 
-@TeleOp(name="TeleOP For Internal Testing", group="Outreach")
+@TeleOp(name="TeleOP For Outreach", group="Outreach")
 public class teleOpOutreach  extends LinearOpMode {
     /*declare OpMode members, initialize some classes*/
     HardwareOutreach robot          = new HardwareOutreach();

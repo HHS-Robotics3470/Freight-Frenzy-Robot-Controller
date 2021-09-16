@@ -42,8 +42,13 @@ public class rallyTeleOp extends LinearOpMode {
             turn  =  gamepad1.right_stick_x/3.0;
 
             // Combine drive and turn for blended motion.
+<<<<<<< HEAD
             left  = drive - turn;
             right = drive + turn;
+=======
+            left  = drive + turn;
+            right = drive - turn;
+>>>>>>> outreachbotDONTMERGE
 
             // Normalize the values so neither exceed +/- 1.0
             max = Math.max(Math.abs(left), Math.abs(right));
@@ -59,8 +64,11 @@ public class rallyTeleOp extends LinearOpMode {
         }
 
         ////////////after driver presses stop////////////
+<<<<<<< HEAD
         robot.leftDrive.setPower(0);
         robot.rightDrive.setPower(0);
+=======
+>>>>>>> outreachbotDONTMERGE
     }
 
     ////////////other methods and whatnot below here////////////

@@ -47,7 +47,7 @@ gamepad joystick signs
       y-neg
         ___
       /  |  \
-x-neg|---+---|pos
+x-neg|---+---|x-pos
       \__|__/
        y-pos
  */

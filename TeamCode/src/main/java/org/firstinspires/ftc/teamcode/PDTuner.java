@@ -11,7 +11,7 @@ import java.util.ArrayList;
 this opmode should tune the strafing PID's using a manual method
  */
 @TeleOp(name="PD Tuner", group = "Testing")
-//@Disabled
+@Disabled
 public class PDTuner extends LinearOpMode {
     /*declare OpMode members, initialize some classes*/
     Hardware robot          = new Hardware();

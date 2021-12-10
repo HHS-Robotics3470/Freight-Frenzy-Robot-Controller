@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 @Autonomous(name = "PID Demo Auto", group = "Demos")
-//@Disabled
+@Disabled
 public class PIDDemoAuto extends LinearOpMode {
     /*declare OpMode members, initialize some classes*/
     Hardware robot          = new Hardware();

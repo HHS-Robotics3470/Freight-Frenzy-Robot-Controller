@@ -1,13 +1,11 @@
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-@TeleOp(name="teleOpProgramTemplate")
-@Disabled //this line disables the teleop from appearing on the driver station, remove it for your code
-public class teleOpProgramTemplate extends LinearOpMode {
+@TeleOp(name="mecanum TeleOp", group="Competition")
+public class MecanumTeleOp extends LinearOpMode {
     /*declare OpMode members, initialize some classes*/
     Hardware robot          = new Hardware();
     ElapsedTime runtime     = new ElapsedTime();
@@ -18,6 +16,10 @@ public class teleOpProgramTemplate extends LinearOpMode {
     {
         ////////////before driver presses play////////////
         //Variables
+
+        //button locks
+        boolean aC, bC, yC, xC, upC, downC; //currently pressed
+        boolean aP = false, bP = false, yP = false, xP = false, upP = false, downP = false; //previously pressed
 
 
         /* Initialize the hardware variables.
@@ -36,28 +38,24 @@ public class teleOpProgramTemplate extends LinearOpMode {
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
-             /* CONTROLS
+            /* CONTROLS
             joysticks: movement
-                left joystick:
-                right joystick:
+                left joystick: strafe
+                right joystick: rotation
 
-            triggers and bumpers:
-                left trigger:
-                right trigger:
-                left bumper:
-                right bumper:
+            triggers and bumpers: unassigned
 
-            ABYX:
-                A:
-                B:
-                Y:
-                X:
+            ABYX: special functions
+                A: grap item w/ input servo (open/close input servo)
+                B: flip intake and drop off in output basket (retract if neccessary)
+                Y: if output flipper is extended, retract, otherwise extend to flat
+                X: drop item off (open/close output servo)
 
             D-Pad:
-                Up:
-                Down:
-                Left:
-                Right:
+                Up: if output flipper is extended flat, go to extended up; if output flipper is extended down, go to extended flat; if output flipper is retracted, extend flat
+                Down: if output flipper is extended flat, go to extended down; if output flipper is extended up, go to extended flat; if output flipper is retracted, extend flat
+                Left: extend cascade kit
+                Right: retract cascade kit
 
              */
 
@@ -66,6 +64,8 @@ public class teleOpProgramTemplate extends LinearOpMode {
             /////TRIGGERS AND BUMPERS/////
 
             /////ABXY/////
+            //A
+
 
             /////D-Pad/////
 

@@ -11,8 +11,8 @@ import java.util.ArrayList;
 this opmode should tune the strafing PID's using the Ziegler-Nichols method
 
  */
-@TeleOp(name="PID Tuner")
-//@Disabled
+@TeleOp(name="PID Tuner", group = "Testing")
+@Disabled
 public class PIDTuner extends LinearOpMode {
     /*declare OpMode members, initialize some classes*/
     Hardware robot          = new Hardware();

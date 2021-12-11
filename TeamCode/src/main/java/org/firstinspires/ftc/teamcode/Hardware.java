@@ -239,13 +239,13 @@ public class Hardware {
         // Define and initialize ALL installed servos.
         cascadeOutputServo = hwMap.get(Servo.class, "cascade_output_servo"); //closed 1, open to drop 0.75, open to receive 0.5
         cascadeFlipperServo = hwMap.get(Servo.class, "cascade_output_flipper_servo"); // retracted 0.125, extended flat 0.8, extended up 0.6, extended down 0.95
-        frontInputFlipperServo = hwMap.get(Servo.class, "front_input_flipper_servo"); //down 0, up 0.7
+        frontInputFlipperServo = hwMap.get(Servo.class, "front_input_flipper_servo"); //down 0.01, up 0.7
         frontInputServo = hwMap.get(Servo.class, "front_input_servo");//full open 0.3; half open 0.55; closed 0.72
 
         // Set start positions for ALL installed servos
         cascadeOutputServo.setPosition(1);
         cascadeFlipperServo.setPosition(0.125);
-        frontInputFlipperServo.setPosition(0);
+        frontInputFlipperServo.setPosition(0.01);
         frontInputServo.setPosition(0.3);
 
 

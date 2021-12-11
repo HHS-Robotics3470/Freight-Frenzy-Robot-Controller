@@ -104,33 +104,35 @@ public class MecanumTeleOp extends LinearOpMode {
                 robot.frontInputFlipperServo.setPosition(0.7);//TODO rotate input flipper to drop off position
                 sleep(700);
 
+                robot.cascadeOutputServo.setPosition(1); //close output
+                outputOpen = false;
                 robot.frontInputServo.setPosition(0.55); //open input
                 sleep(300);
 
-                robot.frontInputFlipperServo.setPosition(0);//TODO rotate input flipper to collection position
+                robot.frontInputFlipperServo.setPosition(0.01);//TODO rotate input flipper to collection position
                 robot.frontInputServo.setPosition(0.25); //fully open input
                 inputOpen = true;
-                robot.cascadeOutputServo.setPosition(1); //close output
-                outputOpen = false;
                 robot.runMotorToPosition(robot.cascadeLiftMotor, cascadeCount, 1); //extend cascade back to previous position
                 robot.cascadeFlipperServo.setPosition(outputFlipperPosition); //move output back to level it was at previously
                 //sleep(200);
             }
             //X
             if (xC&&!xP) {
-                if (outputOpen) {
-                    robot.cascadeOutputServo.setPosition(1);
+                if (outputOpen) { //if open
+                    robot.cascadeOutputServo.setPosition(1); //close
+                    outputOpen = false;
                 } else {
                     robot.cascadeOutputServo.setPosition(0.75);
+                    outputOpen = true;
                 }
             }
             //Y
             if (yC&&!yP) {
-                if (outputFlipperState != 0){
-                    robot.cascadeFlipperServo.setPosition(0.125);
+                if (outputFlipperState != 0){ //not retracted
+                    robot.cascadeFlipperServo.setPosition(0.125); //retract
                     outputFlipperState=0;
                 } else {
-                    robot.cascadeFlipperServo.setPosition(0.8);
+                    robot.cascadeFlipperServo.setPosition(0.8); //extend flat
                     outputFlipperState=1;
                 }
             }

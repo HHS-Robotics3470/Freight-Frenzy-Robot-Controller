@@ -273,7 +273,6 @@ public class Hardware {
     //webcam
     private void initWebcamAndVuforia() {
         //webcam
-        vuforiaWebcam = hwMap.get(WebcamName.class, "vuforia_webcam");
 
         //TODO: add vuforia configs adeel
     }

@@ -237,16 +237,16 @@ public class Hardware {
     //servos
     private void initServos() {
         // Define and initialize ALL installed servos.
-        cascadeOutputServo = hwMap.get(Servo.class, "cascade_output_servo"); //closed 1, open 0.75
-        cascadeFlipperServo = hwMap.get(Servo.class, "cascade_output_flipper_servo"); //extended flat 0.8, extended up 0.6, extended down 0.95, retracted 0.125
+        cascadeOutputServo = hwMap.get(Servo.class, "cascade_output_servo"); //closed 1, open to drop 0.75, open to receive 0.5
+        cascadeFlipperServo = hwMap.get(Servo.class, "cascade_output_flipper_servo"); // retracted 0.125, extended flat 0.8, extended up 0.6, extended down 0.95
         frontInputFlipperServo = hwMap.get(Servo.class, "front_input_flipper_servo"); //NEEDS TO BE ROTATED
-        frontInputServo = hwMap.get(Servo.class, "front_input_servo");//full open 0.2; half open 0.55; closed 0.72
+        frontInputServo = hwMap.get(Servo.class, "front_input_servo");//full open 0.25; half open 0.55; closed 0.72
 
         // Set start positions for ALL installed servos
         cascadeOutputServo.setPosition(1);
         cascadeFlipperServo.setPosition(0.125);
         frontInputFlipperServo.setPosition(0.75);
-        frontInputServo.setPosition(0.55);
+        frontInputServo.setPosition(0.3);
 
 
     }
@@ -338,6 +338,28 @@ public class Hardware {
     }
 
     ////////////////////////////// Methods //////////////////////////////
+    /**
+     * runs a given motor (that has an encoder) to a given position, at a given power
+     * @param motor the motor to move
+     * @param targetPosition    the position to move to
+     * @param power the power to move at (must be positive)
+     */
+    public void runMotorToPosition(DcMotor motor, int targetPosition, double power) {
+        power = Math.abs(power);
+        motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        motor.setTargetPosition(targetPosition);
+        motor.setPower(0);
+        if (targetPosition > motor.getCurrentPosition()) motor.setPower(power);
+        else if (targetPosition < motor.getCurrentPosition()) motor.setPower(-power);
+
+        motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        while (motor.isBusy()) {} //let the motor run to that position
+
+        motor.setPower(0);
+        motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+    }
+
     /**
      * given a power and direction, causes the robot to strafe continuously in that given direction at the given power
      * @param power power factor

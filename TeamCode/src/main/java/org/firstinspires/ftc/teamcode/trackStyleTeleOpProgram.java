@@ -5,7 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-@TeleOp(name="trackStyleTeleOpProgram")
+@TeleOp(name="trackStyleTeleOpProgram", group="Demos")
 @Disabled
 public class trackStyleTeleOpProgram extends LinearOpMode {
     /*declare OpMode members, initialize some classes*/

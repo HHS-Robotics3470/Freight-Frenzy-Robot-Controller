@@ -47,11 +47,11 @@ public class teleOpProgramTemplate extends LinearOpMode {
                 left bumper:
                 right bumper:
 
-            ABYX:
+            ABXY:
                 A:
                 B:
-                Y:
                 X:
+                Y:
 
             D-Pad:
                 Up:

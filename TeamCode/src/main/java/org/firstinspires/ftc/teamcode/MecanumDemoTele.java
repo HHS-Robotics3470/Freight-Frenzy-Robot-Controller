@@ -41,7 +41,7 @@ public class MecanumDemoTele extends LinearOpMode {
 
 
             //don't turn and strafe at the same time
-            if (gamepad1.right_stick_x >= 0.2) {
+            if (Math.abs(gamepad1.right_stick_x) >= 0.2) {
                 robot.rotate(gamepad1.right_stick_x);
             } else {
                 robot.strafeDirection(leftStickPolar[0], leftStickPolar[1]);

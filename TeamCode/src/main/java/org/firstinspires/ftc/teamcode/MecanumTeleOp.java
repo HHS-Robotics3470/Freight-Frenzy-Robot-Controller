@@ -82,13 +82,21 @@ public class MecanumTeleOp extends LinearOpMode {
             if (aC&&!aP) {
                 //robot.frontInputServo.setPosition((-1 * (robot.frontInputServo.getPosition() - 0.285) + 0.285) + 0.25); //toggle between 0.25 and .72
                 if (inputOpen) { // if open
-                    robot.frontInputServo.setPosition(0.72); //close
-                    sleep(300);
-                    robot.frontInputFlipperServo.setPosition(0.2); //raise
+                    robot.frontInputServo.setPosition(
+                            robot.params.get("frontInputServo").get("closed")
+                    ); //close
+                    sleep(400);
+                    robot.frontInputFlipperServo.setPosition(
+                            robot.params.get("frontInputFlipperServo").get("raised")
+                    ); //raise slightly
                     inputOpen = false;
                 } else { //else
-                    robot.frontInputServo.setPosition(0.3); //open
-                    robot.frontInputFlipperServo.setPosition(0); //lower
+                    robot.frontInputServo.setPosition(
+                            robot.params.get("frontInputServo").get("full open")
+                    ); //open
+                    robot.frontInputFlipperServo.setPosition(
+                            robot.params.get("frontInputFlipperServo").get("down")
+                    ); //down
                     inputOpen = true;
                 }
             }
@@ -96,21 +104,37 @@ public class MecanumTeleOp extends LinearOpMode {
             cascadeCount = robot.cascadeLiftMotor.getCurrentPosition();
             double outputFlipperPosition = robot.cascadeFlipperServo.getPosition();
             if (bC&&!bP) {
-                robot.frontInputServo.setPosition(0.72); //close input
-                robot.cascadeOutputServo.setPosition(0.5); //open output
-                robot.cascadeFlipperServo.setPosition(0.125); //fold back
-                robot.runMotorToPosition(robot.cascadeLiftMotor, 50, 1);//retract cascade
+                robot.frontInputServo.setPosition(
+                        robot.params.get("frontInputServo").get("closed")
+                ); //close input
+                robot.cascadeOutputServo.setPosition(
+                        robot.params.get("cascadeOutputServo").get("receive")
+                ); //open output
+                robot.cascadeFlipperServo.setPosition(
+                        robot.params.get("cascadeFlipperServo").get("retracted")
+                ); //fold back
+                robot.runMotorToPosition(robot.cascadeLiftMotor, robot.params.get("cascadeLiftMotor").get("retracted").intValue(), 1);//retract cascade
 
-                robot.frontInputFlipperServo.setPosition(0.7);//TODO rotate input flipper to drop off position
+                robot.frontInputFlipperServo.setPosition(
+                        robot.params.get("frontInputFlipperServo").get("up")
+                );//TODO rotate input flipper to drop off position
                 sleep(700);
 
-                robot.cascadeOutputServo.setPosition(1); //close output
+                robot.cascadeOutputServo.setPosition(
+                        robot.params.get("cascadeOutputServo").get("closed")
+                ); //close output
                 outputOpen = false;
-                robot.frontInputServo.setPosition(0.55); //open input
+                robot.frontInputServo.setPosition(
+                        robot.params.get("frontInputServo").get("half open")
+                ); //open input
                 sleep(300);
 
-                robot.frontInputFlipperServo.setPosition(0.01);//TODO rotate input flipper to collection position
-                robot.frontInputServo.setPosition(0.25); //fully open input
+                robot.frontInputFlipperServo.setPosition(
+                        robot.params.get("frontInputFlipperServo").get("down")
+                );//TODO rotate input flipper to collection position
+                robot.frontInputServo.setPosition(
+                        robot.params.get("frontInputServo").get("full open")
+                ); //fully open input
                 inputOpen = true;
                 robot.runMotorToPosition(robot.cascadeLiftMotor, cascadeCount, 1); //extend cascade back to previous position
                 robot.cascadeFlipperServo.setPosition(outputFlipperPosition); //move output back to level it was at previously
@@ -119,20 +143,28 @@ public class MecanumTeleOp extends LinearOpMode {
             //X
             if (xC&&!xP) {
                 if (outputOpen) { //if open
-                    robot.cascadeOutputServo.setPosition(1); //close
+                    robot.cascadeOutputServo.setPosition(
+                            robot.params.get("cascadeOutputServo").get("closed")
+                    ); //close
                     outputOpen = false;
                 } else {
-                    robot.cascadeOutputServo.setPosition(0.75);
+                    robot.cascadeOutputServo.setPosition(
+                            robot.params.get("cascadeOutputServo").get("drop")
+                    );
                     outputOpen = true;
                 }
             }
             //Y
             if (yC&&!yP) {
                 if (outputFlipperState != 0){ //not retracted
-                    robot.cascadeFlipperServo.setPosition(0.125); //retract
+                    robot.cascadeFlipperServo.setPosition(
+                            robot.params.get("cascadeFlipperServo").get("retracted")
+                    ); //retract
                     outputFlipperState=0;
                 } else {
-                    robot.cascadeFlipperServo.setPosition(0.8); //extend flat
+                    robot.cascadeFlipperServo.setPosition(
+                            robot.params.get("cascadeFlipperServo").get("flat")
+                    ); //extend flat
                     outputFlipperState=1;
                 }
             }
@@ -146,26 +178,38 @@ public class MecanumTeleOp extends LinearOpMode {
             //UP
             if (upC&&!upP) {
                 if(outputFlipperState == 1) { //extended flat
-                    robot.cascadeFlipperServo.setPosition(0.6); //up
+                    robot.cascadeFlipperServo.setPosition(
+                            robot.params.get("cascadeFlipperServo").get("up")
+                    ); //up
                     outputFlipperState=2;
                 } else if (outputFlipperState == 3) { //extended down
-                    robot.cascadeFlipperServo.setPosition(0.8); //flat
+                    robot.cascadeFlipperServo.setPosition(
+                            robot.params.get("cascadeFlipperServo").get("flat")
+                    ); //flat
                     outputFlipperState=1;
                 } else if (outputFlipperState == 2) { //extended up
-                    robot.cascadeFlipperServo.setPosition(0.95); //down
+                    robot.cascadeFlipperServo.setPosition(
+                            robot.params.get("cascadeFlipperServo").get("down")
+                    ); //down
                     outputFlipperState=3;
                 }
             }
             //DOWN
             if (downC&&!downP) {
                 if(outputFlipperState == 1) { //extended flat
-                    robot.cascadeFlipperServo.setPosition(0.95); //down
+                    robot.cascadeFlipperServo.setPosition(
+                            robot.params.get("cascadeFlipperServo").get("down")
+                    ); //down
                     outputFlipperState=3;
                 } else if (outputFlipperState == 2) { //extended up
-                    robot.cascadeFlipperServo.setPosition(0.8); //flat
+                    robot.cascadeFlipperServo.setPosition(
+                            robot.params.get("cascadeFlipperServo").get("flat")
+                    ); //flat
                     outputFlipperState=1;
                 } else if (outputFlipperState == 3) { //extended down
-                    robot.cascadeFlipperServo.setPosition(0.6); //up
+                    robot.cascadeFlipperServo.setPosition(
+                            robot.params.get("cascadeFlipperServo").get("up")
+                    ); //up
                     outputFlipperState=2;
                 }
             }
@@ -173,18 +217,18 @@ public class MecanumTeleOp extends LinearOpMode {
             downP = downC;
             //LEFT
             if (gamepad1.dpad_left) {
-                if (robot.cascadeLiftMotor.getCurrentPosition() > 2150) {
+                if (robot.cascadeLiftMotor.getCurrentPosition() > robot.params.get("cascadeLiftMotor").get("extended").intValue()) {
                     robot.cascadeLiftMotor.setPower(0);
-                    robot.runMotorToPosition(robot.cascadeLiftMotor, 2150, 1);
+                    robot.runMotorToPosition(robot.cascadeLiftMotor, robot.params.get("cascadeLiftMotor").get("extended").intValue(), 1);
                 } else {
                     robot.cascadeLiftMotor.setPower(1);
                 }
             }
             //RIGHT
             else if (gamepad1.dpad_right) {
-                if (robot.cascadeLiftMotor.getCurrentPosition() < 0) {
+                if (robot.cascadeLiftMotor.getCurrentPosition() < robot.params.get("cascadeLiftMotor").get("retracted").intValue()) {
                     robot.cascadeLiftMotor.setPower(0);
-                    robot.runMotorToPosition(robot.cascadeLiftMotor, 0, 1);
+                    robot.runMotorToPosition(robot.cascadeLiftMotor, robot.params.get("cascadeLiftMotor").get("retracted").intValue(), 1);
                 } else {
                     robot.cascadeLiftMotor.setPower(-1);
                 }

@@ -1,30 +1,23 @@
 package org.firstinspires.ftc.teamcode;
 
-import android.graphics.Bitmap;
-import android.os.Handler;
-
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
-import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.HardwareDevice;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.PIDCoefficients;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.robotcore.external.hardware.camera.Camera;
-import org.firstinspires.ftc.robotcore.external.hardware.camera.CameraCaptureSession;
-import org.firstinspires.ftc.robotcore.external.hardware.camera.CameraManager;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
-import org.firstinspires.ftc.robotcore.internal.collections.EvictingBlockingQueue;
-import org.firstinspires.ftc.robotcore.internal.system.AppUtil;
 
-import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 
 /*
     NOTE -conventions for the measurement of distances and anlges-
@@ -91,6 +84,12 @@ x-neg|---+---|pos
  */
 public class Hardware {
     ////////////////////////////// class variables //////////////////////////////
+
+    //params for hardware elements, store positions and whatnot that equate to known output, IE servo position for a claw to open/close,
+    //first layer: specific hardware element (ie "cascade lift", "front input servo", etc.)
+    //      second layer, parameters (k,v) (ie. ("open", 0.6), etc.)
+    public Map<String, Map<String, Double>> params;
+
     /* --Public OpMode members.-- */
     //**Motors**//
     public DcMotor driveFrontRight,driveFrontLeft,driveBackLeft,driveBackRight; //drive motors
@@ -170,6 +169,14 @@ public class Hardware {
 
         //other motors
         initOtherMotors();
+
+        //parameters
+        params = new HashMap<>();
+        //cascade lift params
+        HashMap<String, Double> cascadeLiftParams = new HashMap<>();
+        cascadeLiftParams.put("extended", 2150.0);
+        cascadeLiftParams.put("retracted", 0.0);
+        params.put("cascadeLiftMotor", cascadeLiftParams);
     }
     private void initDriveMotors() {
         // Define and initialize all Motors
@@ -248,6 +255,29 @@ public class Hardware {
         frontInputFlipperServo.setPosition(0.01);
         frontInputServo.setPosition(0.3);
 
+        //params
+        params = new HashMap<>();
+        HashMap<String, Double> cascadeOutputServoParams = new HashMap<>();
+        cascadeOutputServoParams.put("closed", 1.0);
+        cascadeOutputServoParams.put("drop", 0.75);
+        cascadeOutputServoParams.put("receive", 0.5);
+        HashMap<String, Double> cascadeFlipperServoParams = new HashMap<>();
+        cascadeFlipperServoParams.put("retracted", 0.125);
+        cascadeFlipperServoParams.put("flat", 0.8);
+        cascadeFlipperServoParams.put("up", 0.6);
+        cascadeFlipperServoParams.put("down", 0.95);
+        HashMap<String, Double> frontInputFlipperServoParams = new HashMap<>();
+        frontInputFlipperServoParams.put("down", 0.05);
+        frontInputFlipperServoParams.put("up", 0.7);
+        frontInputFlipperServoParams.put("raised", 0.2);
+        HashMap<String, Double> frontInputServoParams = new HashMap<>();
+        frontInputServoParams.put("full open", 0.3);
+        frontInputServoParams.put("half open", 0.55);
+        frontInputServoParams.put("closed", 0.72);
+        params.put("cascadeOutputServo", cascadeOutputServoParams);
+        params.put("cascadeFlipperServo", cascadeFlipperServoParams);
+        params.put("frontInputFlipperServo",frontInputFlipperServoParams);
+        params.put("frontInputServo", frontInputServoParams);
 
     }
     //sensors
@@ -628,4 +658,5 @@ public class Hardware {
         lastAngles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.RADIANS);
         globalAngle = 0;
     }
+
 }

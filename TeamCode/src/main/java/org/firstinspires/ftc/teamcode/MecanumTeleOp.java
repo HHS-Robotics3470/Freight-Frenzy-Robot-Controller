@@ -412,6 +412,8 @@ public class MecanumTeleOp extends LinearOpMode {
                 }
             } else robot.cascadeLiftMotor.setPower(0);
 
+            //telemetry on robot state
+            runTelemetry(outputFlipperState, outputState, inputState, aState, bState);
 
             //update button locks
             aP=aC;
@@ -426,6 +428,14 @@ public class MecanumTeleOp extends LinearOpMode {
     }
 
     ////////////other methods and whatnot below here////////////
-
+    public void runTelemetry(OutputFlipperState outputFlipperState, IOState outputState, IOState inputState, AProcess aState, BProcess bState) {
+        telemetry.addLine("---====STATES====---");
+        telemetry.addData("Output Flipper: ", outputFlipperState.toString());
+        telemetry.addData("Output: ", outputState.toString());
+        telemetry.addData("Input: ", inputState.toString());
+        telemetry.addData("\nA-button process: ", aState.toString());
+        telemetry.addData("B-button process: ", bState.toString());
+        telemetry.update();
+    }
 
 }

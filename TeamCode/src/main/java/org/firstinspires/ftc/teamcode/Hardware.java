@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
+import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareDevice;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -16,6 +17,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /*
@@ -110,6 +112,8 @@ public class Hardware {
     private Orientation lastAngles = new Orientation();
     //Webcam
     private WebcamName vuforiaWebcam;
+    //expansion hubs
+    List<LynxModule> allHubs;
 
     /* --local OpMode members.-- */
     HardwareMap hwMap           =  null;
@@ -160,6 +164,12 @@ public class Hardware {
         initWebcamAndVuforia();
         //PID's
         initPIDs();
+        //hubs
+        allHubs = hwMap.getAll(LynxModule.class);
+        for (LynxModule module : allHubs) { //optimizes sensor reading by caching in bulk, effectively reading all sensors in the same time as one,
+                                            //however you must clear the BulkCache once per control cycle, see teleOpProgramTemplate for how
+            module.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
+        }
     }
     //motors
     private void initMotors()

@@ -3,7 +3,6 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareDevice;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.PIDCoefficients;
@@ -84,6 +83,10 @@ x-neg|---+---|pos
  */
 public class Hardware {
     ////////////////////////////// class variables //////////////////////////////
+    //TODO: in the future, maybe isolate specific mechanisms into their own "hardware" classes
+    // (like: drivetrain, cascade, frontCollector, etc.) that could include
+    // more specific methods and variables without cluttering this class so much
+    // they'd be in their own folder too
 
     //params for hardware elements, store positions and whatnot that equate to known output, IE servo position for a claw to open/close,
     //first layer: specific hardware element (ie "cascade lift", "front input servo", etc.)
@@ -111,9 +114,6 @@ public class Hardware {
     /* --local OpMode members.-- */
     HardwareMap hwMap           =  null;
     private ElapsedTime runtime  = new ElapsedTime();
-    //**PIDS**//
-    //PID coefficients
-    private PIDCoefficients FrBlStrafePIDCoeffecients, FlBrStrafePIDCoeffecients, rotatePIDCoeffecients;
     //PID controllers
     public PIDController FrBlStrafePIDController, FlBrStrafePIDController, rotatePIDController;
 
@@ -239,7 +239,7 @@ public class Hardware {
 
         // assign motor directions
         cascadeLiftMotor.setDirection(DcMotor.Direction.FORWARD);
-        turntableMotor.setDirection(DcMotorSimple.Direction.FORWARD);
+        turntableMotor.setDirection(DcMotor.Direction.FORWARD);
     }
     //servos
     private void initServos() {
@@ -325,7 +325,7 @@ public class Hardware {
     private void initPIDs() {
 
         initPIDs(
-                new PIDCoefficients(0.001534/3,0.031958/3,0.000049/3),//0.004602, 0.04315, 0.000055), //frbl strafe pid
+                new PIDCoefficients(0.001534,0.031958,0.000049),//0.004602, 0.04315, 0.000055), //frbl strafe pid
                 new PIDCoefficients(0.001534,0.031958,0.000049),//0.004602, 0.04315, 0.000055), //flbr strafe pid
                 new PIDCoefficients(0.004602, 0.04315, 0.000055)  //rotation pid
         );
@@ -338,14 +338,13 @@ public class Hardware {
      */
     public void initPIDs(PIDCoefficients FrBlStrafe, PIDCoefficients FlBrStrafe, PIDCoefficients rotate) {
         //save coefficients
-        FrBlStrafePIDCoeffecients   = FrBlStrafe;
-        FlBrStrafePIDCoeffecients   = FlBrStrafe;
-        rotatePIDCoeffecients       = rotate;
+        //**PIDS**//
+        //PID coefficients
 
         //initialize PID controllers
-        FrBlStrafePIDController     = new PIDController(FrBlStrafePIDCoeffecients);
-        FlBrStrafePIDController     = new PIDController(FlBrStrafePIDCoeffecients);
-        rotatePIDController         = new PIDController(rotatePIDCoeffecients);
+        FrBlStrafePIDController     = new PIDController(FrBlStrafe);
+        FlBrStrafePIDController     = new PIDController(FlBrStrafe);
+        rotatePIDController         = new PIDController(rotate);
 
         //configure PID controllers
         FrBlStrafePIDController.reset();
@@ -375,16 +374,24 @@ public class Hardware {
      */
     public void runMotorToPosition(DcMotor motor, int targetPosition, double power) {
         power = Math.abs(power);
-        motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        motor.setTargetPosition(targetPosition);
         motor.setPower(0);
-        if (targetPosition > motor.getCurrentPosition()) motor.setPower(power);
-        else if (targetPosition < motor.getCurrentPosition()) motor.setPower(-power);
+        motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
+        //set target
+        motor.setTargetPosition(targetPosition);
+
+        //set to RUN_TO_POSITION
         motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
+        //set power
+        motor.setPower(power);
+        //if (targetPosition > motor.getCurrentPosition()) motor.setPower(power);
+        //else if (targetPosition < motor.getCurrentPosition()) motor.setPower(-power);
+
+        //wait
         while (motor.isBusy()) {} //let the motor run to that position
 
+        //stop, and go back to normal drive mode
         motor.setPower(0);
         motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
@@ -411,8 +418,9 @@ public class Hardware {
      * @param targetDistance    distance to strafe, measured in meters
      */
     public void strafeToDistance(double power, double angle, double targetDistance) {
+        double rotationCorrection;
         //initial heading and encoder counts
-        //double initialHeading = getGlobalAngle();
+        double initialHeading = getGlobalAngle();
         int initialFrBlAxisEncoderCount = (driveFrontRight.getCurrentPosition() + driveBackLeft.getCurrentPosition())/2;
         int initialFlBrAxisEncoderCount = (driveFrontLeft.getCurrentPosition() + driveBackRight.getCurrentPosition())/2;
 
@@ -421,11 +429,8 @@ public class Hardware {
         double FlBrPairPower = Math.sin(angle + (Math.PI/4));
 
         //find the desired target for each strafe PID
-        int FrBlAxisTarget = (int) (targetDistance * (FrBlPairPower)); //in meters
-        int FlBrAxisTarget = (int) (targetDistance * (FlBrPairPower)); //in meters
-        // convert to encoder counts
-        FrBlAxisTarget *= NADO_COUNTS_PER_METER;
-        FlBrAxisTarget *= NADO_COUNTS_PER_METER;
+        int FrBlAxisTarget = (int) (targetDistance * (FrBlPairPower) * NADO_COUNTS_PER_METER);
+        int FlBrAxisTarget = (int) (targetDistance * (FlBrPairPower) * NADO_COUNTS_PER_METER);
 
         //set up the PIDs
         power = Math.abs(power);
@@ -440,10 +445,10 @@ public class Hardware {
         FlBrStrafePIDController.setOutputRange(-power*FlBrPairPower, power*FlBrPairPower);
         FlBrStrafePIDController.enable(runtime.seconds());
         //rotation PID (will be used to maintain constant heading)
-        //rotatePIDController.reset();
-        //rotatePIDController.setSetpoint(initialHeading);
-        //rotatePIDController.setOutputRange(-power, power);
-        //rotatePIDController.enable(runtime.seconds());
+        rotatePIDController.reset();
+        rotatePIDController.setSetpoint(initialHeading);
+        rotatePIDController.setOutputRange(-power, power);
+        rotatePIDController.enable(runtime.seconds());
 
 
         while (!FrBlStrafePIDController.onTarget() || !FlBrStrafePIDController.onTarget()) {
@@ -454,30 +459,42 @@ public class Hardware {
             //get correction values
             FrBlPairPower = FrBlStrafePIDController.performPID(FrBlAxisEncoderCount - initialFrBlAxisEncoderCount,runtime.seconds());
             FlBrPairPower = FlBrStrafePIDController.performPID(FlBrAxisEncoderCount - initialFlBrAxisEncoderCount,runtime.seconds());
-            //double rotationCorrection = rotatePIDController.performPID(getGlobalAngle(),runtime.seconds());
+            rotationCorrection = rotatePIDController.performPID(getGlobalAngle(),runtime.seconds());
 
+            //largest power + rotation correction, or 1
+            double denom = Math.max(
+                    Math.max(Math.abs(FrBlPairPower), Math.abs(FlBrPairPower)) + Math.abs(rotationCorrection),
+                    1.0
+            );
             //assign drive motor powers
             setDrivetrainPower(
-                    FrBlPairPower,// - rotationCorrection,
-                    FlBrPairPower,// + rotationCorrection,
-                    FrBlPairPower,// + rotationCorrection,
-                    FlBrPairPower// - rotationCorrection
+                    (FrBlPairPower - rotationCorrection)/denom,
+                    (FlBrPairPower + rotationCorrection)/denom,
+                    (FrBlPairPower + rotationCorrection)/denom,
+                    (FlBrPairPower - rotationCorrection)/denom
             );
         }
 
     }
 
     /**
-     * DOES NOT WORK AS EXPECTED
      * rotates the robot by adjusting its current motor powers rather than directly setting powers, allows turning while strafing
      * @param signedPower determines the directions and power of rotation, larger values result in faster movement, and the sign (positive or negative) of this value determine direction
      */
     public void rotateByCorrection(double signedPower) {
+        //largest current power + signedPower, or 1
+        double denom = Math.max(
+                Math.max(
+                        Math.max( Math.abs(driveFrontRight.getPower()), Math.abs(driveFrontLeft.getPower())),
+                        Math.max( Math.abs(driveBackRight.getPower()), Math.abs(driveBackLeft.getPower()))
+                ) + Math.abs(signedPower),
+                1.0
+        );
         setDrivetrainPower(
-                driveFrontRight.getPower()-signedPower,
-                driveFrontLeft.getPower()+signedPower,
-                driveBackLeft.getPower()+signedPower,
-                driveBackRight.getPower()-signedPower
+                (driveFrontRight.getPower()-signedPower)/denom,
+                (driveFrontLeft.getPower()+signedPower)/denom,
+                (driveBackLeft.getPower()+signedPower)/denom,
+                (driveBackRight.getPower()-signedPower)/denom
         );
     }
     /**

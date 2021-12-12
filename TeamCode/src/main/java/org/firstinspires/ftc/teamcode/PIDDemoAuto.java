@@ -3,12 +3,13 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 @Autonomous(name = "PID Demo Auto", group = "Demos")
-@Disabled
+//@Disabled
 public class PIDDemoAuto extends LinearOpMode {
     /*declare OpMode members, initialize some classes*/
     Hardware robot          = new Hardware();
@@ -29,14 +30,75 @@ public class PIDDemoAuto extends LinearOpMode {
         runtime.reset();
 
         //auto routine
+        strafeToDistanceBuiltInPIDs(1, Math.PI,0.2);
         //strafe(1, 0, .1);
-        strafeToDistanceNoHeading(1,Math.PI,.2);
+        //strafeToDistanceNoHeading(1,Math.PI,.2);
         //strafeToDistanceNoHeading(1, Math.PI/2.0, 0.1);
         //robot.strafeToDistance(0.3, 4.0*Math.PI/6.0, 0.2);
         //strafeToDistanceNoHeading(0.3, -7.0*Math.PI/6.0, 0.2);
         //robot.strafeToDistance(0.3, -10.0*Math.PI/6.0, 0.2);
     }
 
+    /**
+     * causes the robot to strafe a given direction, at a given power, for a given distance using build in PID controllers
+     * power and distance should always be positive
+     * @param power             power factor
+     * @param angle             direction to strafe relative to robot, measured in radians, angle of 0 == starboard
+     * @param targetDistance    distance to strafe, measured in meters
+     */
+    public void strafeToDistanceBuiltInPIDs(double power, double angle, double targetDistance){
+        power = Math.abs(power);
+        targetDistance = Math.abs(targetDistance);
+        //DATA
+        boolean moving = true;
+
+        //calculate desired power for each diagonal motor pair
+        double FrBlPairPower = Math.sin(angle - (Math.PI/4)); //this is just done to help convert the radial inputs (magnitude and angle) into target distances that the PID can use
+        double FlBrPairPower = Math.sin(angle + (Math.PI/4));
+        //find the desired target for each strafe PID
+        int FrBlAxisTarget = (int) (targetDistance * (FrBlPairPower) * robot.NADO_COUNTS_PER_METER);
+        int FlBrAxisTarget = (int) (targetDistance * (FlBrPairPower) * robot.NADO_COUNTS_PER_METER);
+        //scale power appropriately
+        FrBlPairPower *= power;
+        FrBlPairPower *= power;
+
+        //stop and prep
+        robot.setDrivetrainPower(0);
+        robot.driveFrontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.driveFrontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.driveBackLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.driveBackRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        //set target
+        robot.driveFrontRight.setTargetPosition(robot.driveFrontRight.getCurrentPosition()+FrBlAxisTarget);
+        robot.driveFrontLeft.setTargetPosition(robot.driveFrontLeft.getCurrentPosition()+FlBrAxisTarget);
+        robot.driveBackLeft.setTargetPosition(robot.driveBackLeft.getCurrentPosition()+FrBlAxisTarget);
+        robot.driveBackRight.setTargetPosition(robot.driveBackRight.getCurrentPosition()+FlBrAxisTarget);
+
+        //set to run to position
+        robot.driveFrontRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        robot.driveFrontLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        robot.driveBackLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        robot.driveBackRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        //set power
+        robot.setDrivetrainPowerMecanum(FrBlPairPower, FlBrPairPower);
+
+        //let RUN_TO_POSITION PID do its thing
+        while (moving && opModeIsActive()) {
+            //are any of the motors busy?
+            moving = robot.driveFrontRight.isBusy() || robot.driveFrontLeft.isBusy() || robot.driveBackLeft.isBusy() || robot.driveBackRight.isBusy();
+        }
+        //give a little more time to settle
+        sleep(500);
+
+        //stop and go back to normal
+        robot.setDrivetrainPower(0);
+        robot.driveFrontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.driveFrontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.driveBackLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.driveBackRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+    }
     public void strafe(double power, double angle, double targetDistance){
         //DATA
         //initial heading and encoder counts
@@ -56,11 +118,13 @@ public class PIDDemoAuto extends LinearOpMode {
         robot.FrBlStrafePIDController.reset();
         robot.FrBlStrafePIDController.setSetpoint(FrBlAxisTarget);
         robot.FrBlStrafePIDController.setOutputRange(-power*FrBlPairPower,power*FrBlPairPower);
-        robot.FrBlStrafePIDController.enable(runtime.seconds());
         //FlBr PID
         robot.FlBrStrafePIDController.reset();
         robot.FlBrStrafePIDController.setSetpoint(FlBrAxisTarget);
         robot.FlBrStrafePIDController.setOutputRange(-power*FrBlPairPower,power*FrBlPairPower);
+
+        //enable
+        robot.FrBlStrafePIDController.enable(runtime.seconds());
         robot.FlBrStrafePIDController.enable(runtime.seconds());
 
         //try doing the two movements separately before doing them at the same time
@@ -124,11 +188,8 @@ public class PIDDemoAuto extends LinearOpMode {
         double FrBlPairPower = Math.sin(angle - (Math.PI/4)); //this is just done to help convert the radial inputs (magnitude and angle) into target distances that the PID can use
         double FlBrPairPower = Math.sin(angle + (Math.PI/4));
         //find the desired target for each strafe PID
-        int FrBlAxisTarget = (int) (targetDistance * (FrBlPairPower)); //in meters
-        int FlBrAxisTarget = (int) (targetDistance * (FlBrPairPower)); //in meters
-        // convert to encoder counts
-        FrBlAxisTarget *= robot.NADO_COUNTS_PER_METER;
-        FlBrAxisTarget *= robot.NADO_COUNTS_PER_METER;
+        int FrBlAxisTarget = (int) (targetDistance * (FrBlPairPower) * robot.NADO_COUNTS_PER_METER);
+        int FlBrAxisTarget = (int) (targetDistance * (FlBrPairPower) * robot.NADO_COUNTS_PER_METER);
 
         //set up the PIDs
         power = Math.abs(power);
@@ -136,11 +197,13 @@ public class PIDDemoAuto extends LinearOpMode {
         robot.FrBlStrafePIDController.reset();
         robot.FrBlStrafePIDController.setSetpoint(FrBlAxisTarget);
         robot.FrBlStrafePIDController.setOutputRange(-power*FrBlPairPower,power*FrBlPairPower);
-        robot.FrBlStrafePIDController.enable(runtime.seconds());
         //FlBr PID
         robot.FlBrStrafePIDController.reset();
         robot.FlBrStrafePIDController.setSetpoint(FlBrAxisTarget);
         robot.FlBrStrafePIDController.setOutputRange(-power*FlBrPairPower,power*FlBrPairPower);
+
+        //enable
+        robot.FrBlStrafePIDController.enable(runtime.seconds());
         robot.FlBrStrafePIDController.enable(runtime.seconds());
 
         //run PID

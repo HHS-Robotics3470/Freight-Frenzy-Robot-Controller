@@ -19,8 +19,8 @@ public class MecanumTeleOp extends LinearOpMode {
         int outputFlipperState = 0; //0-3, 0=retracked, 1=extended flat, 2=extended up, 3=extended down
         boolean inputOpen = true;
         boolean outputOpen = false;
-        int cascadeCount = 0;
-        double[] leftStickPolar;
+        int cascadeCount;
+        //double[] leftStickPolar;
         //button locks
         boolean aC, bC, yC, xC, upC, downC; //is currently pressed
         boolean aP = false, bP = false, yP = false, xP = false, upP = false, downP = false; //was previously pressed
@@ -50,8 +50,8 @@ public class MecanumTeleOp extends LinearOpMode {
             triggers and bumpers: unassigned
 
             ABXY: special functions
-                A: grab item w/ input servo (open/close input servo) //TODO: readjust
-                B: flip intake and drop off in output basket (retract if necessary) //TODO: readjust flipper
+                A: grab item w/ input servo (open/close input servo)
+                B: flip intake and drop off in output basket (retract if necessary)
                 X: drop item off (open/close output servo)
                 Y: if output flipper is extended, retract, otherwise extend to flat
 
@@ -64,12 +64,22 @@ public class MecanumTeleOp extends LinearOpMode {
              */
 
             /////JOYSTICKS/////
-            leftStickPolar = Hardware.convertRectangularToPolar(gamepad1.left_stick_x, -gamepad1.left_stick_y);
-            if (Math.abs(gamepad1.right_stick_x) >= 0.2) {
-                robot.rotate(gamepad1.right_stick_x); //rotate
-            } else {
-                robot.strafeDirection(leftStickPolar[0], leftStickPolar[1]); //strafe in direction that left joystick is pointing
-            }
+            //this has it in 2 steps, we could combine it to one and save ~4 calls to the math library (2 max, 2 abs)
+            //leftStickPolar = Hardware.convertRectangularToPolar(gamepad1.left_stick_x, -gamepad1.left_stick_y);
+            //robot.strafeDirection(leftStickPolar[0], leftStickPolar[1]);
+            //robot.rotateByCorrection(gamepad1.right_stick_x);
+            //combined to 1 step, and optimized to minimize calls to the Math library, and eliminates need for trig functions
+            double x = gamepad1.left_stick_x;
+            double y = -gamepad1.left_stick_y;
+            double r = gamepad1.right_stick_x/2.0;
+            double denom = Math.max(Math.abs(x) + Math.abs(y) + Math.abs(r) , 1.0);
+            robot.setDrivetrainPower(
+                    (x-y-r)/denom,
+                    (x+y+r)/denom,
+                    (x-y+r)/denom,
+                    (x+y-r)/denom
+            );
+
 
             /////TRIGGERS AND BUMPERS/////
 
@@ -117,7 +127,7 @@ public class MecanumTeleOp extends LinearOpMode {
 
                 robot.frontInputFlipperServo.setPosition(
                         robot.params.get("frontInputFlipperServo").get("up")
-                );//TODO rotate input flipper to drop off position
+                );
                 sleep(700);
 
                 robot.cascadeOutputServo.setPosition(
@@ -131,7 +141,7 @@ public class MecanumTeleOp extends LinearOpMode {
 
                 robot.frontInputFlipperServo.setPosition(
                         robot.params.get("frontInputFlipperServo").get("down")
-                );//TODO rotate input flipper to collection position
+                );
                 robot.frontInputServo.setPosition(
                         robot.params.get("frontInputServo").get("full open")
                 ); //fully open input

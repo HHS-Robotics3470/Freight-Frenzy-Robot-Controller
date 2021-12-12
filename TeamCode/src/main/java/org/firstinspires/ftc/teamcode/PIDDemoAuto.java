@@ -94,7 +94,7 @@ public class PIDDemoAuto extends LinearOpMode {
         //let RUN_TO_POSITION PID do its thing
         while (moving && opModeIsActive()) {
             //are any of the motors busy?
-            moving = robot.driveFrontRight.isBusy() || robot.driveFrontLeft.isBusy() || robot.driveBackLeft.isBusy() || robot.driveBackRight.isBusy();
+            moving = robot.driveFrontRight.isBusy() || robot.driveFrontLeft.isBusy(); //save 6ms per loop by only reading from one motor of each diagonal pair
         }
         //give a little more time to settle
         sleep(500);

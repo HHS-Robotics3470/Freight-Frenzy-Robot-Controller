@@ -30,7 +30,14 @@ public class PIDDemoAuto extends LinearOpMode {
         runtime.reset();
 
         //auto routine
-        strafeToDistanceBuiltInPIDs(1, Math.PI,0.2);
+        strafeToDistanceBuiltInPIDs(1, Math.PI,0.2); //strafe left
+        strafeToDistanceBuiltInPIDs(1, 0,0.4); //strafe right
+        //strafe in a rectangle
+        strafeToDistanceBuiltInPIDs(0.5, Math.PI/4.0, 0.2);
+        strafeToDistanceBuiltInPIDs(0.5, Math.PI*3.0/4.0, 0.3);
+        strafeToDistanceBuiltInPIDs(0.5, Math.PI*5.0/4.0, 0.2);
+        strafeToDistanceBuiltInPIDs(0.5, -Math.PI/4.0, 0.3);
+
         //strafe(1, 0, .1);
         //strafeToDistanceNoHeading(1,Math.PI,.2);
         //strafeToDistanceNoHeading(1, Math.PI/2.0, 0.1);

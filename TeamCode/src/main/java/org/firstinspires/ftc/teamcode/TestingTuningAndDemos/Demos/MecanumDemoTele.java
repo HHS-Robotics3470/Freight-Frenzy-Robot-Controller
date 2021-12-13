@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.Hardware;
+import org.firstinspires.ftc.teamcode.Util;
 
 @TeleOp(name = "Mecanum Demo TeleOp", group = "Demos")
 @Disabled
@@ -33,7 +34,7 @@ public class MecanumDemoTele extends LinearOpMode {
         while (opModeIsActive()) {
 
             //left joystick strafes, right joystick rotates
-            leftStickPolar = Hardware.convertRectangularToPolar(gamepad1.left_stick_x, -gamepad1.left_stick_y);
+            leftStickPolar = Util.convertRectangularToPolar(gamepad1.left_stick_x, -gamepad1.left_stick_y);
 
             telemetry.addData("left stick x: ", gamepad1.left_stick_x);
             telemetry.addData("left stick y: ", gamepad1.left_stick_y);
@@ -44,9 +45,9 @@ public class MecanumDemoTele extends LinearOpMode {
 
             //don't turn and strafe at the same time
             if (Math.abs(gamepad1.right_stick_x) >= 0.2) {
-                robot.rotate(gamepad1.right_stick_x);
+                robot.driveTrain.rotate(gamepad1.right_stick_x);
             } else {
-                robot.strafeDirection(leftStickPolar[0], leftStickPolar[1]);
+                robot.driveTrain.strafeDirection(leftStickPolar[0], leftStickPolar[1]);
             }
 
         }

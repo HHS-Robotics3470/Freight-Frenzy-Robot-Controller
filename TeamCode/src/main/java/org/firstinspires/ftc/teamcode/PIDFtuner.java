@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.MotorControlAlgorithm;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -98,7 +99,7 @@ public class PIDFtuner extends LinearOpMode {
         /* Initialize the hardware variables.
          * The init() method of the hardware class does all the work here
          */
-        robot.initMotors(); //runs this to get motor positions
+        robot.init(hardwareMap); //runs this to get motor positions
         //configure ALL installed motors
         for (DcMotorEx m : motorList)
         {
@@ -237,8 +238,15 @@ public class PIDFtuner extends LinearOpMode {
                     newVelPidfCoefficients = new PIDFCoefficients(p,i,0,f);
 
                     //assign motor those coefficients
-                    currentMotor.setVelocityPIDFCoefficients(p,i,0,f);
-                    currentMotor.setPositionPIDFCoefficients(posP);
+                    try {
+                        currentMotor.setVelocityPIDFCoefficients(p, i, 0, f);
+                        currentMotor.setPositionPIDFCoefficients(posP);
+                    } catch (UnsupportedOperationException e) {
+                        //change algorithm and try again
+                        currentMotor.getMotorType().getHubVelocityParams().algorithm = MotorControlAlgorithm.PIDF;
+                        currentMotor.getMotorType().getHubPositionParams().algorithm = MotorControlAlgorithm.PIDF;
+                        break;
+                    }
 
                     generalTelemetry(motorName, portNum, encoderCounts, velocity, maxVelocity, controlAlgorithm, newVelPidfCoefficients);
                     state = ProcessState.TEST_ONE;

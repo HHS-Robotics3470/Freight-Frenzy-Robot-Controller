@@ -125,12 +125,13 @@ public class MecanumTeleOp extends LinearOpMode {
 
             /////JOYSTICKS/////
             //handles strafing and turning in one optimized step.
+            //because the joysticks give rectangular coordinates, there's not much point converting to polar than back to rectangular
             double denom = Math.max(Math.abs(x) + Math.abs(y) + Math.abs(r) , 1.0);
-            robot.setDrivetrainPower(
-                    (x-y-r)/denom,
-                    (x+y+r)/denom,
-                    (x-y+r)/denom,
-                    (x+y-r)/denom
+            robot.driveTrain.setPower(
+                    (y-x-r)/denom,
+                    (y+x+r)/denom,
+                    (y-x+r)/denom,
+                    (y+x-r)/denom
             ); //+12ms
 
 
@@ -172,7 +173,7 @@ public class MecanumTeleOp extends LinearOpMode {
                     break;
                 case IN_PROGRESS:
                     //wait 400ms to give flipper time to raise / lower
-                    if (inputTimer.seconds() >= 400) {
+                    if (inputTimer.seconds() >= .400) {
                         robot.frontInputFlipperServo.setPosition(
                                 robot.params.get("frontInputFlipperServo").get("raised")
                         ); //raise slightly
@@ -238,7 +239,7 @@ public class MecanumTeleOp extends LinearOpMode {
                     break;
                 case STAGE_TWO:
                     //wait 700ms for input flipper to raise fully
-                    if (bProcessTimer.seconds() >= 700) {
+                    if (bProcessTimer.seconds() >= .700) {
                         robot.cascadeOutputServo.setPosition(
                                 robot.params.get("cascadeOutputServo").get("closed")
                         ); //close output
@@ -252,7 +253,7 @@ public class MecanumTeleOp extends LinearOpMode {
                     break;
                 case STAGE_THREE:
                     //wait 300ms to give time for the game element to transfer before re-extending cascade
-                    if (bProcessTimer.seconds() >= 300) {
+                    if (bProcessTimer.seconds() >= .300) {
                         robot.frontInputFlipperServo.setPosition(
                                 robot.params.get("frontInputFlipperServo").get("down")
                         );
@@ -397,7 +398,7 @@ public class MecanumTeleOp extends LinearOpMode {
             else if (gamepad1.dpad_left) {
                 if (robot.cascadeLiftMotor.getCurrentPosition() > robot.params.get("cascadeLiftMotor").get("extended").intValue()) {
                     robot.cascadeLiftMotor.setPower(0);
-                    robot.runMotorToPosition(robot.cascadeLiftMotor, robot.params.get("cascadeLiftMotor").get("extended").intValue(), 1);
+                    Util.runMotorToPosition(robot.cascadeLiftMotor, robot.params.get("cascadeLiftMotor").get("extended").intValue(), 1);
                 } else {
                     robot.cascadeLiftMotor.setPower(1);
                 }
@@ -406,7 +407,7 @@ public class MecanumTeleOp extends LinearOpMode {
             else if (gamepad1.dpad_right) {
                 if (robot.cascadeLiftMotor.getCurrentPosition() < robot.params.get("cascadeLiftMotor").get("retracted").intValue()) {
                     robot.cascadeLiftMotor.setPower(0);
-                    robot.runMotorToPosition(robot.cascadeLiftMotor, robot.params.get("cascadeLiftMotor").get("retracted").intValue(), 1);
+                    Util.runMotorToPosition(robot.cascadeLiftMotor, robot.params.get("cascadeLiftMotor").get("retracted").intValue(), 1);
                 } else {
                     robot.cascadeLiftMotor.setPower(-1);
                 }

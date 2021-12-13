@@ -4,9 +4,10 @@ import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.HardwareDevice;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.PIDCoefficients;
+import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -15,6 +16,9 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
+import org.firstinspires.ftc.teamcode.Components.Component;
+import org.firstinspires.ftc.teamcode.Components.MecanumDriveTrain;
+import org.firstinspires.ftc.teamcode.Components.PIDController;
 
 import java.util.HashMap;
 import java.util.List;
@@ -83,7 +87,7 @@ x-neg|---+---|pos
  *
  * this class should contain the initialization for the robot, as well as many of the methods the robot will use in its OpModes
  */
-public class Hardware {
+public class Hardware implements Component {
     ////////////////////////////// class variables //////////////////////////////
     //TODO: in the future, maybe isolate specific mechanisms into their own "hardware" classes
     // (like: drivetrain, cascade, frontCollector, etc.) that could include
@@ -97,7 +101,7 @@ public class Hardware {
 
     /* --Public OpMode members.-- */
     //**Motors**//
-    public DcMotor driveFrontRight,driveFrontLeft,driveBackLeft,driveBackRight; //drive motors
+    public MecanumDriveTrain driveTrain = new MecanumDriveTrain();
     public DcMotor cascadeLiftMotor,turntableMotor; //other motors
 
     //**Servos**//
@@ -120,6 +124,7 @@ public class Hardware {
     private ElapsedTime runtime  = new ElapsedTime();
     //PID controllers
     public PIDController FrBlStrafePIDController, FlBrStrafePIDController, rotatePIDController;
+    private PIDFCoefficients pidfCoefficients;
 
     //**variables for robot measurements**//
 
@@ -129,12 +134,11 @@ public class Hardware {
     // stats for the TorqueNADO motors
     public final double NADO_COUNTS_PER_MOTOR_REV = 1440;
     public final double NADO_DRIVE_GEAR_REDUCTION = 1;  // This is < 1.0 if geared UP (to increase speed)
-    public final double NADO_WHEEL_DIAMETER_METERS= 0.1016; //(4") For figuring circumference
+    public final double NADO_WHEEL_DIAMETER_METERS= 0.2032; //(8") For figuring circumference
     public final double NADO_COUNTS_PER_METER      = (NADO_COUNTS_PER_MOTOR_REV * NADO_DRIVE_GEAR_REDUCTION) /
             (NADO_WHEEL_DIAMETER_METERS * Math.PI);
     public final double NADO_METERS_PER_COUNT = 1.0 / NADO_COUNTS_PER_METER;
 
-    ////////////////////////////// Constructors and init method //////////////////////////////
     /* --Constructors-- */
     public Hardware(){
 
@@ -148,7 +152,9 @@ public class Hardware {
         hwMap = ahwMap;
 
         /*initialize hardware components*/
-        /* Motors */
+        /* Drive Train */
+        driveTrain.init(hwMap);
+
         initMotors();
 
         /* Servos */
@@ -175,7 +181,6 @@ public class Hardware {
     private void initMotors()
     {
         //drive motors
-        initDriveMotors();
 
         //other motors
         initOtherMotors();
@@ -187,45 +192,6 @@ public class Hardware {
         cascadeLiftParams.put("extended", 2150.0);
         cascadeLiftParams.put("retracted", 0.0);
         params.put("cascadeLiftMotor", cascadeLiftParams);
-    }
-    private void initDriveMotors() {
-        // Define and initialize all Motors
-        driveFrontLeft  = hwMap.get(DcMotor.class, "front_left_drive");  //main hub port 0
-        driveFrontRight = hwMap.get(DcMotor.class, "front_right_drive"); //main hub port 1
-        driveBackRight  = hwMap.get(DcMotor.class, "back_right_drive");  //main hub port 2
-        driveBackLeft   = hwMap.get(DcMotor.class, "back_left_drive");   //main hub port 3
-
-        // Set all motors to zero power
-        driveFrontRight.setPower(0);
-        driveFrontLeft.setPower(0);
-        driveBackLeft.setPower(0);
-        driveBackRight.setPower(0);
-
-        // Set run modes
-        //TODO: set drive motors to RUN_WITHOUT_ENCODER when PIDs are integrated for movement in order to improve output power
-        //reset encoders
-        driveFrontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        driveFrontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        driveBackLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        driveBackRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        //run using encoders
-        driveFrontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER); //torqueNADO motor
-        driveFrontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);  //torqueNADO motor
-        driveBackLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);   //torqueNADO motor
-        driveBackRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);  //torqueNADO motor
-        //run without encoders
-
-        // Set Zero power behavior
-        driveFrontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        driveFrontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        driveBackLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        driveBackRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-
-        //assign motor directions
-        driveFrontRight.setDirection(DcMotor.Direction.REVERSE);
-        driveFrontLeft.setDirection(DcMotor.Direction.FORWARD);
-        driveBackLeft.setDirection(DcMotor.Direction.FORWARD);
-        driveBackRight.setDirection(DcMotor.Direction.REVERSE);
     }
     private void initOtherMotors()
     {
@@ -316,7 +282,6 @@ public class Hardware {
 
         //TODO: add vuforia configs adeel
     }
-    //PIDS
     /*
     calculated coefficients for a torquenado motor with no load.
     target and input values are the encoder count of the motor, it's a position PID, and while it may work for velocity, velocity was not what it was tuned for.
@@ -346,7 +311,7 @@ public class Hardware {
      * @param FlBrStrafe    coefficients for the frontLeft-backRight axis strafing PID
      * @param rotate        coefficients for the rotation PID
      */
-    public void initPIDs(PIDCoefficients FrBlStrafe, PIDCoefficients FlBrStrafe, PIDCoefficients rotate) {
+    private void initPIDs(PIDCoefficients FrBlStrafe, PIDCoefficients FlBrStrafe, PIDCoefficients rotate) {
         //save coefficients
         //**PIDS**//
         //PID coefficients
@@ -376,247 +341,8 @@ public class Hardware {
     }
 
     ////////////////////////////// Methods //////////////////////////////
-    /**
-     * runs a given motor (that has an encoder) to a given position, at a given power
-     * @param motor the motor to move
-     * @param targetPosition    the position to move to
-     * @param power the power to move at (must be positive)
-     */
-    public void runMotorToPosition(DcMotor motor, int targetPosition, double power) {
-        power = Math.abs(power);
-        motor.setPower(0);
-        motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
-        //set target
-        motor.setTargetPosition(targetPosition);
-
-        //set to RUN_TO_POSITION
-        motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
-        //set power
-        motor.setPower(power);
-        //if (targetPosition > motor.getCurrentPosition()) motor.setPower(power);
-        //else if (targetPosition < motor.getCurrentPosition()) motor.setPower(-power);
-
-        //wait
-        while (motor.isBusy()) {} //let the motor run to that position
-
-        //stop, and go back to normal drive mode
-        motor.setPower(0);
-        motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-    }
-
-    /**
-     * given a power and direction, causes the robot to strafe continuously in that given direction at the given power
-     * @param power power factor
-     * @param angle direction to strafe relative to robot, measure in radians, angle of 0 == starboard
-     */
-    public void strafeDirection(double power, double angle) {
-        // calculate the power that needs to be assigned to each diagonal pair of motors
-        double FrBlPairPower = Math.sin(angle - (Math.PI/4)) * power;
-        double FlBrPairPower = Math.sin(angle + (Math.PI/4)) * power;
-
-        setDrivetrainPowerMecanum(FrBlPairPower, FlBrPairPower);
-    }
-    /**
-     * TODO: reimplement heading correction once odometry is up and running
-     * causes the robot to strafe a given direction, at a given power, for a given distance using PIDs
-     * power and distance should always be positive
-     * DOES NOT USE IMU ANYMORE BC THAT WAS CAUSING ISSUES
-     * @param power             power factor
-     * @param angle             direction to strafe relative to robot, measure in radians, angle of 0 == starboard
-     * @param targetDistance    distance to strafe, measured in meters
-     */
-    public void strafeToDistance(double power, double angle, double targetDistance) {
-        double rotationCorrection;
-        //initial heading and encoder counts
-        double initialHeading = getGlobalAngle();
-        int initialFrBlAxisEncoderCount = (driveFrontRight.getCurrentPosition() + driveBackLeft.getCurrentPosition())/2;
-        int initialFlBrAxisEncoderCount = (driveFrontLeft.getCurrentPosition() + driveBackRight.getCurrentPosition())/2;
-
-        //calculate desired power for each diagonal motor pair
-        double FrBlPairPower = Math.sin(angle - (Math.PI/4));
-        double FlBrPairPower = Math.sin(angle + (Math.PI/4));
-
-        //find the desired target for each strafe PID
-        int FrBlAxisTarget = (int) (targetDistance * (FrBlPairPower) * NADO_COUNTS_PER_METER);
-        int FlBrAxisTarget = (int) (targetDistance * (FlBrPairPower) * NADO_COUNTS_PER_METER);
-
-        //set up the PIDs
-        power = Math.abs(power);
-        //FrBl PID
-        FrBlStrafePIDController.reset();
-        FrBlStrafePIDController.setSetpoint(FrBlAxisTarget);
-        FrBlStrafePIDController.setOutputRange(-power*FrBlPairPower, power*FrBlPairPower);
-        FrBlStrafePIDController.enable(runtime.seconds());
-        //FlBr PID
-        FlBrStrafePIDController.reset();
-        FlBrStrafePIDController.setSetpoint(FlBrAxisTarget);
-        FlBrStrafePIDController.setOutputRange(-power*FlBrPairPower, power*FlBrPairPower);
-        FlBrStrafePIDController.enable(runtime.seconds());
-        //rotation PID (will be used to maintain constant heading)
-        rotatePIDController.reset();
-        rotatePIDController.setSetpoint(initialHeading);
-        rotatePIDController.setOutputRange(-power, power);
-        rotatePIDController.enable(runtime.seconds());
-
-
-        while (!FrBlStrafePIDController.onTarget() || !FlBrStrafePIDController.onTarget()) {
-            //calculate distance travelled by each diagonal pair
-            int FrBlAxisEncoderCount = (driveFrontRight.getCurrentPosition() + driveBackLeft.getCurrentPosition())/2;
-            int FlBrAxisEncoderCount = (driveFrontLeft.getCurrentPosition() + driveBackRight.getCurrentPosition())/2;
-
-            //get correction values
-            FrBlPairPower = FrBlStrafePIDController.performPID(FrBlAxisEncoderCount - initialFrBlAxisEncoderCount,runtime.seconds());
-            FlBrPairPower = FlBrStrafePIDController.performPID(FlBrAxisEncoderCount - initialFlBrAxisEncoderCount,runtime.seconds());
-            rotationCorrection = rotatePIDController.performPID(getGlobalAngle(),runtime.seconds());
-
-            //largest power + rotation correction, or 1
-            double denom = Math.max(
-                    Math.max(Math.abs(FrBlPairPower), Math.abs(FlBrPairPower)) + Math.abs(rotationCorrection),
-                    1.0
-            );
-            //assign drive motor powers
-            setDrivetrainPower(
-                    (FrBlPairPower - rotationCorrection)/denom,
-                    (FlBrPairPower + rotationCorrection)/denom,
-                    (FrBlPairPower + rotationCorrection)/denom,
-                    (FlBrPairPower - rotationCorrection)/denom
-            );
-        }
-
-    }
-
-    /**
-     * rotates the robot by adjusting its current motor powers rather than directly setting powers, allows turning while strafing
-     * @param signedPower determines the directions and power of rotation, larger values result in faster movement, and the sign (positive or negative) of this value determine direction
-     */
-    public void rotateByCorrection(double signedPower) {
-        //largest current power + signedPower, or 1
-        double denom = Math.max(
-                Math.max(
-                        Math.max( Math.abs(driveFrontRight.getPower()), Math.abs(driveFrontLeft.getPower())),
-                        Math.max( Math.abs(driveBackRight.getPower()), Math.abs(driveBackLeft.getPower()))
-                ) + Math.abs(signedPower),
-                1.0
-        );
-        setDrivetrainPower(
-                (driveFrontRight.getPower()-signedPower)/denom,
-                (driveFrontLeft.getPower()+signedPower)/denom,
-                (driveBackLeft.getPower()+signedPower)/denom,
-                (driveBackRight.getPower()-signedPower)/denom
-        );
-    }
-    /**
-     * rotates the bot by directly setting powers
-     * @param power the power to rotate at
-     */
-    public void rotate(double power) {
-        setDrivetrainPower(
-                -power,
-                power,
-                power,
-                -power
-        );
-    }
-
-    /**
-     * given an array of rectangular coordinates (x,y), returns array of equivalent polar coordinates (r, theta)
-     * @param rectangularCoords array of length 2 containing rectangular (x,y) coordinates
-     * @return array of length 2 containing equivalent polar coordinates (or null values if passed array is too big / too small)
-     */
-    public static double[] convertRectangularToPolar(double[] rectangularCoords) {
-        //error prevention
-        if (rectangularCoords.length != 2) return new double[2];
-        else {
-            //calculations
-            double x = rectangularCoords[0];
-            double y = rectangularCoords[1];
-            double radius   = Math.sqrt((x * x) + (y * y));    //radius, distance formula
-            double theta    = Math.atan2(y, x);                //theta, arctangent(y/x)
-
-            return new double[]{radius,theta};
-        }
-    }
-
-    /**
-     * given rectangular coordinates (x,y), returns array of equivalent polar coordinates (r, theta)
-     * @param x x-coordinate
-     * @param y y-coordinate
-     * @return array of length 2 containing equivalent polar coordinates
-     */
-
-    public static double[] convertRectangularToPolar(double x, double y) {
-        return convertRectangularToPolar(new double[]{x, y});
-    }
-
-    /**
-     * given an array of polar coordinates (r, theta), returns array of equivalent rectangular coordinates (x,y)
-     * @param polarCoords array of length 2 containing polar (r,theta) coordinates
-     * @return array of length 2 containing equivalent rectangular coordinates (or null values if passed array is too big / too small)
-     */
-    public static double[] convertPolarToRectangular(double[] polarCoords) {
-        //error prevention
-        if (polarCoords.length != 2) return new double[2];
-        else {
-            //calculations
-            double radius   = polarCoords[0];
-            double theta    = polarCoords[1];
-            double x        = Math.cos(theta) * radius;
-            double y        = Math.sin(theta) * radius;
-
-            return new double[]{x,y};
-        }
-    }
-    /**
-     * given polar coordinates (r, theta), returns array of equivalent rectangular coordinates (x,y)
-     * @param radius radius, distance
-     * @param theta  theta, angle
-     * @return array of length 2 containing equivalent rectangular coordinates
-     */
-    public static double[] convertPolarToRectangular(double radius, double theta) {
-        return convertPolarToRectangular(new double[]{radius, theta});
-    }
 
     ////////////////////////////// Set Methods //////////////////////////////
-    /**
-     * set power to all drive motors individually
-     * @param frontRightPower   power to assign to driveFrontRight
-     * @param frontLeftPower    power to assign to driveFrontLeft
-     * @param backLeftPower     power to assign to driveBackLeft
-     * @param backRightPower    power to assign to driveBackRight
-     */
-    public void setDrivetrainPower(double frontRightPower, double frontLeftPower, double backLeftPower, double backRightPower){
-        driveFrontRight.setPower(frontRightPower);
-        driveFrontLeft.setPower(frontLeftPower);
-        driveBackLeft.setPower(backLeftPower);
-        driveBackRight.setPower(backRightPower);
-    }
-    /**
-     * set all motors to the same power
-     * @param power     power to assign to all drive motors
-     */
-    public void setDrivetrainPower(double power){
-        setDrivetrainPower(power,power,power,power);
-    }
-    /**
-     * set power to the left and right motors
-     * useful for traditional tank-like driving, and turning
-     * @param rightPower    power to assign to the right drive motors
-     * @param leftPower     power to assign to the left drive motors
-     */
-    public void setDrivetrainPowerTraditional(double rightPower, double leftPower){
-        setDrivetrainPower(rightPower, leftPower, leftPower, rightPower);
-    }
-    /**
-     * set power to the diagonal pairs of drive motors
-     * useful for strafing with mecanum drivetrains
-     * @param FrBlPairPower     power to assign to the driveFrontRight-driveBackLeft diagonal pair of motors
-     * @param FlBrPairPower     power to assign to the driveFrontLeft-driveBackRight diagonal pair of motors
-     */
-    public void setDrivetrainPowerMecanum(double FrBlPairPower, double FlBrPairPower){
-        setDrivetrainPower(FrBlPairPower,FlBrPairPower,FrBlPairPower,FlBrPairPower);
-    }
 
     ////////////////////////////// Get Methods //////////////////////////////
     /**

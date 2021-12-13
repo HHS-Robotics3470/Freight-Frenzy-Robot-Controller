@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.Hardware;
-import org.firstinspires.ftc.teamcode.PIDController;
+import org.firstinspires.ftc.teamcode.Components.PIDController;
 
 import java.util.ArrayList;
 
@@ -145,7 +145,7 @@ public class PIDTuner extends LinearOpMode {
             double dT = t2 - t1; //change in time
 
             c1 = c2;
-            c2 = robot.driveFrontRight.getCurrentPosition();
+            c2 = robot.driveTrain.driveFrontRight.getCurrentPosition();
             double dC = c2 - c1; //change in count
 
             dCdT = dC/dT; //change in encoder count with respect to time
@@ -154,8 +154,8 @@ public class PIDTuner extends LinearOpMode {
             double power;
             if (gamepad1.a) pid.setSetpoint(10);
             else pid.setSetpoint(1000);
-            power = pid.performPID(robot.driveFrontRight.getCurrentPosition(), runtime.seconds());
-            robot.driveFrontRight.setPower(power);
+            power = pid.performPID(robot.driveTrain.driveFrontRight.getCurrentPosition(), runtime.seconds());
+            robot.driveTrain.driveFrontRight.setPower(power);
 
 
             //telemetry
@@ -204,9 +204,9 @@ public class PIDTuner extends LinearOpMode {
         //stop motor, reset encoders, then have it move to encoder count of 1000 and record data as is oscillates
 
         //stop motor and reset encoders
-        robot.driveFrontRight.setPower(0);
-        robot.driveFrontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        robot.driveFrontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.driveTrain.driveFrontRight.setPower(0);
+        robot.driveTrain.driveFrontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.driveTrain.driveFrontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         //reset PID
         pid.reset();
@@ -219,15 +219,15 @@ public class PIDTuner extends LinearOpMode {
         //record data for 4 seconds
         while (runtime.seconds() - startTime <= 4.0) {
             //run pid
-            power = pid.performPID(robot.driveFrontRight.getCurrentPosition(), runtime.seconds());
-            robot.driveFrontRight.setPower(power);
+            power = pid.performPID(robot.driveTrain.driveFrontRight.getCurrentPosition(), runtime.seconds());
+            robot.driveTrain.driveFrontRight.setPower(power);
 
             //record results
-            countList.add(robot.driveFrontRight.getCurrentPosition() - 1000);
+            countList.add(robot.driveTrain.driveFrontRight.getCurrentPosition() - 1000);
             timeList.add(runtime.seconds() - startTime);
             //powerList.add(power);
         }
-        robot.driveFrontRight.setPower(0);
+        robot.driveTrain.driveFrontRight.setPower(0);
 
         //analyze data somehow
 

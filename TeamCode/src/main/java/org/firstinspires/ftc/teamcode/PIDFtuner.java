@@ -18,8 +18,15 @@ basic idea, let the user cycle through every motor on the robot
 when they press 'a', call a function that goes through the process of calculating PIDF values
  */
 
+/**
+ * can cycle through, and calculate PIDF coefficients appropriate for any installed and initialized motor motor
+ *
+ * untested
+ * 
+ * @author Anthony Rubick
+ */
 @TeleOp(name="PIDF tuner", group = "Tuning")
-@Disabled
+//@Disabled
 //this line disables the teleop from appearing on the driver station, remove it for your code
 public class PIDFtuner extends LinearOpMode {
     /*declare OpMode members, initialize some classes*/

@@ -7,13 +7,13 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.Hardware;
-import org.firstinspires.ftc.teamcode.Components.PIDController;
+import org.firstinspires.ftc.teamcode.Utility.PIDController;
 
 import java.util.ArrayList;
 
 /*
 this opmode should tune the strafing PID's using the Ziegler-Nichols method
-
+but doesn't
  */
 @TeleOp(name="PID Tuner", group = "Tuning")
 @Disabled

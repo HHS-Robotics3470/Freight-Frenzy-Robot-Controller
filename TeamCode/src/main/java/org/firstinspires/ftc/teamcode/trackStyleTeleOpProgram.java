@@ -5,6 +5,10 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+/**
+ * old teleOP, from when the robot was a tank
+ * @author Anthony Rubick
+ */
 @TeleOp(name="trackStyleTeleOpProgram", group="Demos")
 @Disabled
 public class trackStyleTeleOpProgram extends LinearOpMode {
@@ -64,7 +68,7 @@ public class trackStyleTeleOpProgram extends LinearOpMode {
             drivePower = -gamepad1.right_stick_y;
             turnPower = gamepad1.left_stick_x;
 
-            robot.setDrivetrainPower(
+            robot.driveTrain.setPower(
                     drivePower-turnPower,
                     drivePower+turnPower,
                     (2/3.0)*(drivePower+turnPower),
@@ -80,7 +84,7 @@ public class trackStyleTeleOpProgram extends LinearOpMode {
             //A
             aCurr = gamepad1.a;
             if (aCurr && !aPrev) {
-                robot.cascadeOutputServo.setPosition((-1*((robot.cascadeOutputServo.getPosition()-0.4) -0.1) + 0.1) + 0.4); //toggle between 0.6 and 0.4
+                robot.cascadeOutputSystem.outputGrabberServo.setPosition((-1*((robot.cascadeOutputSystem.outputGrabberServo.getPosition()-0.4) -0.1) + 0.1) + 0.4); //toggle between 0.6 and 0.4
             }
             aPrev = aCurr;
             //Y
@@ -92,17 +96,17 @@ public class trackStyleTeleOpProgram extends LinearOpMode {
 
             //D-Pad
             //up & down
-            if (gamepad1.dpad_up && robot.cascadeLiftMotor.getCurrentPosition() < 2400) {
-                robot.cascadeLiftMotor.setPower(1);
+            if (gamepad1.dpad_up && robot.cascadeOutputSystem.cascadeLiftMotor.getCurrentPosition() < 2400) {
+                robot.cascadeOutputSystem.cascadeLiftMotor.setPower(1);
             }
-            else if (gamepad1.dpad_down && robot.cascadeLiftMotor.getCurrentPosition() > 0) {
-                robot.cascadeLiftMotor.setPower(-1);
+            else if (gamepad1.dpad_down && robot.cascadeOutputSystem.cascadeLiftMotor.getCurrentPosition() > 0) {
+                robot.cascadeOutputSystem.cascadeLiftMotor.setPower(-1);
             }
             else {
-                robot.cascadeLiftMotor.setPower(0);
+                robot.cascadeOutputSystem.cascadeLiftMotor.setPower(0);
             }
 
-            telemetry.addData("cascade lift motor encoder count: ", robot.cascadeLiftMotor.getCurrentPosition());
+            telemetry.addData("cascade lift motor encoder count: ", robot.cascadeOutputSystem.cascadeLiftMotor.getCurrentPosition());
             telemetry.update();
         }
 

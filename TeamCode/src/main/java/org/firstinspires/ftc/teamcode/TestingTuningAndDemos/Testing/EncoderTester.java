@@ -10,6 +10,10 @@ import org.firstinspires.ftc.teamcode.Hardware;
 
 import java.util.List;
 
+/**
+ * can cycle through and individually test every installed and configured motor
+ * @author Anthony Rubick
+ */
 @TeleOp(name="T: Encoder Tester", group = "Testing")
 //@Disabled //this line disables the teleop from appearing on the driver station, remove it when needed
 public class EncoderTester extends LinearOpMode {
@@ -44,7 +48,7 @@ public class EncoderTester extends LinearOpMode {
 
         ////////////after driver presses play////////////
         //maybe some other set up stuff depending on how we want to do this
-        if (listSize <= 0) // if no servos were loaded, notify the user and end the program
+        if (listSize <= 0) // if no motors were loaded, notify the user and end the program
         {
             telemetry.addLine("ERROR:");
             telemetry.addLine(" - no motors connected/configured, or other issue loading motors");

@@ -1,9 +1,11 @@
-package org.firstinspires.ftc.teamcode.Components;
+package org.firstinspires.ftc.teamcode.Utility;
 
-// PID controller courtesy of Peter Tischler, with modifications by Anthony Rubick
 
 import com.qualcomm.robotcore.hardware.PIDCoefficients;
 
+/**
+ * PID controller courtesy of Peter Tischler, with modifications by Anthony Rubick
+ */
 public class PIDController
 {
     ///////////////////////////////////////////////////////// Class Variables /////////////////////////////////////////////////////////

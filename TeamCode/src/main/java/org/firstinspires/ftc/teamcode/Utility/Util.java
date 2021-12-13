@@ -1,9 +1,10 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.Utility;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 /**
  * contains a bunch of helpful static methods
+ * @author Anthony Rubick
  */
 public class Util {
     /**

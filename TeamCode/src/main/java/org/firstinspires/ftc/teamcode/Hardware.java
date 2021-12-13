@@ -4,7 +4,7 @@ import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.HardwareDevice;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.PIDCoefficients;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
@@ -16,9 +16,11 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
+import org.firstinspires.ftc.teamcode.Components.CascadeOutputSystem;
 import org.firstinspires.ftc.teamcode.Components.Component;
+import org.firstinspires.ftc.teamcode.Components.IntakeSystem;
 import org.firstinspires.ftc.teamcode.Components.MecanumDriveTrain;
-import org.firstinspires.ftc.teamcode.Components.PIDController;
+import org.firstinspires.ftc.teamcode.Utility.PIDController;
 
 import java.util.HashMap;
 import java.util.List;
@@ -86,6 +88,7 @@ x-neg|---+---|pos
  * the risk of error in the event the robot is updated
  *
  * this class should contain the initialization for the robot, as well as many of the methods the robot will use in its OpModes
+ * @author Anthony Rubick
  */
 public class Hardware implements Component {
     ////////////////////////////// class variables //////////////////////////////
@@ -97,15 +100,18 @@ public class Hardware implements Component {
     //params for hardware elements, store positions and whatnot that equate to known output, IE servo position for a claw to open/close,
     //first layer: specific hardware element (ie "cascade lift", "front input servo", etc.)
     //      second layer, parameters (k,v) (ie. ("open", 0.6), etc.)
-    public Map<String, Map<String, Double>> params;
+    //public Map<String, Map<String, Double>> params;
 
     /* --Public OpMode members.-- */
-    //**Motors**//
+    //**Components**//
     public MecanumDriveTrain driveTrain = new MecanumDriveTrain();
-    public DcMotor cascadeLiftMotor,turntableMotor; //other motors
+    public IntakeSystem intakeSystem = new IntakeSystem();
+    public CascadeOutputSystem cascadeOutputSystem = new CascadeOutputSystem();
+
+    //**Motors**//
+    public DcMotor turntableMotor; //other motors
 
     //**Servos**//
-    public Servo cascadeOutputServo, cascadeFlipperServo, frontInputFlipperServo, frontInputServo;
 
     //**Sensors**//
 
@@ -145,6 +151,7 @@ public class Hardware implements Component {
     }
 
     /* --Initialize standard Hardware interfaces-- */
+    @Override
     public void init(HardwareMap ahwMap) {
         runtime.reset();
 
@@ -154,11 +161,15 @@ public class Hardware implements Component {
         /*initialize hardware components*/
         /* Drive Train */
         driveTrain.init(hwMap);
+        /* Intake */
+        intakeSystem.init(hwMap);
+        /* Output */
+        cascadeOutputSystem.init(hwMap);
 
+        /* Motors */
         initMotors();
 
         /* Servos */
-        initServos();
 
         /* Sensors */
         initSensors();
@@ -177,84 +188,30 @@ public class Hardware implements Component {
             module.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
         }
     }
+
+    /**
+     * @return a list of all hardware devices included on the component
+     */
+    @Override
+    public List<HardwareDevice> getAll() {
+        return null;
+    }
+
     //motors
     private void initMotors()
     {
         //drive motors
 
         //other motors
-        initOtherMotors();
-
-        //parameters
-        params = new HashMap<>();
-        //cascade lift params
-        HashMap<String, Double> cascadeLiftParams = new HashMap<>();
-        cascadeLiftParams.put("extended", 2150.0);
-        cascadeLiftParams.put("retracted", 0.0);
-        params.put("cascadeLiftMotor", cascadeLiftParams);
-    }
-    private void initOtherMotors()
-    {
-        //define and initialize
-        cascadeLiftMotor = hwMap.get(DcMotor.class, "cascade_lift_motor");        //expansion hub port 1 //max extension = 2150 counts
         turntableMotor = hwMap.get(DcMotor.class,  "front_left_turntable_motor"); //expansion hub port 2
-
         // Set power to zero
-        cascadeLiftMotor.setPower(0);
         turntableMotor.setPower(0);
-
         // Set run modes
-        cascadeLiftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        cascadeLiftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
         turntableMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-
         // Set zero power behavior
-        cascadeLiftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         turntableMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-
         // assign motor directions
-        cascadeLiftMotor.setDirection(DcMotor.Direction.FORWARD);
         turntableMotor.setDirection(DcMotor.Direction.FORWARD);
-    }
-    //servos
-    private void initServos() {
-        // Define and initialize ALL installed servos.
-        cascadeOutputServo = hwMap.get(Servo.class, "cascade_output_servo"); //closed 1, open to drop 0.75, open to receive 0.5
-        cascadeFlipperServo = hwMap.get(Servo.class, "cascade_output_flipper_servo"); // retracted 0.125, extended flat 0.8, extended up 0.6, extended down 0.95
-        frontInputFlipperServo = hwMap.get(Servo.class, "front_input_flipper_servo"); //down 0.01, up 0.7
-        frontInputServo = hwMap.get(Servo.class, "front_input_servo");//full open 0.3; half open 0.55; closed 0.72
-
-        // Set start positions for ALL installed servos
-        cascadeOutputServo.setPosition(1);
-        cascadeFlipperServo.setPosition(0.125);
-        frontInputFlipperServo.setPosition(0.01);
-        frontInputServo.setPosition(0.3);
-
-        //params
-        params = new HashMap<>();
-        HashMap<String, Double> cascadeOutputServoParams = new HashMap<>();
-        cascadeOutputServoParams.put("closed", 1.0);
-        cascadeOutputServoParams.put("drop", 0.75);
-        cascadeOutputServoParams.put("receive", 0.5);
-        HashMap<String, Double> cascadeFlipperServoParams = new HashMap<>();
-        cascadeFlipperServoParams.put("retracted", 0.125);
-        cascadeFlipperServoParams.put("flat", 0.8);
-        cascadeFlipperServoParams.put("up", 0.6);
-        cascadeFlipperServoParams.put("down", 0.95);
-        HashMap<String, Double> frontInputFlipperServoParams = new HashMap<>();
-        frontInputFlipperServoParams.put("down", 0.05);
-        frontInputFlipperServoParams.put("up", 0.7);
-        frontInputFlipperServoParams.put("raised", 0.2);
-        HashMap<String, Double> frontInputServoParams = new HashMap<>();
-        frontInputServoParams.put("full open", 0.3);
-        frontInputServoParams.put("half open", 0.55);
-        frontInputServoParams.put("closed", 0.72);
-        params.put("cascadeOutputServo", cascadeOutputServoParams);
-        params.put("cascadeFlipperServo", cascadeFlipperServoParams);
-        params.put("frontInputFlipperServo",frontInputFlipperServoParams);
-        params.put("frontInputServo", frontInputServoParams);
-
     }
     //sensors
     private void initSensors() {

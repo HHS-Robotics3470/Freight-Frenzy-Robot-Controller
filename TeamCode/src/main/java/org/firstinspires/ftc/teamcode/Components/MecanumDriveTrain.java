@@ -2,13 +2,21 @@ package org.firstinspires.ftc.teamcode.Components;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.HardwareDevice;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * This is NOT an opmode.
+ * this class should contain the initialization for the drive train,
+ * as well as many of the methods the robot will use in its OpModes
+ * @author Anthony Rubick
+ */
 public class MecanumDriveTrain implements Component {
+    ////////////////////////////// class variables //////////////////////////////
     //**info, measurements, known positions, etc.**//
     // stats for the TorqueNADO motors
     public final double NADO_COUNTS_PER_MOTOR_REV = 1440;
@@ -18,11 +26,10 @@ public class MecanumDriveTrain implements Component {
             (NADO_WHEEL_DIAMETER_METERS * Math.PI);
     public final double NADO_METERS_PER_COUNT = 1.0 / NADO_COUNTS_PER_METER;
     //PID info
-    PIDFCoefficients velocityPIDFCoefficients = new PIDFCoefficients(); //TODO: initialize this once PIDF coefficients are known
-    PIDFCoefficients positionPIDFCoefficients = new PIDFCoefficients(); //TODO: initialize this once PIDF coefficients are known
+    public PIDFCoefficients velocityPIDFCoefficients = new PIDFCoefficients(); //TODO: initialize this once PIDF coefficients are known
+    public PIDFCoefficients positionPIDFCoefficients = new PIDFCoefficients(); //TODO: initialize this once PIDF coefficients are known
     public int targetPositionTolerance = 50;
 
-    ////////////////////////////// class variables //////////////////////////////
     /* --Public OpMode members.-- */
     public DcMotorEx driveFrontRight,driveFrontLeft,driveBackLeft,driveBackRight; //drive motors
 
@@ -33,6 +40,7 @@ public class MecanumDriveTrain implements Component {
     /* --Constructors-- */
     public MecanumDriveTrain(){}
     /* --Initialize standard Hardware interfaces-- */
+    @Override
     public void init(HardwareMap ahwMap) {
         // Save reference to Hardware map
         hwMap = ahwMap;
@@ -268,18 +276,28 @@ public class MecanumDriveTrain implements Component {
         driveBackLeft.setTargetPositionTolerance(tolerance);
         driveBackRight.setTargetPositionTolerance(tolerance);
     }
-
+    /**
+     * runs the setMode() method from DcMotor on all drive motors using passed parameters
+     * @param runMode RUNMODE to use
+     */
+    public void setMode(DcMotor.RunMode runMode) {
+        driveFrontRight.setMode(runMode);
+        driveFrontLeft.setMode(runMode);
+        driveBackLeft.setMode(runMode);
+        driveBackRight.setMode(runMode);
+    }
     ////////////////////////////// Get Methods //////////////////////////////
     /**
      * @return a list containing all DcMotors in this component
      */
-    public List<DcMotorEx> getAllMotors() {
-        List<DcMotorEx> dcMotorExList = new LinkedList<>();
-        dcMotorExList.add(driveFrontRight);
-        dcMotorExList.add(driveFrontLeft);
-        dcMotorExList.add(driveBackLeft);
-        dcMotorExList.add(driveBackRight);
-        return dcMotorExList;
+    @Override
+    public List<HardwareDevice> getAll() {
+        List<HardwareDevice> hardwareDeviceList = new LinkedList<>();
+        hardwareDeviceList.add(driveFrontRight);
+        hardwareDeviceList.add(driveFrontLeft);
+        hardwareDeviceList.add(driveBackLeft);
+        hardwareDeviceList.add(driveBackRight);
+        return hardwareDeviceList;
     }
 
 

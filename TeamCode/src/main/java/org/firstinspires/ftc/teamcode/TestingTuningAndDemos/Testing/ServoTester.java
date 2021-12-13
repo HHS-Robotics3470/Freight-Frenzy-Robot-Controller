@@ -10,6 +10,10 @@ import org.firstinspires.ftc.teamcode.Hardware;
 
 import java.util.List;
 
+/**
+ * can cycle through and test every installed and configured servo
+ * @author Anthony Rubick
+ */
 @TeleOp(name="T: ServoTester", group="Testing" )
 //@Disabled //this line disables the teleop from appearing on the driver station, remove it when needed
 public class ServoTester extends LinearOpMode {

@@ -7,6 +7,11 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.Hardware;
 
+/**
+ * Template for TeleOp routines
+ *
+ * @author Anthony Rubick
+ */
 @TeleOp(name="teleOpProgramTemplate")
 @Disabled //this line disables the teleop from appearing on the driver station, remove it for your code
 public class teleOpProgramTemplate extends LinearOpMode {

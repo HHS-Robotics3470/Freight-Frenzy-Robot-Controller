@@ -9,7 +9,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 public class MecanumTeleOp extends LinearOpMode {
     /*declare OpMode members, initialize some classes*/
     //an enum to represent output flipper states
-    public enum OutputFlipperState {
+    public enum OutputArmState {
         RETRACTED,
         FLAT,
         UP,
@@ -61,7 +61,7 @@ public class MecanumTeleOp extends LinearOpMode {
         ////////////before driver presses play////////////
         //Variables
         //state enums
-        OutputFlipperState outputFlipperState = OutputFlipperState.RETRACTED;
+        OutputArmState outputArmState = OutputArmState.RETRACTED;
         IOState inputState = IOState.OPEN;
         IOState outputState = IOState.CLOSED;
         AProcess aState = AProcess.NOT_STARTED; //state of the process attached to the 'a' button
@@ -70,14 +70,14 @@ public class MecanumTeleOp extends LinearOpMode {
         boolean aC, bC, yC, xC, upC, downC; //is currently pressed
         boolean aP = false, bP = false, yP = false, xP = false, upP = false, downP = false; //was previously pressed
         //other
-        double tempOutFlipPos;
+        double tempOutArmPos;
         int cascadeCount = 0;
 
         /* Initialize the hardware variables.
          * The init() method of the hardware class does all the work here
          */
         robot.init(hardwareMap);
-        tempOutFlipPos = robot.params.get("cascadeFlipperServo").get("retracted"); //initialize this as the retracted position
+        tempOutArmPos = robot.cascadeOutputSystem.ARM_RETRACTED; //initialize this as the retracted position
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
         runtime.reset();
@@ -144,25 +144,17 @@ public class MecanumTeleOp extends LinearOpMode {
                     if (aC&&!aP) {
                         switch (inputState) {
                             case OPEN:
-                                robot.frontInputServo.setPosition(
-                                        robot.params.get("frontInputServo").get("closed")
-                                ); //close
+                                robot.intakeSystem.intakeGrabberServo.setPosition(robot.intakeSystem.GRABBER_CLOSED);
                                 inputState = IOState.CLOSED;
-
                                 //set up for rest of the states
                                 aState = AProcess.IN_PROGRESS;
                                 inputTimer.reset();
                                 break;
                             case CLOSED:
-                                robot.frontInputServo.setPosition(
-                                        robot.params.get("frontInputServo").get("full open")
-                                ); //open
+                                robot.intakeSystem.intakeGrabberServo.setPosition(robot.intakeSystem.GRABBER_FULL_OPEN);
                                 inputState = IOState.OPEN;
-
                                 //skip to end
-                                robot.frontInputFlipperServo.setPosition(
-                                        robot.params.get("frontInputFlipperServo").get("down")
-                                ); //down
+                                robot.intakeSystem.intakeArmServo.setPosition(robot.intakeSystem.ARM_DOWN);
                                 aState = AProcess.ENDED;
                                 break;
                             default:
@@ -174,10 +166,7 @@ public class MecanumTeleOp extends LinearOpMode {
                 case IN_PROGRESS:
                     //wait 400ms to give flipper time to raise / lower
                     if (inputTimer.seconds() >= .400) {
-                        robot.frontInputFlipperServo.setPosition(
-                                robot.params.get("frontInputFlipperServo").get("raised")
-                        ); //raise slightly
-
+                        robot.intakeSystem.intakeArmServo.setPosition(robot.intakeSystem.ARM_RAISED);
                         aState = AProcess.ENDED;
                     }
                     break;
@@ -188,51 +177,39 @@ public class MecanumTeleOp extends LinearOpMode {
             }
             //B transfer input to output
             //cascadeCount saves the position of the cascade so we can return to it later
-            //tempOutFlipPos saves the position of the flipper so we can return to it later
+            //tempOutArmPos saves the position of the flipper so we can return to it later
             switch (bState) {
                 case NOT_STARTED:
                     if (bC&&!bP) {
                         //save some info about the robots state so we can return to it at the end
-                        tempOutFlipPos = robot.cascadeFlipperServo.getPosition();
-                        cascadeCount = robot.cascadeLiftMotor.getCurrentPosition();
+                        tempOutArmPos = robot.cascadeOutputSystem.outputArmServo.getPosition();
+                        cascadeCount = robot.cascadeOutputSystem.cascadeLiftMotor.getCurrentPosition();
 
                         if (inputState != IOState.CLOSED) {
-                            robot.frontInputServo.setPosition(
-                                    robot.params.get("frontInputServo").get("closed")
-                            ); //close input
+                            robot.intakeSystem.intakeGrabberServo.setPosition(robot.intakeSystem.GRABBER_CLOSED);//close input
                         }
-                        robot.cascadeOutputServo.setPosition(
-                                robot.params.get("cascadeOutputServo").get("receive")
-                        ); //open output
-                        robot.cascadeFlipperServo.setPosition(
-                                robot.params.get("cascadeFlipperServo").get("retracted")
-                        ); //fold back
+                        robot.cascadeOutputSystem.outputGrabberServo.setPosition(robot.cascadeOutputSystem.GRABBER_RECEIVE);//open output
+                        robot.cascadeOutputSystem.outputArmServo.setPosition(robot.cascadeOutputSystem.ARM_RETRACTED);//fold back
                         //restrict relevant systems
                         inputState = IOState.RESTRICTED;
                         outputState = IOState.RESTRICTED;
-                        outputFlipperState = OutputFlipperState.RESTRICTED;
+                        outputArmState = OutputArmState.RESTRICTED;
 
                         //retract cascade
-                        robot.cascadeLiftMotor.setPower(0);
-                        robot.cascadeLiftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-                        robot.cascadeLiftMotor.setTargetPosition(robot.params.get("cascadeLiftMotor").get("retracted").intValue());
-                        robot.cascadeLiftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                        robot.cascadeLiftMotor.setPower(1);
+                        robot.cascadeOutputSystem.extendCascadeToPosition(robot.cascadeOutputSystem.CASCADE_RETRACTED,1);
 
                         bState = BProcess.STAGE_ONE; //go to next stage
                     }
                     break;
                 case STAGE_ONE:
                     //wait for cascadeLiftMotor to finish moving
-                    if (!robot.cascadeLiftMotor.isBusy()) {
+                    if (!robot.cascadeOutputSystem.cascadeLiftMotor.isBusy()) {
                         //reset motor, get out of RUN_TO_POSITION mode
-                        robot.cascadeLiftMotor.setPower(0);
-                        robot.cascadeLiftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                        robot.cascadeOutputSystem.cascadeLiftMotor.setPower(0);
+                        robot.cascadeOutputSystem.cascadeLiftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
                         //raise front input flipper to drop off element
-                        robot.frontInputFlipperServo.setPosition(
-                                robot.params.get("frontInputFlipperServo").get("up")
-                        );
+                        robot.intakeSystem.intakeArmServo.setPosition(robot.intakeSystem.ARM_UP);
                         bState = BProcess.STAGE_TWO; //go to next stage
                         bProcessTimer.reset();
                     }
@@ -240,12 +217,8 @@ public class MecanumTeleOp extends LinearOpMode {
                 case STAGE_TWO:
                     //wait 700ms for input flipper to raise fully
                     if (bProcessTimer.seconds() >= .700) {
-                        robot.cascadeOutputServo.setPosition(
-                                robot.params.get("cascadeOutputServo").get("closed")
-                        ); //close output
-                        robot.frontInputServo.setPosition(
-                                robot.params.get("frontInputServo").get("half open")
-                        ); //open input
+                        robot.cascadeOutputSystem.outputGrabberServo.setPosition(robot.cascadeOutputSystem.GRABBER_CLOSED); //close output
+                        robot.intakeSystem.intakeGrabberServo.setPosition(robot.intakeSystem.GRABBER_PARTIAL_OPEN); //open input
 
                         bState = BProcess.STAGE_THREE; // go to next stage
                         bProcessTimer.reset();
@@ -254,32 +227,28 @@ public class MecanumTeleOp extends LinearOpMode {
                 case STAGE_THREE:
                     //wait 300ms to give time for the game element to transfer before re-extending cascade
                     if (bProcessTimer.seconds() >= .300) {
-                        robot.frontInputFlipperServo.setPosition(
-                                robot.params.get("frontInputFlipperServo").get("down")
-                        );
-                        robot.frontInputServo.setPosition(
-                                robot.params.get("frontInputServo").get("full open")
-                        ); //fully open input
+                        robot.intakeSystem.intakeArmServo.setPosition(robot.intakeSystem.ARM_DOWN);
+                        robot.intakeSystem.intakeGrabberServo.setPosition(robot.intakeSystem.GRABBER_FULL_OPEN); //fully open input
 
                         //extend cascade back to previous position
-                        robot.cascadeLiftMotor.setPower(0);
-                        robot.cascadeLiftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-                        robot.cascadeLiftMotor.setTargetPosition(cascadeCount);
-                        robot.cascadeLiftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                        robot.cascadeLiftMotor.setPower(1);
+                        robot.cascadeOutputSystem.cascadeLiftMotor.setPower(0);
+                        robot.cascadeOutputSystem.cascadeLiftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                        robot.cascadeOutputSystem.cascadeLiftMotor.setTargetPosition(cascadeCount);
+                        robot.cascadeOutputSystem.cascadeLiftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                        robot.cascadeOutputSystem.cascadeLiftMotor.setPower(1);
 
                         bState = BProcess.ENDED; //go to next stage
                     }
                     break;
                 case ENDED:
                     //wait for cascadeLiftMotor to finish moving
-                    if (!robot.cascadeLiftMotor.isBusy()) {
+                    if (!robot.cascadeOutputSystem.cascadeLiftMotor.isBusy()) {
                         //move output flipper back to level it was at previously
-                        robot.cascadeFlipperServo.setPosition(tempOutFlipPos);
+                        robot.cascadeOutputSystem.outputArmServo.setPosition(tempOutArmPos);
 
                         //reset motor, get out of RUN_TO_POSITION mode
-                        robot.cascadeLiftMotor.setPower(0);
-                        robot.cascadeLiftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                        robot.cascadeOutputSystem.cascadeLiftMotor.setPower(0);
+                        robot.cascadeOutputSystem.cascadeLiftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
                         //update robot state
                         outputState = IOState.CLOSED;
@@ -295,17 +264,13 @@ public class MecanumTeleOp extends LinearOpMode {
             switch (outputState) {
                 case RESTRICTED:
                     if (xC&&!xP) {
-                        robot.cascadeOutputServo.setPosition(
-                                robot.params.get("cascadeOutputServo").get("closed")
-                        ); //close
+                        robot.cascadeOutputSystem.outputGrabberServo.setPosition(robot.cascadeOutputSystem.GRABBER_CLOSED); //close
                         outputState = IOState.CLOSED;
                     }
                     break;
                 case CLOSED:
                     if (xC&&!xP) {
-                        robot.cascadeOutputServo.setPosition(
-                                robot.params.get("cascadeOutputServo").get("drop")
-                        );
+                        robot.cascadeOutputSystem.outputGrabberServo.setPosition(robot.cascadeOutputSystem.GRABBER_DROP);
                         outputState = IOState.OPEN;
                     }
                     break;
@@ -316,77 +281,55 @@ public class MecanumTeleOp extends LinearOpMode {
 
             /////D-Pad/////
             //UP DOWN Y
-            switch (outputFlipperState) {
+            switch (outputArmState) {
                 case RETRACTED:
                     if (yC&&!yP) {
-                        robot.cascadeFlipperServo.setPosition(
-                                robot.params.get("cascadeFlipperServo").get("flat")
-                        ); //extend flat
-                        outputFlipperState = OutputFlipperState.FLAT;
+                        robot.cascadeOutputSystem.outputArmServo.setPosition(robot.cascadeOutputSystem.ARM_EXTENDED_FLAT); //extend flat
+                        outputArmState = OutputArmState.FLAT;
                     }
                     break;
                 case FLAT:
                     if (upC&&!upP) {
-                        robot.cascadeFlipperServo.setPosition(
-                                robot.params.get("cascadeFlipperServo").get("up")
-                        ); //up
-                        outputFlipperState = OutputFlipperState.UP;
+                        robot.cascadeOutputSystem.outputArmServo.setPosition(robot.cascadeOutputSystem.ARM_EXTENDED_UP); //up
+                        outputArmState = OutputArmState.UP;
                     } else if (downC&&!downP) {
-                        robot.cascadeFlipperServo.setPosition(
-                                robot.params.get("cascadeFlipperServo").get("down")
-                        ); //down
-                        outputFlipperState = OutputFlipperState.DOWN;
+                        robot.cascadeOutputSystem.outputArmServo.setPosition(robot.cascadeOutputSystem.ARM_EXTENDED_DOWN); //down
+                        outputArmState = OutputArmState.DOWN;
                     } else if (yC&&!yP) {
-                        robot.cascadeFlipperServo.setPosition(
-                                robot.params.get("cascadeFlipperServo").get("retracted")
-                        ); //retract
-                        outputFlipperState = OutputFlipperState.RETRACTED;
+                        robot.cascadeOutputSystem.outputArmServo.setPosition(robot.cascadeOutputSystem.ARM_RETRACTED); //retract
+                        outputArmState = OutputArmState.RETRACTED;
                     }
                     break;
                 case UP:
                     if (upC&&!upP) {
-                        robot.cascadeFlipperServo.setPosition(
-                                robot.params.get("cascadeFlipperServo").get("down")
-                        ); //down
-                        outputFlipperState = OutputFlipperState.DOWN;
+                        robot.cascadeOutputSystem.outputArmServo.setPosition(robot.cascadeOutputSystem.ARM_EXTENDED_DOWN); //down
+                        outputArmState = OutputArmState.DOWN;
                     } else if (downC&&!downP) {
-                        robot.cascadeFlipperServo.setPosition(
-                                robot.params.get("cascadeFlipperServo").get("flat")
-                        ); //flat
-                        outputFlipperState = OutputFlipperState.FLAT;
+                        robot.cascadeOutputSystem.outputArmServo.setPosition(robot.cascadeOutputSystem.ARM_EXTENDED_FLAT); //flat
+                        outputArmState = OutputArmState.FLAT;
                     } else if (yC&&!yP) {
-                        robot.cascadeFlipperServo.setPosition(
-                                robot.params.get("cascadeFlipperServo").get("retracted")
-                        ); //retract
-                        outputFlipperState = OutputFlipperState.RETRACTED;
+                        robot.cascadeOutputSystem.outputArmServo.setPosition(robot.cascadeOutputSystem.ARM_RETRACTED); //retract
+                        outputArmState = OutputArmState.RETRACTED;
                     }
                     break;
                 case DOWN:
                     if (upC&&!upP) {
-                        robot.cascadeFlipperServo.setPosition(
-                                robot.params.get("cascadeFlipperServo").get("flat")
-                        ); //flat
-                        outputFlipperState = OutputFlipperState.FLAT;
+                        robot.cascadeOutputSystem.outputArmServo.setPosition(robot.cascadeOutputSystem.ARM_EXTENDED_FLAT); //flat
+                        outputArmState = OutputArmState.FLAT;
                     } else if (downC&&!downP) {
-                        robot.cascadeFlipperServo.setPosition(
-                                robot.params.get("cascadeFlipperServo").get("up")
-                        ); //up
-                        outputFlipperState = OutputFlipperState.UP;
+                        robot.cascadeOutputSystem.outputArmServo.setPosition(robot.cascadeOutputSystem.ARM_EXTENDED_UP); //up
+                        outputArmState = OutputArmState.UP;
                     } else if (yC&&!yP) {
-                        robot.cascadeFlipperServo.setPosition(
-                                robot.params.get("cascadeFlipperServo").get("retracted")
-                        ); //retract
-                        outputFlipperState = OutputFlipperState.RETRACTED;
+                        robot.cascadeOutputSystem.outputArmServo.setPosition(robot.cascadeOutputSystem.ARM_RETRACTED); //retract
+                        outputArmState = OutputArmState.RETRACTED;
                     }
                     break;
                 case RESTRICTED:
                     break;
                 default:
                     //should never be reached, output flipper state should never be null
-                    robot.cascadeFlipperServo.setPosition(
-                            robot.params.get("cascadeFlipperServo").get("retracted")
-                    ); //retract
-                    outputFlipperState = OutputFlipperState.RETRACTED;
+                    robot.cascadeOutputSystem.outputArmServo.setPosition(robot.cascadeOutputSystem.ARM_RETRACTED); //retract
+                    outputArmState = OutputArmState.RETRACTED;
                     break;
             }
 
@@ -396,25 +339,24 @@ public class MecanumTeleOp extends LinearOpMode {
             }
             //LEFT
             else if (gamepad1.dpad_left) {
-                if (robot.cascadeLiftMotor.getCurrentPosition() > robot.params.get("cascadeLiftMotor").get("extended").intValue()) {
-                    robot.cascadeLiftMotor.setPower(0);
-                    Util.runMotorToPosition(robot.cascadeLiftMotor, robot.params.get("cascadeLiftMotor").get("extended").intValue(), 1);
+                if (robot.cascadeOutputSystem.cascadeLiftMotor.getCurrentPosition() > robot.cascadeOutputSystem.CASCADE_EXTENDED) {
+                    robot.cascadeOutputSystem.extendCascadeToPosition(robot.cascadeOutputSystem.CASCADE_EXTENDED,0.5);
                 } else {
-                    robot.cascadeLiftMotor.setPower(1);
+                    robot.cascadeOutputSystem.cascadeLiftMotor.setPower(1);
                 }
             }
             //RIGHT
             else if (gamepad1.dpad_right) {
-                if (robot.cascadeLiftMotor.getCurrentPosition() < robot.params.get("cascadeLiftMotor").get("retracted").intValue()) {
-                    robot.cascadeLiftMotor.setPower(0);
-                    Util.runMotorToPosition(robot.cascadeLiftMotor, robot.params.get("cascadeLiftMotor").get("retracted").intValue(), 1);
+                if (robot.cascadeOutputSystem.cascadeLiftMotor.getCurrentPosition() < robot.cascadeOutputSystem.CASCADE_RETRACTED) {
+                    robot.cascadeOutputSystem.extendCascadeToPosition(robot.cascadeOutputSystem.CASCADE_RETRACTED,0.5);
+
                 } else {
-                    robot.cascadeLiftMotor.setPower(-1);
+                    robot.cascadeOutputSystem.cascadeLiftMotor.setPower(-1);
                 }
-            } else robot.cascadeLiftMotor.setPower(0);
+            } else robot.cascadeOutputSystem.cascadeLiftMotor.setPower(0);
 
             //telemetry on robot state
-            runTelemetry(outputFlipperState, outputState, inputState, aState, bState);
+            runTelemetry(outputArmState, outputState, inputState, aState, bState);
 
             //update button locks
             aP=aC;
@@ -429,9 +371,9 @@ public class MecanumTeleOp extends LinearOpMode {
     }
 
     ////////////other methods and whatnot below here////////////
-    public void runTelemetry(OutputFlipperState outputFlipperState, IOState outputState, IOState inputState, AProcess aState, BProcess bState) {
+    public void runTelemetry(OutputArmState outputArmState, IOState outputState, IOState inputState, AProcess aState, BProcess bState) {
         telemetry.addLine("---====STATES====---");
-        telemetry.addData("Output Flipper: ", outputFlipperState.toString());
+        telemetry.addData("Output Arm: ", outputArmState.toString());
         telemetry.addData("Output: ", outputState.toString());
         telemetry.addData("Input: ", inputState.toString());
         telemetry.addData("\nA-button process: ", aState.toString());

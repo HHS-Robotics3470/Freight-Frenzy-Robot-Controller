@@ -1,16 +1,20 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.TestingTuningAndDemos.Tuning;
 
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
+
+import org.firstinspires.ftc.teamcode.Hardware;
+import org.firstinspires.ftc.teamcode.PIDController;
+
 import java.util.ArrayList;
 
 /*
 this opmode should tune the strafing PID's using a manual method
  */
-@TeleOp(name="PD Tuner", group = "Testing")
+@TeleOp(name="PD Tuner", group = "Tuning")
 @Disabled
 public class PDTuner extends LinearOpMode {
     /*declare OpMode members, initialize some classes*/

@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.TestingTuningAndDemos.Demos;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.Hardware;
 
 @Autonomous(name = "PID Demo Auto", group = "Demos")
 //@Disabled
@@ -32,11 +33,12 @@ public class PIDDemoAuto extends LinearOpMode {
         //auto routine
         strafeToDistanceBuiltInPIDs(1, Math.PI,0.2); //strafe left
         strafeToDistanceBuiltInPIDs(1, 0,0.4); //strafe right
+        strafeToDistanceBuiltInPIDs(1, 3*Math.PI,0.2); //strafe left
         //strafe in a rectangle
-        strafeToDistanceBuiltInPIDs(0.5, Math.PI/4.0, 0.2);
+        strafeToDistanceBuiltInPIDs(1, Math.PI/4.0, 0.2);
         strafeToDistanceBuiltInPIDs(0.5, Math.PI*3.0/4.0, 0.3);
         strafeToDistanceBuiltInPIDs(0.5, Math.PI*5.0/4.0, 0.2);
-        strafeToDistanceBuiltInPIDs(0.5, -Math.PI/4.0, 0.3);
+        strafeToDistanceBuiltInPIDs(1, -Math.PI/4.0, 0.3);
 
         //strafe(1, 0, .1);
         //strafeToDistanceNoHeading(1,Math.PI,.2);

@@ -199,7 +199,11 @@ public class MecanumTeleOp extends LinearOpMode {
                         outputArmState = OutputArmState.RESTRICTED;
 
                         //retract cascade
-                        robot.cascadeOutputSystem.extendCascadeToPosition(robot.cascadeOutputSystem.CASCADE_RETRACTED,1);
+                        robot.cascadeOutputSystem.cascadeLiftMotor.setPower(0);
+                        robot.cascadeOutputSystem.cascadeLiftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                        robot.cascadeOutputSystem.cascadeLiftMotor.setTargetPosition(robot.cascadeOutputSystem.CASCADE_RETRACTED);
+                        robot.cascadeOutputSystem.cascadeLiftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                        robot.cascadeOutputSystem.cascadeLiftMotor.setPower(1);
 
                         bState = BProcess.STAGE_ONE; //go to next stage
                     }

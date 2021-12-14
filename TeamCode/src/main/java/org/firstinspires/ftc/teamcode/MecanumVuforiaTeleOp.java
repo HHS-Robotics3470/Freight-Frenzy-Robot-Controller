@@ -5,12 +5,20 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.ClassFactory;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
+import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
+import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
+
+import java.util.List;
+
 /**
  * @author Anthony Rubick - Movement
  * @author Adeel Ahmad - Vuforia
  */
 @TeleOp(name="mecanum TeleOp w/ Vuforia", group="Competition")
-public class MecanumTeleOp extends LinearOpMode {
+public class MecanumVuforiaTeleOp extends LinearOpMode {
     /*declare OpMode members, initialize some classes*/
     //an enum to represent output flipper states
     public enum OutputArmState {
@@ -57,9 +65,6 @@ public class MecanumTeleOp extends LinearOpMode {
     ElapsedTime runtime     = new ElapsedTime();
     ElapsedTime bProcessTimer = new ElapsedTime();
     ElapsedTime inputTimer = new ElapsedTime();
-
-    robot.init(hardwareMap);
-
 
     // Vuforia initialization
 

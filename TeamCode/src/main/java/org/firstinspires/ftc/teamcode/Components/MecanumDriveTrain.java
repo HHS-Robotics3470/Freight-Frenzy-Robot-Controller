@@ -4,6 +4,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareDevice;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.MotorControlAlgorithm;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 
 import java.util.LinkedList;
@@ -25,9 +26,18 @@ public class MecanumDriveTrain implements Component {
     public final double NADO_COUNTS_PER_METER      = (NADO_COUNTS_PER_MOTOR_REV * NADO_DRIVE_GEAR_REDUCTION) /
             (NADO_WHEEL_DIAMETER_METERS * Math.PI);
     public final double NADO_METERS_PER_COUNT = 1.0 / NADO_COUNTS_PER_METER;
+    //TODO: recalculate at full battery
     //PID info
-    public PIDFCoefficients velocityPIDFCoefficients = new PIDFCoefficients(); //TODO: initialize this once PIDF coefficients are known
-    public PIDFCoefficients positionPIDFCoefficients = new PIDFCoefficients(); //TODO: initialize this once PIDF coefficients are known
+    //CALCULATED: (as of 12/14/2021, battery voltage: 12.77
+    // p:1.3884311033898306
+    // i:0.13884311033898306
+    // d:
+    // f:13.884311033898306
+    //Default:
+    // p: 10
+    // i: 3
+    public PIDFCoefficients velocityPIDFCoefficients = new PIDFCoefficients(1.3884311033898306,0.13884311033898306,0,13.884311033898306);//default
+    public PIDFCoefficients positionPIDFCoefficients = new PIDFCoefficients(5,0,0,0);// //TODO: initialize this once PIDF coefficients are known
     public int targetPositionTolerance = 50;
 
     /* --Public OpMode members.-- */
@@ -87,9 +97,21 @@ public class MecanumDriveTrain implements Component {
         driveBackRight.setDirection(DcMotor.Direction.REVERSE);
 
         //PIDF setup
-        setVelocityPIDFCoefficients(velocityPIDFCoefficients);
-        setPositionPIDFCoefficients(5);
-        setTargetPositionTolerance(targetPositionTolerance);
+        try {
+            setVelocityPIDFCoefficients(velocityPIDFCoefficients);
+            setPositionPIDFCoefficients(5);
+            setTargetPositionTolerance(targetPositionTolerance);
+        } catch (UnsupportedOperationException e) {
+            //if setting pid coefficients throws an error due to motor control algorithm being legacy, try to change the algorithm
+            driveFrontRight.getMotorType().getHubVelocityParams().algorithm = MotorControlAlgorithm.PIDF;
+            driveFrontLeft.getMotorType().getHubVelocityParams().algorithm = MotorControlAlgorithm.PIDF;
+            driveBackLeft.getMotorType().getHubVelocityParams().algorithm = MotorControlAlgorithm.PIDF;
+            driveBackRight.getMotorType().getHubVelocityParams().algorithm = MotorControlAlgorithm.PIDF;
+            //then try setting pid stuff again
+            setVelocityPIDFCoefficients(velocityPIDFCoefficients);
+            setPositionPIDFCoefficients(5);
+            setTargetPositionTolerance(targetPositionTolerance);
+        }
     }
 
     ////////////////////////////// Methods //////////////////////////////

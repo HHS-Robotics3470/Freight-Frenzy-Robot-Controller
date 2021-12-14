@@ -4,6 +4,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareDevice;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.MotorControlAlgorithm;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.Servo;
 
@@ -28,9 +29,18 @@ public class CascadeOutputSystem implements Component {
     public final double GRABBER_RECEIVE = .5;
     public final double GRABBER_DROP = 0.75;
     public final double GRABBER_CLOSED = 1.0;
+    //TODO: recalculate at full battery
     //PID info
-    public PIDFCoefficients velocityPIDFCoefficients = new PIDFCoefficients(); //TODO: initialize this once PIDF coefficients are known
-    public PIDFCoefficients positionPIDFCoefficients = new PIDFCoefficients(); //TODO: initialize this once PIDF coefficients are known
+    //CALCULATED:
+    // p:
+    // i:
+    // d:
+    // f:
+    //Default:
+    // p: 10
+    // i: 3
+    public PIDFCoefficients velocityPIDFCoefficients = new PIDFCoefficients(1.3884311033898306,0.13884311033898306,0,13.884311033898306); //using values from drivetrain rn
+    public PIDFCoefficients positionPIDFCoefficients = new PIDFCoefficients(5,0,0,0); //TODO: initialize this once PIDF coefficients are known
     public int targetPositionTolerance = 25;
 
     /* --Public OpMode members.-- */
@@ -64,6 +74,17 @@ public class CascadeOutputSystem implements Component {
         cascadeLiftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         cascadeLiftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         cascadeLiftMotor.setDirection(DcMotor.Direction.FORWARD);
+        //cascade PIDF stuff
+        try {
+            cascadeLiftMotor.setVelocityPIDFCoefficients(velocityPIDFCoefficients.p,velocityPIDFCoefficients.i,velocityPIDFCoefficients.d,velocityPIDFCoefficients.f);
+            cascadeLiftMotor.setTargetPositionTolerance(targetPositionTolerance);
+        } catch (UnsupportedOperationException e) {
+            //if setting pid coefficients throws an error due to motor control algorithm being legacy, try to change the algorithm
+            cascadeLiftMotor.getMotorType().getHubVelocityParams().algorithm = MotorControlAlgorithm.PIDF;
+            //then try setting pid stuff again
+            cascadeLiftMotor.setVelocityPIDFCoefficients(velocityPIDFCoefficients.p,velocityPIDFCoefficients.i,velocityPIDFCoefficients.d,velocityPIDFCoefficients.f);
+            cascadeLiftMotor.setTargetPositionTolerance(targetPositionTolerance);
+        }
     }
     /**
      * @return a list of all hardware devices included on the component

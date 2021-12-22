@@ -206,11 +206,12 @@ public class MecanumTeleOp extends LinearOpMode {
                         robot.cascadeOutputSystem.cascadeLiftMotor.setPower(1);
 
                         bState = BProcess.STAGE_ONE; //go to next stage
+                        bProcessTimer.reset();
                     }
                     break;
                 case STAGE_ONE:
                     //wait for cascadeLiftMotor to finish moving
-                    if (!robot.cascadeOutputSystem.cascadeLiftMotor.isBusy()) {
+                    if (!robot.cascadeOutputSystem.cascadeLiftMotor.isBusy() && bProcessTimer.seconds() >= 0.250) {
                         //reset motor, get out of RUN_TO_POSITION mode
                         robot.cascadeOutputSystem.cascadeLiftMotor.setPower(0);
                         robot.cascadeOutputSystem.cascadeLiftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);

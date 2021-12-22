@@ -35,14 +35,19 @@ public class PIDDemoAuto extends LinearOpMode {
         runtime.reset();
 
         //auto routine
-        strafeToDistanceBuiltInPIDs(1, Math.PI, 0.2); //strafe left
-        strafeToDistanceBuiltInPIDs(1, 0, 0.4); //strafe right
-        strafeToDistanceBuiltInPIDs(1, 3 * Math.PI, 0.2); //strafe left
+        //uses current strafe method
+        demoDriveTrainPID();
+
+        //uses the strafe methods being tested
+        //strafeToDistanceBuiltInPIDs(1, Math.PI, 0.2); //strafe left
+        //strafeToDistanceBuiltInPIDs(1, 0, 0.4); //strafe right
+        //strafeToDistanceBuiltInPIDs(1, 3 * Math.PI, 0.2); //strafe left
         //strafe in a rectangle
-        strafeToDistanceBuiltInPIDs(1, Math.PI / 4.0, 0.2);
-        strafeToDistanceBuiltInPIDs(0.5, Math.PI * 3.0 / 4.0, 0.3);
-        strafeToDistanceBuiltInPIDs(0.5, Math.PI * 5.0 / 4.0, 0.2);
-        strafeToDistanceBuiltInPIDs(1, -Math.PI / 4.0, 0.3);
+        //strafeToDistanceBuiltInPIDs(1, Math.PI / 4.0, 0.2);
+        //strafeToDistanceBuiltInPIDs(0.5, Math.PI * 3.0 / 4.0, 0.3);
+        //strafeToDistanceBuiltInPIDs(0.5, Math.PI * 5.0 / 4.0, 0.2);
+        //strafeToDistanceBuiltInPIDs(1, -Math.PI / 4.0, 0.3);
+
 
         //strafe(1, 0, .1);
         //strafeToDistanceNoHeading(1,Math.PI,.2);
@@ -51,7 +56,17 @@ public class PIDDemoAuto extends LinearOpMode {
         //strafeToDistanceNoHeading(0.3, -7.0*Math.PI/6.0, 0.2);
         //robot.strafeToDistance(0.3, -10.0*Math.PI/6.0, 0.2);
     }
-
+    private void demoDriveTrainPID() {
+        double sqrt2 = Math.sqrt(2.0);
+        //strafe in a square centered on where it initialized
+        robot.driveTrain.strafeToDistance(1, Math.PI/2.0, .5);              //      `|`                1,5
+        robot.driveTrain.strafeToDistance(.2, 5.0*Math.PI/4.0, sqrt2*.5);   //      ./               /  |  \
+        robot.driveTrain.strafeToDistance(.5, -Math.PI/4.0, sqrt2*.5);      //      \.             /    |    \
+        robot.driveTrain.strafeToDistance(1, Math.PI/4.0, sqrt2*.5);        //      /`          2,6----0,7     4
+        robot.driveTrain.strafeToDistance(1, -5.0*Math.PI/4.0, sqrt2*.5);   //      `\             \         /
+        robot.driveTrain.strafeToDistance(.2, -3.0*Math.PI/4.0, sqrt2*.5);  //      ./               \     /
+        robot.driveTrain.strafeToDistance(1, 0, 0.5);                       //      __.                 3
+    }
     /**
      * causes the robot to strafe a given direction, at a given power, for a given distance using build in PID controllers
      * power and distance should always be positive

@@ -78,7 +78,7 @@ public class PIDFtuner extends LinearOpMode {
         //Variables
         List<DcMotorEx> motorList = hardwareMap.getAll(DcMotorEx.class);
         DcMotorEx currentMotor = motorList.get(0);
-        int listSize = motorList.size(), currIndex=0;
+        int listSize = motorList.size()-1, currIndex=0;
         ProcessState state = ProcessState.CHOOSING;
 
         //variables read from hardware components
@@ -88,8 +88,8 @@ public class PIDFtuner extends LinearOpMode {
         //read once when motor changes
         String motorName = currentMotor.getDeviceName();
         int portNum = currentMotor.getPortNumber();
-        String controlAlgorithm = currentMotor.getMotorType().getHubVelocityParams().algorithm.toString();
         PIDFCoefficients velPidfCoefficients = currentMotor.getPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER);
+        String controlAlgorithm = velPidfCoefficients.toString().substring(velPidfCoefficients.toString().lastIndexOf("alg="));//TODO: find out how to extract just the control algorithm name from the string
         double posP = currentMotor.getPIDFCoefficients(DcMotor.RunMode.RUN_TO_POSITION).p; //p coefficient for position PIDF
 
         //double newP; //p coefficient for position PIDF
@@ -179,18 +179,18 @@ public class PIDFtuner extends LinearOpMode {
                         currentMotor = motorList.get(currIndex);
                         motorName = currentMotor.getDeviceName();
                         portNum = currentMotor.getPortNumber();
-                        controlAlgorithm = currentMotor.getMotorType().getHubVelocityParams().algorithm.toString();
                         velPidfCoefficients = currentMotor.getPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER);
+                        controlAlgorithm =  velPidfCoefficients.toString().substring(velPidfCoefficients.toString().lastIndexOf("alg="));
                         posP = currentMotor.getPIDFCoefficients(DcMotor.RunMode.RUN_TO_POSITION).p; //p coefficient for position PIDF
                     } else if (rb) {
                         // set currentMotor to the next index in motor list
                         currIndex++;
-                        if (currIndex >= listSize) currIndex = 0;
+                        if (currIndex > listSize) currIndex = 0;
                         currentMotor = motorList.get(currIndex);
                         motorName = currentMotor.getDeviceName();
                         portNum = currentMotor.getPortNumber();
-                        controlAlgorithm = currentMotor.getMotorType().getHubVelocityParams().algorithm.toString();
                         velPidfCoefficients = currentMotor.getPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER);
+                        controlAlgorithm =  velPidfCoefficients.toString().substring(velPidfCoefficients.toString().lastIndexOf("alg="));
                         posP = currentMotor.getPIDFCoefficients(DcMotor.RunMode.RUN_TO_POSITION).p; //p coefficient for position PIDF
                     }
 
@@ -259,8 +259,8 @@ public class PIDFtuner extends LinearOpMode {
                     state = ProcessState.TEST_ONE;
                     break;
                 case TEST_ONE:
-                    //rotate once at 1/3 power
-                    currentMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                    //rotate back at 1/3 power
+                    //currentMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                     currentMotor.setTargetPosition( 1440 );
                     currentMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                     currentMotor.setVelocity(maxVelocity/3);
@@ -270,10 +270,10 @@ public class PIDFtuner extends LinearOpMode {
                     break;
                 case TEST_TWO:
                     if (!currentMotor.isBusy()) {
-                        //rotate back at full power
+                        //rotate forward at full power
                         currentMotor.setVelocity(0);
-                        currentMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                        currentMotor.setTargetPosition( -2880 );
+                        //currentMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                        currentMotor.setTargetPosition( 4320 );
                         currentMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                         currentMotor.setVelocity(maxVelocity);
 
@@ -304,10 +304,6 @@ public class PIDFtuner extends LinearOpMode {
                 case DONE:
                     state = ProcessState.CHOOSING;
                     break;
-            }
-
-            if (!state.equals(ProcessState.SHOWING_WARNINGS)) {
-                generalTelemetry(motorName, portNum, encoderCounts, velocity, maxVelocity, controlAlgorithm, velPidfCoefficients);
             }
 
             //rather than having this repeated in every state, do it once here, b aborts calculations and goes back to default state

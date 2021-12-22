@@ -411,7 +411,7 @@ public class MecanumVuforiaTeleOp extends LinearOpMode {
             } else robot.cascadeOutputSystem.cascadeLiftMotor.setPower(0);
 
             //telemetry on robot state
-            runTelemetry(outputArmState, outputState, inputState, aState, bState);
+//            runTelemetry(outputArmState, outputState, inputState, aState, bState);
 
             //update button locks
             aP=aC;

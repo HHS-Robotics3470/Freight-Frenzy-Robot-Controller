@@ -27,14 +27,14 @@ import java.util.List;
 import java.util.Map;
 
 /*
-    NOTE -conventions for the measurement of distances and anlges-
+    NOTE -conventions for the measurement of distances and angles-
     distances will be recorded and implemented in Standard units (meters), do not use the imperial system in your code
         this is because the metric system is easier to convert and work with than imperial units
     angles will be measured in radians
         this is due to how the Trig functions operate in java (they expect input, and return, values measured in radians)
         should be constricted to [pi, -pi) when possible
     angle 0:
-        for the robot, heading of 0 means that it's facing to the right (POV: you're looking toward the far side of the field (far side meaning the side opposite to the side the robot starts on))
+        for the robot, heading of 0 means that it's facing same diretion as  x+ axis
         for the horiz odometry, + change should mean turning CCW
                                 - change should mean turning CW
 
@@ -43,10 +43,12 @@ import java.util.Map;
     *      field x bounds []
     *      field y bounds []
     * z = height from the foam grid
-    * x+ =
-    * x- =
-    * y+ =
-    * y- =
+    * x+ = blue alliance side
+    * x- = red alliance side
+    * y+ = warehouse side (and shared shipping hub)
+    * y- = shipping unit side
+
+    robot starts autonomous with back (side w/ webcam) facing barcodes
 
     front of robot is always the side with the main: intake, output, webcam (go in that order (i.e. if robot has no input, the front is the side w/ the output, if robot has no input or output, front is side with the main encoder)
  */

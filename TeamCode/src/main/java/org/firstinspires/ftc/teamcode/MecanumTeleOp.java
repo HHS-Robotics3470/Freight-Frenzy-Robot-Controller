@@ -251,13 +251,14 @@ public class MecanumTeleOp extends LinearOpMode {
                     //wait for cascadeLiftMotor to finish moving
                     if (!robot.cascadeOutputSystem.cascadeLiftMotor.isBusy()) {
                         //move output flipper back to level it was at previously
-                        robot.cascadeOutputSystem.outputArmServo.setPosition(tempOutArmPos);
+                        robot.cascadeOutputSystem.outputArmServo.setPosition(robot.cascadeOutputSystem.ARM_EXTENDED_FLAT);
 
                         //reset motor, get out of RUN_TO_POSITION mode
                         robot.cascadeOutputSystem.cascadeLiftMotor.setPower(0);
                         robot.cascadeOutputSystem.cascadeLiftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
                         //update robot state
+                        outputArmState = OutputArmState.FLAT;
                         outputState = IOState.CLOSED;
                         inputState = IOState.OPEN;
                         bState = BProcess.NOT_STARTED; //back to start
@@ -269,7 +270,7 @@ public class MecanumTeleOp extends LinearOpMode {
             }
             //X output
             switch (outputState) {
-                case RESTRICTED:
+                case OPEN:
                     if (xC&&!xP) {
                         robot.cascadeOutputSystem.outputGrabberServo.setPosition(robot.cascadeOutputSystem.GRABBER_CLOSED); //close
                         outputState = IOState.CLOSED;

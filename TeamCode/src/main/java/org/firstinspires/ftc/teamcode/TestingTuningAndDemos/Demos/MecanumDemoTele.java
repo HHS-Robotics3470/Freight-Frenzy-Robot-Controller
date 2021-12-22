@@ -13,7 +13,7 @@ import org.firstinspires.ftc.teamcode.Utility.Util;
  * @author Anthony Rubick
  */
 @TeleOp(name = "Mecanum Demo TeleOp", group = "Demos")
-@Disabled
+//@Disabled
 public class MecanumDemoTele extends LinearOpMode {
     /*declare OpMode members, initialize some classes*/
     Hardware robot          = new Hardware();

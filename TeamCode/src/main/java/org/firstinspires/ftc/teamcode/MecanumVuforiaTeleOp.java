@@ -135,13 +135,12 @@ public class MecanumVuforiaTeleOp extends LinearOpMode {
         bProcessTimer.reset();
         inputTimer.reset();
 
-
         ////////////after driver presses play////////////
         //maybe some other set up stuff depending on how we want to do this
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
-            /* CONTROLS
+           /* CONTROLS
             joysticks: movement
                 left joystick: strafe
                 right joystick: rotation
@@ -254,11 +253,12 @@ public class MecanumVuforiaTeleOp extends LinearOpMode {
                         robot.cascadeOutputSystem.cascadeLiftMotor.setPower(1);
 
                         bState = BProcess.STAGE_ONE; //go to next stage
+                        bProcessTimer.reset();
                     }
                     break;
                 case STAGE_ONE:
                     //wait for cascadeLiftMotor to finish moving
-                    if (!robot.cascadeOutputSystem.cascadeLiftMotor.isBusy()) {
+                    if (!robot.cascadeOutputSystem.cascadeLiftMotor.isBusy() && bProcessTimer.seconds() >= 0.250) {
                         //reset motor, get out of RUN_TO_POSITION mode
                         robot.cascadeOutputSystem.cascadeLiftMotor.setPower(0);
                         robot.cascadeOutputSystem.cascadeLiftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -313,12 +313,12 @@ public class MecanumVuforiaTeleOp extends LinearOpMode {
                     }
                     break;
                 default:
-                    bState = MecanumVuforiaTeleOp.BProcess.NOT_STARTED; //back to start
+                    bState = BProcess.NOT_STARTED; //back to start
                     break;
             }
             //X output
             switch (outputState) {
-                case RESTRICTED:
+                case OPEN:
                     if (xC&&!xP) {
                         robot.cascadeOutputSystem.outputGrabberServo.setPosition(robot.cascadeOutputSystem.GRABBER_CLOSED); //close
                         outputState = IOState.CLOSED;
@@ -411,9 +411,6 @@ public class MecanumVuforiaTeleOp extends LinearOpMode {
                 }
             } else robot.cascadeOutputSystem.cascadeLiftMotor.setPower(0);
 
-            //telemetry on robot state
-//            runTelemetry(outputArmState, outputState, inputState, aState, bState);
-
             //update button locks
             aP=aC;
             bP=bC;
@@ -422,8 +419,7 @@ public class MecanumVuforiaTeleOp extends LinearOpMode {
             upP = upC;
             downP = downC;
 
-
-            if (tfod != null) {
+        if (tfod != null) {
                 // getUpdatedRecognitions() will return null if no new information is available since
                 // the last time that call was made.
                 List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();

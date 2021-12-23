@@ -28,7 +28,7 @@ public class MecanumDriveTrain implements Component {
     public final double NADO_COUNTS_PER_METER      = (NADO_COUNTS_PER_MOTOR_REV * NADO_DRIVE_GEAR_REDUCTION) /
             (NADO_WHEEL_DIAMETER_METERS * Math.PI);
     public final double NADO_METERS_PER_COUNT = 1.0 / NADO_COUNTS_PER_METER;
-    public final double ROBOT_WIDTH = 0; //width of the robot, distance between wheels
+    public final double ROBOT_WIDTH = 0.362; //width of the robot, distance between wheels
     //TODO: recalculate at full battery
     //PID info
     //CALCULATED: (as of 12/14/2021, battery voltage: 12.77

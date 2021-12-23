@@ -18,6 +18,8 @@ import java.util.List;
  */
 public class MecanumDriveTrain implements Component {
     ////////////////////////////// class variables //////////////////////////////
+    private boolean motorsBusy = false; //are drive motors busy running to position?
+
     //**info, measurements, known positions, etc.**//
     // stats for the TorqueNADO motors
     public final double NADO_COUNTS_PER_MOTOR_REV = 1440;
@@ -26,6 +28,7 @@ public class MecanumDriveTrain implements Component {
     public final double NADO_COUNTS_PER_METER      = (NADO_COUNTS_PER_MOTOR_REV * NADO_DRIVE_GEAR_REDUCTION) /
             (NADO_WHEEL_DIAMETER_METERS * Math.PI);
     public final double NADO_METERS_PER_COUNT = 1.0 / NADO_COUNTS_PER_METER;
+    public final double ROBOT_WIDTH = 0; //width of the robot, distance between wheels
     //TODO: recalculate at full battery
     //PID info
     //CALCULATED: (as of 12/14/2021, battery voltage: 12.77
@@ -36,7 +39,7 @@ public class MecanumDriveTrain implements Component {
     //Default:
     // p: 10
     // i: 3
-    public PIDFCoefficients velocityPIDFCoefficients = new PIDFCoefficients(1.3884311033898306,0.13884311033898306,0,13.884311033898306);//default
+    public PIDFCoefficients velocityPIDFCoefficients = new PIDFCoefficients(1.3884311033898306,0.13884311033898306,0,13.884311033898306);
     public PIDFCoefficients positionPIDFCoefficients = new PIDFCoefficients(5,0,0,0);// //TODO: initialize this once PIDF coefficients are known
     public int targetPositionTolerance = 50;
 
@@ -121,6 +124,7 @@ public class MecanumDriveTrain implements Component {
      * @param angle direction to strafe relative to robot, measure in radians, angle of 0 == starboard
      */
     public void strafeDirection(double power, double angle) {
+        if (motorsBusy) return;
         // calculate the power that needs to be assigned to each diagonal pair of motors
         double FrBlPairPower = Math.sin(angle - (Math.PI/4)) * power;
         double FlBrPairPower = Math.sin(angle + (Math.PI/4)) * power;
@@ -136,6 +140,9 @@ public class MecanumDriveTrain implements Component {
      * @param targetDistance    distance to strafe, measured in meters
      */
     public void strafeToDistance(double power, double angle, double targetDistance) {
+        if (motorsBusy) return;
+        else motorsBusy = true;
+
         power = Math.abs(power);
         targetDistance = Math.abs(targetDistance);
         //DATA
@@ -185,12 +192,15 @@ public class MecanumDriveTrain implements Component {
         driveFrontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         driveBackLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         driveBackRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        motorsBusy = false;
     }
     /**
      * rotates the robot by adjusting its current motor powers rather than directly setting powers, allows turning while strafing
      * @param signedPower determines the directions and power of rotation, larger values result in faster movement, and the sign (positive or negative) of this value determine direction
      */
     public void rotateByCorrection(double signedPower) {
+        if (motorsBusy) return;
         //largest current power + signedPower, or 1
         double denom = Math.max(
                 Math.max(
@@ -211,12 +221,71 @@ public class MecanumDriveTrain implements Component {
      * @param power the power to rotate at
      */
     public void rotate(double power) {
+        if (motorsBusy) return;
         setPower(
                 -power,
                 power,
                 power,
                 -power
         );
+    }
+
+    /**
+     * causes the robot to rotate in place by a given angle, at a given power, for a given distance using PIDs
+     * power and distance should always be positive
+     * DOES NOT USE IMU ANYMORE BC THAT WAS CAUSING ISSUES
+     * @param power             power factor
+     * @param angle             magnitude and direction of rotation (in radians)
+     */
+    public void rotateByAngle(double angle, double power) {
+        if (motorsBusy) return;
+        else motorsBusy = true;
+        //DATA
+        boolean moving = true;
+        power = Math.abs(power);
+
+        //calculate desired distance for each motor pair to move
+        //+ angle == turn CCW;   - angle == turn CW
+        double leftPairDistance = -angle * (ROBOT_WIDTH/2); // theta * r = arc length
+        double rightPairDistance = angle * (ROBOT_WIDTH/2); // theta * r = arc length
+        //find the desired target for each strafe PID
+        int leftAxisTarget = (int) (leftPairDistance * NADO_COUNTS_PER_METER);
+        int rightAxisTarget = (int) (rightPairDistance * NADO_COUNTS_PER_METER);
+
+        //stop and prep
+        setPower(0);
+        driveFrontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        driveFrontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        driveBackLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        driveBackRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        //set target
+        driveFrontRight.setTargetPosition(driveFrontRight.getCurrentPosition()+rightAxisTarget);
+        driveFrontLeft.setTargetPosition(driveFrontLeft.getCurrentPosition()+leftAxisTarget);
+        driveBackLeft.setTargetPosition(driveBackLeft.getCurrentPosition()+leftAxisTarget);
+        driveBackRight.setTargetPosition(driveBackRight.getCurrentPosition()+rightAxisTarget);
+
+        //set to run to position
+        driveFrontRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        driveFrontLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        driveBackLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        driveBackRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        //set power
+        setPower(power);
+
+        //let RUN_TO_POSITION PID do its thing
+        while (moving) {
+            //are any of the motors busy?
+            moving = driveFrontRight.isBusy() || driveFrontLeft.isBusy(); //save 6ms per loop by only reading from one motor of each pair
+        }
+
+        //stop and go back to normal
+        setPower(0);
+        driveFrontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        driveFrontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        driveBackLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        driveBackRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
     ////////////////////////////// Set Methods //////////////////////////////
@@ -322,5 +391,10 @@ public class MecanumDriveTrain implements Component {
         return hardwareDeviceList;
     }
 
-
+    /**
+     * @return motors busy driving to position?
+     */
+    public boolean isMotorsBusy() {
+        return motorsBusy;
+    }
 }

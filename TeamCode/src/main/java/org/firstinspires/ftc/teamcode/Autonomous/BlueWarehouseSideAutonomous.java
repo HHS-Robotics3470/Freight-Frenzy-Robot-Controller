@@ -107,7 +107,7 @@ public class BlueWarehouseSideAutonomous extends org.firstinspires.ftc.teamcode.
 
         /*step 1*/
         //1.1
-        //use vuforia to figure out which position the pre-loaded element needs to be delivered to, assign it to level
+        //todo: use vuforia to figure out which position the pre-loaded element needs to be delivered to, assign it to level
         level = super.determineLevel(robot);
         switch (level) { //depending on the level, set one of the indexes in barcodes to false to represent the position of the game element
             //W - O + S

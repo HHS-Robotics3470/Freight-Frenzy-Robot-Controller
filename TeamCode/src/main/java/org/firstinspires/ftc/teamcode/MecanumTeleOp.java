@@ -270,21 +270,20 @@ public class MecanumTeleOp extends LinearOpMode {
                     break;
             }
             //X output
-            switch (outputState) {
-                case OPEN:
-                    if (xC&&!xP) {
+            if (xC&&!xP) {
+                switch (outputState) {
+                    case OPEN:
                         robot.cascadeOutputSystem.outputGrabberServo.setPosition(robot.cascadeOutputSystem.GRABBER_CLOSED); //close
                         outputState = IOState.CLOSED;
-                    }
-                    break;
-                case CLOSED:
-                    if (xC&&!xP) {
+                        break;
+                    case CLOSED:
                         robot.cascadeOutputSystem.outputGrabberServo.setPosition(robot.cascadeOutputSystem.GRABBER_DROP);
                         outputState = IOState.OPEN;
-                    }
-                    break;
-                default:
-                    break;
+                        break;
+                    case RESTRICTED:
+                    default:
+                        break;
+                }
             }
             //Y implemented later, bundled w/ UP and DOWN
 

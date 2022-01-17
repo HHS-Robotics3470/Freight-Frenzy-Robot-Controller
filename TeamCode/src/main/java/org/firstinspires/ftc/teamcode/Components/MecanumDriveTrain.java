@@ -225,7 +225,7 @@ public class MecanumDriveTrain implements Component {
      * power and distance should always be positive
      * DOES NOT USE IMU ANYMORE BC THAT WAS CAUSING ISSUES
      * @param power             power factor
-     * @param angle             magnitude and direction of rotation (in radians)
+     * @param angle             magnitude and direction of rotation (in radians): positive angle==turn CCW; negative angle==turn CW
      */
     public void rotateByAngle(double angle, double power) {
         if (motorsBusy) return;

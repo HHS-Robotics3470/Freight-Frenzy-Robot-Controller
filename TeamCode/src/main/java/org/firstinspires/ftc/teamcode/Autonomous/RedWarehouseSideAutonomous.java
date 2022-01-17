@@ -161,7 +161,7 @@ public class RedWarehouseSideAutonomous extends org.firstinspires.ftc.teamcode.A
         //robot facing: =>      needs to move:  <=
         robot.driveTrain.strafeToDistance(1, -pi/4.0, driveXPlusStep2_1);
 
-        //rotate 180 degrees so webcam is facing x- direction
+        //rotate 180 degrees so webcam is facing x+ direction (and output is facing shipping hub)
         //robot facing: ->      needs to face:  <-
         robot.driveTrain.rotateByAngle(pi, 0.75);
 

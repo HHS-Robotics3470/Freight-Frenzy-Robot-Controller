@@ -143,10 +143,6 @@ public class Hardware implements Component {
     private ElapsedTime runtime  = new ElapsedTime();
     private static final String VUFORIA_KEY = "AW/D8Tv/////AAABmaz//hdMn0Nmm2YoSrW8emZqrSTAb26m/pJRCgy4GeNX6aO6frTzk1FQ/y8IC0mbDWke8NXa87KACa/HR1kVRqaamTM60GJcobyaZaK1k0NAkVZ94iJY/RlWsIzESF3hql3ADHV9oHUuSvZWAVkF8f01xr4bzFtLrXgORIxOFKsT4TWSfHIr1pZel50uC0psgWIWpcDFGY3wTHlcfahX93OY8rqz98vwZC6b2u0MiikDwFjzKD2zxtSvQkYyIogyccKwZrC4z432K1GwxSvUanLJVsNypOcDqVrXWJdHKSmJSuQ8Zrl5SDvPXFewBpBYUTacsrdIx6bUykW+hSTcMxFzMo8MHjrv+FYgtJwaVsFT";
 
-    //PID controllers
-    //public PIDController FrBlStrafePIDController, FlBrStrafePIDController, rotatePIDController;
-    //private PIDFCoefficients pidfCoefficients;
-
     /* --Constructors-- */
     public Hardware(){
 
@@ -181,8 +177,6 @@ public class Hardware implements Component {
         initIMU();
         //webcam and vuforia
         //done only in opmodes that need it
-        //PID's
-        //initPIDs();
         //hubs
         allHubs = hwMap.getAll(LynxModule.class);
         for (LynxModule module : allHubs) { //optimizes sensor reading by caching in bulk, effectively reading all sensors in the same time as one,
@@ -266,65 +260,6 @@ public class Hardware implements Component {
         tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABELS);
     }
 
-    /*
-    calculated coefficients for a torquenado motor with no load.
-    target and input values are the encoder count of the motor, it's a position PID, and while it may work for velocity, velocity was not what it was tuned for.
-                            Kp      Ki      Kd
-    PID                 |.004602|.095875| 0.000055
-    PI                  |.003452|0.04315|
-    P                   |.003835|       |
-    PD                  |.006136|       | 0.000074
-    some overshoot      |.002557|.053271| 0.000082
-    no overshoot        |.001534|.031958| 0.000049
-    pessen integration  |.005369|.139818| 0.000077
-    */
-    /*
-    /**
-     * init PIDs with default coefficients
-     *//*
-    private void initPIDs() {
-
-        initPIDs(
-                new PIDCoefficients(0.001534,0.031958,0.000049),//0.004602, 0.04315, 0.000055), //frbl strafe pid
-                new PIDCoefficients(0.001534,0.031958,0.000049),//0.004602, 0.04315, 0.000055), //flbr strafe pid
-                new PIDCoefficients(0.004602, 0.04315, 0.000055)  //rotation pid
-        );
-    }
-    /**
-     * init PIDs with custom coefficients
-     * @param FrBlStrafe    coefficients for the frontRight-backLeft axis strafing PID
-     * @param FlBrStrafe    coefficients for the frontLeft-backRight axis strafing PID
-     * @param rotate        coefficients for the rotation PID
-     *//*
-    private void initPIDs(PIDCoefficients FrBlStrafe, PIDCoefficients FlBrStrafe, PIDCoefficients rotate) {
-        //save coefficients
-        //**PIDS**//*
-        //PID coefficients
-
-        //initialize PID controllers
-        FrBlStrafePIDController     = new PIDController(FrBlStrafe);
-        FlBrStrafePIDController     = new PIDController(FlBrStrafe);
-        rotatePIDController         = new PIDController(rotate);
-
-        //configure PID controllers
-        FrBlStrafePIDController.reset();
-        FrBlStrafePIDController.setOutputRange(-1,1);   //(-1,1) because those are the range of powers for DcMotors
-        FrBlStrafePIDController.setTolerance(1);        //percent
-        //FrBlStrafePIDController.enable();
-
-        FlBrStrafePIDController.reset();
-        FlBrStrafePIDController.setOutputRange(-1,1);   //(-1,1) because those are the range of powers for DcMotors
-        FlBrStrafePIDController.setTolerance(1);        //percent
-        //FlBrStrafePIDController.enable();
-
-        rotatePIDController.reset();
-        rotatePIDController.setInputRange(-Math.PI, Math.PI);   // convention for angles
-        rotatePIDController.setOutputRange(-1,1);               // (-1,1) because those are the range of powers for DcMotors
-        rotatePIDController.setTolerance(1);                    // percent
-        rotatePIDController.setContinuous(true);                // we want input angles to wrap, because angles wrap
-        //rotatePIDController.enable();
-    }
-    */
     ////////////////////////////// Methods //////////////////////////////
     /**
      * @return a list of all hardware devices included on the component

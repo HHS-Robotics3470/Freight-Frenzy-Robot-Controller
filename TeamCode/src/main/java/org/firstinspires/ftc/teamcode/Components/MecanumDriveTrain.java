@@ -74,7 +74,6 @@ public class MecanumDriveTrain implements Component {
         driveBackRight.resetDeviceConfigurationForOpMode();
 
         // Set run modes
-        //TODO: set drive motors to RUN_WITHOUT_ENCODER when PIDs are integrated for movement in order to improve output power
         //reset encoders
         driveFrontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         driveFrontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -160,10 +159,7 @@ public class MecanumDriveTrain implements Component {
 
         //stop and prep
         setPower(0);
-        driveFrontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        driveFrontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        driveBackLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        driveBackRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         //set target
         driveFrontRight.setTargetPosition(driveFrontRight.getCurrentPosition()+FrBlAxisTarget);
@@ -172,10 +168,7 @@ public class MecanumDriveTrain implements Component {
         driveBackRight.setTargetPosition(driveBackRight.getCurrentPosition()+FlBrAxisTarget);
 
         //set to run to position
-        driveFrontRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        driveFrontLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        driveBackLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        driveBackRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
         //set power
         setPower(FrBlPairPower, FlBrPairPower);
@@ -188,10 +181,7 @@ public class MecanumDriveTrain implements Component {
 
         //stop and go back to normal
         setPower(0);
-        driveFrontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        driveFrontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        driveBackLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        driveBackRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         motorsBusy = false;
     }
@@ -254,10 +244,7 @@ public class MecanumDriveTrain implements Component {
 
         //stop and prep
         setPower(0);
-        driveFrontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        driveFrontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        driveBackLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        driveBackRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         //set target
         driveFrontRight.setTargetPosition(driveFrontRight.getCurrentPosition()+rightAxisTarget);
@@ -266,10 +253,7 @@ public class MecanumDriveTrain implements Component {
         driveBackRight.setTargetPosition(driveBackRight.getCurrentPosition()+rightAxisTarget);
 
         //set to run to position
-        driveFrontRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        driveFrontLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        driveBackLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        driveBackRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
         //set power
         setPower(power);
@@ -282,10 +266,7 @@ public class MecanumDriveTrain implements Component {
 
         //stop and go back to normal
         setPower(0);
-        driveFrontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        driveFrontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        driveBackLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        driveBackRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
     ////////////////////////////// Set Methods //////////////////////////////

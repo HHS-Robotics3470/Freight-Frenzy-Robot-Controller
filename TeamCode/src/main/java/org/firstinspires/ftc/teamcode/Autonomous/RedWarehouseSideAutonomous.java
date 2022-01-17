@@ -117,7 +117,7 @@ public class RedWarehouseSideAutonomous extends org.firstinspires.ftc.teamcode.A
         //move to the shipping hub
         //y- movement to be in-line w/ shipping hub
         //robot facing: =>      needs to move:  V
-        robot.driveTrain.strafeToDistance(1, pi, driveYMinusStep1_2);
+        robot.driveTrain.strafeToDistance(1, 0, driveYMinusStep1_2);
         //x- movement if necessary (just make sure arm can extend long enough to drop off preloaded thing into shipping hub)
         //robot facing: =>      needs to move:  <=
         robot.driveTrain.strafeToDistance(1, -pi/4.0, driveXPlusStep1_2);
@@ -176,7 +176,7 @@ public class RedWarehouseSideAutonomous extends org.firstinspires.ftc.teamcode.A
                     break;
                 }
             }
-            robot.driveTrain.strafeToDistance(1, pi, driveYPlusStep2_1 +distanceBetweenBarcodes*j);
+            robot.driveTrain.strafeToDistance(1, 0, driveYPlusStep2_1 + (distanceBetweenBarcodes * j));
 
             //2.2
             robot.intakeSystem.intakeArmServo.setPosition(robot.intakeSystem.ARM_DOWN);
@@ -199,7 +199,7 @@ public class RedWarehouseSideAutonomous extends org.firstinspires.ftc.teamcode.A
             //2.3
             //y- movement, equal distance, opposite direction, as step 2.1.     until inline w/ shipping hub again
             //robot facing: <=      needs to move:  V
-            robot.driveTrain.strafeToDistance(1, 0, driveYPlusStep2_1+distanceBetweenBarcodes*j);
+            robot.driveTrain.strafeToDistance(1, pi, driveYPlusStep2_1 + (distanceBetweenBarcodes * j));
 
             //2.4
             //move to shipping hub and deposit
@@ -227,7 +227,7 @@ public class RedWarehouseSideAutonomous extends org.firstinspires.ftc.teamcode.A
         //strafe into the warehouse and end
         //rotate to face warehouse
         //robot facing: <-      needs to face:  ^
-        robot.driveTrain.rotateByAngle(pi/4.0, 0.75);
+        robot.driveTrain.rotateByAngle(-pi/4.0, 0.75);
 
         //y+ movement into warehouse
         //robot facing: ^       needs to move:  ^

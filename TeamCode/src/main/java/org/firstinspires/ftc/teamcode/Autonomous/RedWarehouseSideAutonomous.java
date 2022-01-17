@@ -100,12 +100,12 @@ public class RedWarehouseSideAutonomous extends org.firstinspires.ftc.teamcode.A
         //todo: use vuforia to figure out which position the pre-loaded element needs to be delivered to, assign it to level, this will be done in the determineLevel() method of the Autonomous.java class that's in the same folder as this
         level = super.determineLevel(robot);
         switch (level) { //depending on the level, set one of the indexes in barcodes to false to represent the position of the game element
-            //W - O + S
+            //S - O + W
             case 0:
-                barcodes[2] = false;
+                barcodes[0] = false;
                 break;
             case 2:
-                barcodes[0] = false;
+                barcodes[2] = false;
                 break;
             case 1:
             default:
@@ -116,10 +116,10 @@ public class RedWarehouseSideAutonomous extends org.firstinspires.ftc.teamcode.A
         //1.2
         //move to the shipping hub
         //y- movement to be in-line w/ shipping hub
-        //robot facing: <=      needs to move:  V
+        //robot facing: =>      needs to move:  V
         robot.driveTrain.strafeToDistance(1, pi, driveYMinusStep1_2);
-        //x+ movement if necessary (just make sure arm can extend long enough to drop off preloaded thing into shipping hub)
-        //robot facing: <=      needs to move:  =>
+        //x- movement if necessary (just make sure arm can extend long enough to drop off preloaded thing into shipping hub)
+        //robot facing: =>      needs to move:  <=
         robot.driveTrain.strafeToDistance(1, -pi/4.0, driveXPlusStep1_2);
 
 
@@ -157,18 +157,18 @@ public class RedWarehouseSideAutonomous extends org.firstinspires.ftc.teamcode.A
         /*step 2*/
         //pick up and deposit additional freight
         //2.1
-        //x+ (maybe x- in future) movement until in-line with bar codes
-        //robot facing: <=      needs to move:  =>
+        //x- (maybe x+ in future) movement until in-line with bar codes
+        //robot facing: =>      needs to move:  <=
         robot.driveTrain.strafeToDistance(1, -pi/4.0, driveXPlusStep2_1);
 
         //rotate 180 degrees so webcam is facing x- direction
-        //robot facing: <-      needs to face:  ->
+        //robot facing: ->      needs to face:  <-
         robot.driveTrain.rotateByAngle(pi, 0.75);
 
         for (int i = 0; i < 2; i++) { //do twice
             //2.1 continued
             //y+ movement to next piece of freight, //distance depends on variables i and level
-            //robot facing: =>      needs to move:  ^
+            //robot facing: <=      needs to move:  ^
             int j = 0;
             for (j = 0; j < barcodes.length; j++) { //find closest block
                 if (barcodes[j]) {
@@ -183,7 +183,7 @@ public class RedWarehouseSideAutonomous extends org.firstinspires.ftc.teamcode.A
             robot.intakeSystem.intakeGrabberServo.setPosition(robot.intakeSystem.GRABBER_FULL_OPEN);
             sleep(300);
             //move forward, collect, then move back a bit
-            //robot facing: =>      needs to move:  =>
+            //robot facing: <=      needs to move:  <=
             robot.driveTrain.strafeToDistance(1, pi/4.0, driveXStep2_2);
 
             //collect
@@ -193,18 +193,18 @@ public class RedWarehouseSideAutonomous extends org.firstinspires.ftc.teamcode.A
             robot.intakeSystem.intakeArmServo.setPosition(robot.intakeSystem.ARM_RAISED);
             sleep(300);
 
-            //robot facing: =>      needs to move:  <=
+            //robot facing: <=      needs to move:  =>
             robot.driveTrain.strafeToDistance(1, -pi/4.0, driveXStep2_2);
 
             //2.3
             //y- movement, equal distance, opposite direction, as step 2.1.     until inline w/ shipping hub again
-            //robot facing: =>      needs to move:  V
+            //robot facing: <=      needs to move:  V
             robot.driveTrain.strafeToDistance(1, 0, driveYPlusStep2_1+distanceBetweenBarcodes*j);
 
             //2.4
             //move to shipping hub and deposit
-            //x+ movement until up to shipping hub
-            //robot facing: =>      needs to move:  =>
+            //x- movement until up to shipping hub
+            //robot facing: <=      needs to move:  <=
             robot.driveTrain.strafeToDistance(1,pi/4.0, driveXStep2_4);
 
             //drop off from input to bottom level
@@ -213,8 +213,8 @@ public class RedWarehouseSideAutonomous extends org.firstinspires.ftc.teamcode.A
 
             //2.5
             //move back to where we ended step 2.1
-            //x- movement, equal distance, opposite direction as step 2.4
-            //robot facing: =>      needs to move:  <=
+            //x+ movement, equal distance, opposite direction as step 2.4
+            //robot facing: <=      needs to move:  =>
             robot.driveTrain.strafeToDistance(1,-pi/4.0, driveXStep2_4);
             robot.intakeSystem.intakeArmServo.setPosition(robot.intakeSystem.ARM_RAISED);
         }//2.6, repeat
@@ -226,7 +226,7 @@ public class RedWarehouseSideAutonomous extends org.firstinspires.ftc.teamcode.A
         //3.1
         //strafe into the warehouse and end
         //rotate to face warehouse
-        //robot facing: ->      needs to face:  ^
+        //robot facing: <-      needs to face:  ^
         robot.driveTrain.rotateByAngle(pi/4.0, 0.75);
 
         //y+ movement into warehouse

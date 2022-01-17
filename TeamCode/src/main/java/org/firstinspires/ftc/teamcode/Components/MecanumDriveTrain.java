@@ -267,6 +267,7 @@ public class MecanumDriveTrain implements Component {
         //stop and go back to normal
         setPower(0);
         setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        motorsBusy = false;
     }
 
     ////////////////////////////// Set Methods //////////////////////////////

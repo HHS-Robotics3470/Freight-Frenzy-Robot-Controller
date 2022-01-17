@@ -131,8 +131,8 @@ public class Hardware implements Component {
     HardwareMap hwMap           =  null;
     private ElapsedTime runtime  = new ElapsedTime();
     //PID controllers
-    public PIDController FrBlStrafePIDController, FlBrStrafePIDController, rotatePIDController;
-    private PIDFCoefficients pidfCoefficients;
+    //public PIDController FrBlStrafePIDController, FlBrStrafePIDController, rotatePIDController;
+    //private PIDFCoefficients pidfCoefficients;
 
     //**variables for robot measurements**//
 
@@ -182,7 +182,7 @@ public class Hardware implements Component {
         //webcam and vuforia
         initWebcamAndVuforia();
         //PID's
-        initPIDs();
+        //initPIDs();
         //hubs
         allHubs = hwMap.getAll(LynxModule.class);
         for (LynxModule module : allHubs) { //optimizes sensor reading by caching in bulk, effectively reading all sensors in the same time as one,
@@ -253,9 +253,10 @@ public class Hardware implements Component {
     no overshoot        |.001534|.031958| 0.000049
     pessen integration  |.005369|.139818| 0.000077
     */
+    /*
     /**
      * init PIDs with default coefficients
-     */
+     *//*
     private void initPIDs() {
 
         initPIDs(
@@ -269,10 +270,10 @@ public class Hardware implements Component {
      * @param FrBlStrafe    coefficients for the frontRight-backLeft axis strafing PID
      * @param FlBrStrafe    coefficients for the frontLeft-backRight axis strafing PID
      * @param rotate        coefficients for the rotation PID
-     */
+     *//*
     private void initPIDs(PIDCoefficients FrBlStrafe, PIDCoefficients FlBrStrafe, PIDCoefficients rotate) {
         //save coefficients
-        //**PIDS**//
+        //**PIDS**//*
         //PID coefficients
 
         //initialize PID controllers
@@ -298,7 +299,7 @@ public class Hardware implements Component {
         rotatePIDController.setContinuous(true);                // we want input angles to wrap, because angles wrap
         //rotatePIDController.enable();
     }
-
+    */
     ////////////////////////////// Methods //////////////////////////////
 
     ////////////////////////////// Set Methods //////////////////////////////

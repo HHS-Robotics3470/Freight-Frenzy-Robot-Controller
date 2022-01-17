@@ -27,7 +27,7 @@ when they press 'a', call a function that goes through the process of calculatin
  * 
  * @author Anthony Rubick
  */
-@TeleOp(name="PIDF tuner", group = "Tuning")
+@TeleOp(name="T: PIDF tuner", group = "Tuning")
 //@Disabled
 //this line disables the teleop from appearing on the driver station, remove it for your code
 public class PIDFtuner extends LinearOpMode {

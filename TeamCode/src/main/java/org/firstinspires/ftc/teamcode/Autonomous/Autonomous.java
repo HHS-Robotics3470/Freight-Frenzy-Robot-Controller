@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.Autonomous;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.Hardware;
 
@@ -21,6 +22,7 @@ public abstract class Autonomous extends LinearOpMode {
     public void setStartPos(StartPos startPos) {
         this.startPos = startPos;
     }
+    Hardware robot          = new Hardware();
 
     //gameplan
     /*

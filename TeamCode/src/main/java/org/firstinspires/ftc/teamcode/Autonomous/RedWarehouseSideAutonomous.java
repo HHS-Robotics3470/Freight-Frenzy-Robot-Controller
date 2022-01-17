@@ -8,21 +8,14 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.Hardware;
 
 /**
- * Currently just psuedo code, comments\
- * next steps:
- * -code out comments with variables for any values like distance, power, or position
- * -through testing, find out what those variables need to be set to
- * -test and refine
- *
- * -basically, get one working perfectly, then copy paste and change some things for the other start positions
- * -create new code for every start position (red/blue, top/bottom)
- * -test and refine
- *
+ * copied version of BlueWarehouseSideAutonomous.java, changed up to work for the other side,
+ * TODO: calibrate every distance, angle, etc. to be accurate
+ * we use this at the remote events
  * @author Anthony Rubick
  */
-@Autonomous(name="Blue Warehouse-side Autonomous", group="Needs Calibration" )
+@Autonomous(name="Red Warehouse-side Autonomous", group="Needs Calibration" )
 //@Disabled //this line disables the autonomous from appearing on the driver station, remove it for your code
-public class BlueWarehouseSideAutonomous extends org.firstinspires.ftc.teamcode.Autonomous.Autonomous {
+public class RedWarehouseSideAutonomous extends org.firstinspires.ftc.teamcode.Autonomous.Autonomous {
 
     /*declare OpMode members, initialize some classes*/
     //Hardware robot          = new Hardware(); // moved to superclass
@@ -32,7 +25,7 @@ public class BlueWarehouseSideAutonomous extends org.firstinspires.ftc.teamcode.
     @Override
     public void runOpMode()
     {
-        super.setStartPos(StartPos.BLUE_WAREHOUSE);
+        super.setStartPos(StartPos.RED_WAREHOUSE);
         ////////////before driver presses play////////////
         //Variables
         double pi = Math.PI;
@@ -41,9 +34,9 @@ public class BlueWarehouseSideAutonomous extends org.firstinspires.ftc.teamcode.
         //level of the shipping hub that the preloaded freight needs to be moved to
         int level = 1; // 0 == bottom, 1 == middle, 2 == top    see appendix D (pg 42) of gm2 for details
         boolean[] barcodes = {true, true, true};   //is there a freight element in each barcode
-                                                    //index 0, closest to shipping hub
-                                                    //index 1, middle
-                                                    //index 2, farthest from shipping hub
+        //index 0, closest to shipping hub
+        //index 1, middle
+        //index 2, farthest from shipping hub
 
         //distances, in meters, needed for specific movements
         double driveYMinusStep1_2   = 0.6096;   //2 ft
@@ -65,15 +58,11 @@ public class BlueWarehouseSideAutonomous extends org.firstinspires.ftc.teamcode.
         int extendCascadeStep1_3 = robot.cascadeOutputSystem.CASCADE_EXTENDED;
         int retractCascadeStep1_3 = robot.cascadeOutputSystem.CASCADE_RETRACTED;
 
-
-
-
         /* Initialize the hardware variables.
          * The init() method of the hardware class does all the work here
          */
         robot.init(hardwareMap);
         robot.initVuforiaAndTfod(hardwareMap);
-
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();

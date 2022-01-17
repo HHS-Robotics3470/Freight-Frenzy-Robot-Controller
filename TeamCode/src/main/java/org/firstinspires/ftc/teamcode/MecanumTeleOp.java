@@ -80,6 +80,7 @@ public class MecanumTeleOp extends LinearOpMode {
          * The init() method of the hardware class does all the work here
          */
         robot.init(hardwareMap);
+        //robot.initVuforiaAndTfod(hardwareMap); //uncomment if necessary
         tempOutArmPos = robot.cascadeOutputSystem.ARM_RETRACTED; //initialize this as the retracted position
         // Wait for the game to start (driver presses PLAY)
         waitForStart();

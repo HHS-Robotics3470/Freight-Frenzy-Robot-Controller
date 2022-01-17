@@ -13,7 +13,7 @@ import org.firstinspires.ftc.teamcode.Hardware;
  */
 @Autonomous(name="Auto Name goes here", group="opmode group goes here" )
 @Disabled //this line disables the autonomous from appearing on the driver station, remove it for your code
-public class autoProgramTemplate extends LinearOpMode{
+public class warehouseParkingAuto extends LinearOpMode{
     /*declare OpMode members, initialize some classes*/
     Hardware robot          = new Hardware();
     ElapsedTime runtime     = new ElapsedTime();

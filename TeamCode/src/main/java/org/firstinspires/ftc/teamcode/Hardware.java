@@ -6,26 +6,23 @@ import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareDevice;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.PIDCoefficients;
-import com.qualcomm.robotcore.hardware.PIDFCoefficients;
-import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
+import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
+import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
+
 import org.firstinspires.ftc.teamcode.Components.CascadeOutputSystem;
 import org.firstinspires.ftc.teamcode.Components.Component;
 import org.firstinspires.ftc.teamcode.Components.IntakeSystem;
 import org.firstinspires.ftc.teamcode.Components.MecanumDriveTrain;
-import org.firstinspires.ftc.teamcode.Utility.PIDController;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
 /*
     NOTE -conventions for the measurement of distances and angles-
     distances will be recorded and implemented in Standard units (meters), do not use the imperial system in your code
@@ -91,14 +88,10 @@ x-neg|---+---|pos
  *
  * this class should contain the initialization for the robot, as well as many of the methods the robot will use in its OpModes
  * @author Anthony Rubick
+ * @author Adeel Ahmad - Vuforia
  */
 public class Hardware implements Component {
     ////////////////////////////// class variables //////////////////////////////
-    //TODO: in the future, maybe isolate specific mechanisms into their own "hardware" classes
-    // (like: drivetrain, cascade, frontCollector, etc.) that could include
-    // more specific methods and variables without cluttering this class so much
-    // they'd be in their own folder too
-
     //params for hardware elements, store positions and whatnot that equate to known output, IE servo position for a claw to open/close,
     //first layer: specific hardware element (ie "cascade lift", "front input servo", etc.)
     //      second layer, parameters (k,v) (ie. ("open", 0.6), etc.)
@@ -122,21 +115,19 @@ public class Hardware implements Component {
     public BNO055IMU imu;
     private double globalAngle;
     private Orientation lastAngles = new Orientation();
-    //Webcam
+    //Webcam vuforia and tensorflow
     private WebcamName vuforiaWebcam;
+    public VuforiaLocalizer vuforia;
+    public TFObjectDetector tfod;
+    private static final String TFOD_MODEL_ASSET = "FreightFrenzy_BCDM.tflite";
+    private static final String[] LABELS = {
+            "Ball",
+            "Cube",
+            "Duck",
+            "Marker"
+    };
     //expansion hubs
     List<LynxModule> allHubs;
-
-    /* --local OpMode members.-- */
-    HardwareMap hwMap           =  null;
-    private ElapsedTime runtime  = new ElapsedTime();
-    //PID controllers
-    //public PIDController FrBlStrafePIDController, FlBrStrafePIDController, rotatePIDController;
-    //private PIDFCoefficients pidfCoefficients;
-
-    //**variables for robot measurements**//
-
-    //**odometry direction multipliers**//
 
     //**hardware stats**//
     // stats for the TorqueNADO motors
@@ -146,6 +137,15 @@ public class Hardware implements Component {
     public final double NADO_COUNTS_PER_METER      = (NADO_COUNTS_PER_MOTOR_REV * NADO_DRIVE_GEAR_REDUCTION) /
             (NADO_WHEEL_DIAMETER_METERS * Math.PI);
     public final double NADO_METERS_PER_COUNT = 1.0 / NADO_COUNTS_PER_METER;
+
+    /* --local OpMode members.-- */
+    HardwareMap hwMap           =  null;
+    private ElapsedTime runtime  = new ElapsedTime();
+    private static final String VUFORIA_KEY = "AW/D8Tv/////AAABmaz//hdMn0Nmm2YoSrW8emZqrSTAb26m/pJRCgy4GeNX6aO6frTzk1FQ/y8IC0mbDWke8NXa87KACa/HR1kVRqaamTM60GJcobyaZaK1k0NAkVZ94iJY/RlWsIzESF3hql3ADHV9oHUuSvZWAVkF8f01xr4bzFtLrXgORIxOFKsT4TWSfHIr1pZel50uC0psgWIWpcDFGY3wTHlcfahX93OY8rqz98vwZC6b2u0MiikDwFjzKD2zxtSvQkYyIogyccKwZrC4z432K1GwxSvUanLJVsNypOcDqVrXWJdHKSmJSuQ8Zrl5SDvPXFewBpBYUTacsrdIx6bUykW+hSTcMxFzMo8MHjrv+FYgtJwaVsFT";
+
+    //PID controllers
+    //public PIDController FrBlStrafePIDController, FlBrStrafePIDController, rotatePIDController;
+    //private PIDFCoefficients pidfCoefficients;
 
     /* --Constructors-- */
     public Hardware(){
@@ -180,7 +180,7 @@ public class Hardware implements Component {
         //IMU (Inertial Motion Unit)
         initIMU();
         //webcam and vuforia
-        initWebcamAndVuforia();
+        //done only in opmodes that need it
         //PID's
         //initPIDs();
         //hubs
@@ -191,19 +191,9 @@ public class Hardware implements Component {
         }
     }
 
-    /**
-     * @return a list of all hardware devices included on the component
-     */
-    @Override
-    public List<HardwareDevice> getAll() {
-        return null;
-    }
-
     //motors
     private void initMotors()
     {
-        //drive motors
-
         //other motors
         turntableMotor = hwMap.get(DcMotor.class,  "front_left_turntable_motor"); //expansion hub port 2
         // Set power to zero
@@ -215,11 +205,13 @@ public class Hardware implements Component {
         // assign motor directions
         turntableMotor.setDirection(DcMotor.Direction.FORWARD);
     }
+
     //sensors
     private void initSensors() {
         // Define and initialize all Sensors
 
     }
+
     //other
     //imu
     private void initIMU() {
@@ -235,12 +227,45 @@ public class Hardware implements Component {
         parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
         imu.initialize(parameters);
     }
-    //webcam
-    private void initWebcamAndVuforia() {
-        //webcam
 
-        //TODO: add vuforia configs adeel
+    //vuforia stuff
+    public void initVuforiaAndTfod(HardwareMap ahwMap) {
+        if (hwMap == null) {
+            hwMap=ahwMap;// Save reference to Hardware map
+        }
+
+        //webcam
+        vuforiaWebcam = hwMap.get(WebcamName.class, "vuforia_webcam");
+
+        //vuforia and tensorflow
+        initVuforia();
+        initTfod();
     }
+    private void initVuforia() {
+        /*
+         * Configure Vuforia by creating a Parameter object, and passing it to the Vuforia engine.
+         */
+        VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters();
+
+        parameters.vuforiaLicenseKey = VUFORIA_KEY;
+        parameters.cameraName = vuforiaWebcam;
+
+        //  Instantiate the Vuforia engine
+        vuforia = ClassFactory.getInstance().createVuforia(parameters);
+
+        // Loading trackables is not necessary for the TensorFlow Object Detection engine.
+    }
+    private void initTfod() {
+        int tfodMonitorViewId = hwMap.appContext.getResources().getIdentifier(
+                "tfodMonitorViewId", "id", hwMap.appContext.getPackageName());
+        TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
+        tfodParameters.minResultConfidence = 0.5f; //TODO: update and tune this value
+        tfodParameters.isModelTensorFlow2 = true;
+        tfodParameters.inputSize = 320;
+        tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);
+        tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABELS);
+    }
+
     /*
     calculated coefficients for a torquenado motor with no load.
     target and input values are the encoder count of the motor, it's a position PID, and while it may work for velocity, velocity was not what it was tuned for.
@@ -301,7 +326,13 @@ public class Hardware implements Component {
     }
     */
     ////////////////////////////// Methods //////////////////////////////
-
+    /**
+     * @return a list of all hardware devices included on the component
+     */
+    @Override
+    public List<HardwareDevice> getAll() {
+        return null;
+    }
     ////////////////////////////// Set Methods //////////////////////////////
 
     ////////////////////////////// Get Methods //////////////////////////////

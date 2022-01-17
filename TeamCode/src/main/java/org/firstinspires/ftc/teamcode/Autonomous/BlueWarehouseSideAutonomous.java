@@ -72,6 +72,7 @@ public class BlueWarehouseSideAutonomous extends org.firstinspires.ftc.teamcode.
          * The init() method of the hardware class does all the work here
          */
         robot.init(hardwareMap);
+        robot.initVuforiaAndTfod(hardwareMap);
 
 
         // Wait for the game to start (driver presses PLAY)
@@ -107,7 +108,7 @@ public class BlueWarehouseSideAutonomous extends org.firstinspires.ftc.teamcode.
 
         /*step 1*/
         //1.1
-        //todo: use vuforia to figure out which position the pre-loaded element needs to be delivered to, assign it to level
+        //todo: use vuforia to figure out which position the pre-loaded element needs to be delivered to, assign it to level, this will be done in the determineLevel() method of the Autonomous.java class that's in the same folder as this
         level = super.determineLevel(robot);
         switch (level) { //depending on the level, set one of the indexes in barcodes to false to represent the position of the game element
             //W - O + S

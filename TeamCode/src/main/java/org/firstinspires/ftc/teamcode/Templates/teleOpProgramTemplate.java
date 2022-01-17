@@ -31,6 +31,7 @@ public class teleOpProgramTemplate extends LinearOpMode {
          * The init() method of the hardware class does all the work here
          */
         robot.init(hardwareMap);
+        //robot.initVuforiaAndTfod(hardwareMap); //uncomment if necessary
 
         // Wait for the game to start (driver presses PLAY)
 

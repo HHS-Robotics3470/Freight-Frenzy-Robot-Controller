@@ -14,7 +14,7 @@ import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 import java.util.List;
 
 /**
- * @author Anthony Rubick - Movement
+ * @author Anthony Rubick - Practically everything but Vuforia
  * @author Adeel Ahmad - Vuforia
  */
 @TeleOp(name="mecanum TeleOp w/ Vuforia", group="Competition")
@@ -33,7 +33,6 @@ public class MecanumVuforiaTeleOp extends LinearOpMode {
         /**
          * for input, this is full open, used when collecting an element
          * for output, this is drop-off position, meaning it's depositing a game element
-         *
          */
         OPEN,
         CLOSED,
@@ -61,33 +60,14 @@ public class MecanumVuforiaTeleOp extends LinearOpMode {
     }
 
 
-    Hardware robot          = new Hardware();
-    ElapsedTime runtime     = new ElapsedTime();
+    Hardware robot = new Hardware();
+    ElapsedTime runtime = new ElapsedTime();
     ElapsedTime bProcessTimer = new ElapsedTime();
     ElapsedTime inputTimer = new ElapsedTime();
 
-    // Vuforia initialization
-
-    private static final String TFOD_MODEL_ASSET = "FreightFrenzy_BCDM.tflite";
-    private static final String[] LABELS = {
-            "Ball",
-            "Cube",
-            "Duck",
-            "Marker"
-    };
-
-    private static final String VUFORIA_KEY =
-            "AW/D8Tv/////AAABmaz//hdMn0Nmm2YoSrW8emZqrSTAb26m/pJRCgy4GeNX6aO6frTzk1FQ/y8IC0mbDWke8NXa87KACa/HR1kVRqaamTM60GJcobyaZaK1k0NAkVZ94iJY/RlWsIzESF3hql3ADHV9oHUuSvZWAVkF8f01xr4bzFtLrXgORIxOFKsT4TWSfHIr1pZel50uC0psgWIWpcDFGY3wTHlcfahX93OY8rqz98vwZC6b2u0MiikDwFjzKD2zxtSvQkYyIogyccKwZrC4z432K1GwxSvUanLJVsNypOcDqVrXWJdHKSmJSuQ8Zrl5SDvPXFewBpBYUTacsrdIx6bUykW+hSTcMxFzMo8MHjrv+FYgtJwaVsFT";
-
-    private VuforiaLocalizer vuforia;
-
-    private TFObjectDetector tfod;
-
-
     //this is the control loop, basically the equivalent of a main function almost
     @Override
-    public void runOpMode()
-    {
+    public void runOpMode() {
         ////////////before driver presses play////////////
         //Variables
         //state enums
@@ -107,15 +87,11 @@ public class MecanumVuforiaTeleOp extends LinearOpMode {
          * The init() method of the hardware class does all the work here
          */
         robot.init(hardwareMap);
+        robot.initVuforiaAndTfod(hardwareMap);
         tempOutArmPos = robot.cascadeOutputSystem.ARM_RETRACTED; //initialize this as the retracted position
 
-        // Initiallize vuforia stuff
-
-        initVuforia();
-        initTfod();
-
-        if (tfod != null) {
-            tfod.activate();
+        if (robot.tfod != null) {
+            robot.tfod.activate();
 
             // The TensorFlow software will scale the input images from the camera to a lower resolution.
             // This can result in lower detection accuracy at longer distances (> 55cm or 22").
@@ -123,7 +99,7 @@ public class MecanumVuforiaTeleOp extends LinearOpMode {
             // to artificially zoom in to the center of image.  For best results, the "aspectRatio" argument
             // should be set to the value of the images used to create the TensorFlow Object Detection model
             // (typically 16/9).
-            tfod.setZoom(2.5, 16.0/9.0);
+            robot.tfod.setZoom(2.5, 16.0 / 9.0);
         }
 
         telemetry.addData(">", "Press Play to start op mode");
@@ -140,7 +116,7 @@ public class MecanumVuforiaTeleOp extends LinearOpMode {
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
-           /* CONTROLS
+            /* CONTROLS
             joysticks: movement
                 left joystick: strafe
                 right joystick: rotation
@@ -170,18 +146,18 @@ public class MecanumVuforiaTeleOp extends LinearOpMode {
             //joystick values
             double x = gamepad1.left_stick_x;
             double y = -gamepad1.left_stick_y;
-            double r = gamepad1.right_stick_x/2.0;
+            double r = gamepad1.right_stick_x / 2.0;
             //these hardware calls take 27ms total (3ms each)
 
             /////JOYSTICKS/////
             //handles strafing and turning in one optimized step.
             //because the joysticks give rectangular coordinates, there's not much point converting to polar than back to rectangular
-            double denom = Math.max(Math.abs(x) + Math.abs(y) + Math.abs(r) , 1.0);
+            double denom = Math.max(Math.abs(x) + Math.abs(y) + Math.abs(r), 1.0);
             robot.driveTrain.setPower(
-                    (y-x-r)/denom,
-                    (y+x+r)/denom,
-                    (y-x+r)/denom,
-                    (y+x-r)/denom
+                    (y - x - r) / denom,
+                    (y + x + r) / denom,
+                    (y - x + r) / denom,
+                    (y + x - r) / denom
             ); //+12ms
 
 
@@ -191,7 +167,7 @@ public class MecanumVuforiaTeleOp extends LinearOpMode {
             //A input
             switch (aState) {
                 case NOT_STARTED:
-                    if (aC&&!aP) {
+                    if (aC && !aP) {
                         switch (inputState) {
                             case OPEN:
                                 robot.intakeSystem.intakeGrabberServo.setPosition(robot.intakeSystem.GRABBER_CLOSED);
@@ -230,7 +206,7 @@ public class MecanumVuforiaTeleOp extends LinearOpMode {
             //tempOutArmPos saves the position of the flipper so we can return to it later
             switch (bState) {
                 case NOT_STARTED:
-                    if (bC&&!bP) {
+                    if (bC && !bP) {
                         //save some info about the robots state so we can return to it at the end
                         tempOutArmPos = robot.cascadeOutputSystem.outputArmServo.getPosition();
                         cascadeCount = robot.cascadeOutputSystem.cascadeLiftMotor.getCurrentPosition();
@@ -317,21 +293,20 @@ public class MecanumVuforiaTeleOp extends LinearOpMode {
                     break;
             }
             //X output
-            switch (outputState) {
-                case OPEN:
-                    if (xC&&!xP) {
+            if (xC && !xP) {
+                switch (outputState) {
+                    case OPEN:
                         robot.cascadeOutputSystem.outputGrabberServo.setPosition(robot.cascadeOutputSystem.GRABBER_CLOSED); //close
                         outputState = IOState.CLOSED;
-                    }
-                    break;
-                case CLOSED:
-                    if (xC&&!xP) {
+                        break;
+                    case CLOSED:
                         robot.cascadeOutputSystem.outputGrabberServo.setPosition(robot.cascadeOutputSystem.GRABBER_DROP);
                         outputState = IOState.OPEN;
-                    }
-                    break;
-                default:
-                    break;
+                        break;
+                    case RESTRICTED:
+                    default:
+                        break;
+                }
             }
             //Y implemented later, bundled w/ UP and DOWN
 
@@ -339,43 +314,43 @@ public class MecanumVuforiaTeleOp extends LinearOpMode {
             //UP DOWN Y
             switch (outputArmState) {
                 case RETRACTED:
-                    if (yC&&!yP) {
+                    if (yC && !yP) {
                         robot.cascadeOutputSystem.outputArmServo.setPosition(robot.cascadeOutputSystem.ARM_EXTENDED_FLAT); //extend flat
                         outputArmState = OutputArmState.FLAT;
                     }
                     break;
                 case FLAT:
-                    if (upC&&!upP) {
+                    if (upC && !upP) {
                         robot.cascadeOutputSystem.outputArmServo.setPosition(robot.cascadeOutputSystem.ARM_EXTENDED_UP); //up
                         outputArmState = OutputArmState.UP;
-                    } else if (downC&&!downP) {
+                    } else if (downC && !downP) {
                         robot.cascadeOutputSystem.outputArmServo.setPosition(robot.cascadeOutputSystem.ARM_EXTENDED_DOWN); //down
                         outputArmState = OutputArmState.DOWN;
-                    } else if (yC&&!yP) {
+                    } else if (yC && !yP) {
                         robot.cascadeOutputSystem.outputArmServo.setPosition(robot.cascadeOutputSystem.ARM_RETRACTED); //retract
                         outputArmState = OutputArmState.RETRACTED;
                     }
                     break;
                 case UP:
-                    if (upC&&!upP) {
+                    if (upC && !upP) {
                         robot.cascadeOutputSystem.outputArmServo.setPosition(robot.cascadeOutputSystem.ARM_EXTENDED_DOWN); //down
                         outputArmState = OutputArmState.DOWN;
-                    } else if (downC&&!downP) {
+                    } else if (downC && !downP) {
                         robot.cascadeOutputSystem.outputArmServo.setPosition(robot.cascadeOutputSystem.ARM_EXTENDED_FLAT); //flat
                         outputArmState = OutputArmState.FLAT;
-                    } else if (yC&&!yP) {
+                    } else if (yC && !yP) {
                         robot.cascadeOutputSystem.outputArmServo.setPosition(robot.cascadeOutputSystem.ARM_RETRACTED); //retract
                         outputArmState = OutputArmState.RETRACTED;
                     }
                     break;
                 case DOWN:
-                    if (upC&&!upP) {
+                    if (upC && !upP) {
                         robot.cascadeOutputSystem.outputArmServo.setPosition(robot.cascadeOutputSystem.ARM_EXTENDED_FLAT); //flat
                         outputArmState = OutputArmState.FLAT;
-                    } else if (downC&&!downP) {
+                    } else if (downC && !downP) {
                         robot.cascadeOutputSystem.outputArmServo.setPosition(robot.cascadeOutputSystem.ARM_EXTENDED_UP); //up
                         outputArmState = OutputArmState.UP;
-                    } else if (yC&&!yP) {
+                    } else if (yC && !yP) {
                         robot.cascadeOutputSystem.outputArmServo.setPosition(robot.cascadeOutputSystem.ARM_RETRACTED); //retract
                         outputArmState = OutputArmState.RETRACTED;
                     }
@@ -396,7 +371,7 @@ public class MecanumVuforiaTeleOp extends LinearOpMode {
             //LEFT
             else if (gamepad1.dpad_left) {
                 if (robot.cascadeOutputSystem.cascadeLiftMotor.getCurrentPosition() > robot.cascadeOutputSystem.CASCADE_EXTENDED) {
-                    robot.cascadeOutputSystem.extendCascadeToPosition(robot.cascadeOutputSystem.CASCADE_EXTENDED,0.5);
+                    robot.cascadeOutputSystem.extendCascadeToPosition(robot.cascadeOutputSystem.CASCADE_EXTENDED, 0.5);
                 } else {
                     robot.cascadeOutputSystem.cascadeLiftMotor.setPower(1);
                 }
@@ -404,7 +379,7 @@ public class MecanumVuforiaTeleOp extends LinearOpMode {
             //RIGHT
             else if (gamepad1.dpad_right) {
                 if (robot.cascadeOutputSystem.cascadeLiftMotor.getCurrentPosition() < robot.cascadeOutputSystem.CASCADE_RETRACTED) {
-                    robot.cascadeOutputSystem.extendCascadeToPosition(robot.cascadeOutputSystem.CASCADE_RETRACTED,0.5);
+                    robot.cascadeOutputSystem.extendCascadeToPosition(robot.cascadeOutputSystem.CASCADE_RETRACTED, 0.5);
 
                 } else {
                     robot.cascadeOutputSystem.cascadeLiftMotor.setPower(-1);
@@ -412,17 +387,18 @@ public class MecanumVuforiaTeleOp extends LinearOpMode {
             } else robot.cascadeOutputSystem.cascadeLiftMotor.setPower(0);
 
             //update button locks
-            aP=aC;
-            bP=bC;
-            xP=xC;
-            yP=yC;
+            aP = aC;
+            bP = bC;
+            xP = xC;
+            yP = yC;
             upP = upC;
             downP = downC;
 
-            if (tfod != null) {
+            //telemetry on robot state
+            if (robot.tfod != null) {
                 // getUpdatedRecognitions() will return null if no new information is available since
                 // the last time that call was made.
-                List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
+                List<Recognition> updatedRecognitions = robot.tfod.getUpdatedRecognitions();
                 if (updatedRecognitions != null) {
                     telemetry.addData("# Object Detected", updatedRecognitions.size());
                     // step through the list of recognitions and display boundary info.
@@ -435,9 +411,10 @@ public class MecanumVuforiaTeleOp extends LinearOpMode {
                                 recognition.getRight(), recognition.getBottom());
                         i++;
                     }
-                    telemetry.update();
+                    //note, don't need to run telemetry.update() here because that happens in the runTelemetry method
                 }
             }
+            runTelemetry(outputArmState, outputState, inputState, aState, bState);
         }
         ////////////after driver presses stop////////////
 
@@ -452,33 +429,6 @@ public class MecanumVuforiaTeleOp extends LinearOpMode {
         telemetry.addData("\nA-button process: ", aState.toString());
         telemetry.addData("B-button process: ", bState.toString());
         telemetry.update();
-    }
-
-
-    private void initVuforia() {
-        /*
-         * Configure Vuforia by creating a Parameter object, and passing it to the Vuforia engine.
-         */
-        VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters();
-
-        parameters.vuforiaLicenseKey = VUFORIA_KEY;
-        parameters.cameraName = hardwareMap.get(WebcamName.class, "vuforia_webcam");
-
-        //  Instantiate the Vuforia engine
-        vuforia = ClassFactory.getInstance().createVuforia(parameters);
-
-        // Loading trackables is not necessary for the TensorFlow Object Detection engine.
-    }
-
-    private void initTfod() {
-        int tfodMonitorViewId = hardwareMap.appContext.getResources().getIdentifier(
-                "tfodMonitorViewId", "id", hardwareMap.appContext.getPackageName());
-        TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
-        tfodParameters.minResultConfidence = 0.5f;
-        tfodParameters.isModelTensorFlow2 = true;
-        tfodParameters.inputSize = 320;
-        tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);
-        tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABELS);
     }
 
 }

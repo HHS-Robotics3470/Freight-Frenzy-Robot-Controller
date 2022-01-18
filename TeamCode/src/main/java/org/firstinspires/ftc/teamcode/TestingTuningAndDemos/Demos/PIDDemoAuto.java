@@ -137,6 +137,7 @@ public class PIDDemoAuto extends LinearOpMode {
      * @param angle          direction to strafe relative to robot, measure in radians, angle of 0 == starboard
      * @param targetDistance distance to strafe, measured in meters
      */
+    /*
     public void strafeToDistanceOld(double power, double angle, double targetDistance) {
         //DATA
         double rotationCorrection;
@@ -196,4 +197,5 @@ public class PIDDemoAuto extends LinearOpMode {
             );
         }
     }
+    */
 }

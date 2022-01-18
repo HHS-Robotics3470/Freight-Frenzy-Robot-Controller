@@ -14,8 +14,8 @@ import org.firstinspires.ftc.teamcode.Hardware;
  * @author Anthony Rubick
  */
 @Autonomous(name="Red Warehouse-side Autonomous", group="Needs Calibration" )
-@Disabled //this line disables the autonomous from appearing on the driver station, remove it for your code
-public class RedWarehouseSideAutonomous extends org.firstinspires.ftc.teamcode.Autonomous.Autonomous {
+//@Disabled //this line disables the autonomous from appearing on the driver station, remove it for your code
+public class remoteEventNoCascadeAuto  extends org.firstinspires.ftc.teamcode.Autonomous.Autonomous {
 
     /*declare OpMode members, initialize some classes*/
     //Hardware robot          = new Hardware(); // moved to superclass

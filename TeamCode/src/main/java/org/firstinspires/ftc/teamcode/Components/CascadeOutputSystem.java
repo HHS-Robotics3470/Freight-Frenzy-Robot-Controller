@@ -67,6 +67,7 @@ public class CascadeOutputSystem implements Component {
         outputArmServo.setPosition(ARM_RETRACTED);
 
         //MOTORS:
+        /*
         cascadeLiftMotor = hwMap.get(DcMotorEx.class, "cascade_lift_motor");        //expansion hub port 1 //max extension = 2150 counts
         cascadeLiftMotor.resetDeviceConfigurationForOpMode();
         cascadeLiftMotor.setPower(0);
@@ -85,6 +86,7 @@ public class CascadeOutputSystem implements Component {
             cascadeLiftMotor.setVelocityPIDFCoefficients(velocityPIDFCoefficients.p,velocityPIDFCoefficients.i,velocityPIDFCoefficients.d,velocityPIDFCoefficients.f);
             cascadeLiftMotor.setTargetPositionTolerance(targetPositionTolerance);
         }
+        */
     }
     /**
      * @return a list of all hardware devices included on the component

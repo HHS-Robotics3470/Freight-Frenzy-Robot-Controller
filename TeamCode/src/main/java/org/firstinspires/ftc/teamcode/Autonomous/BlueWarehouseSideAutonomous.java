@@ -21,7 +21,7 @@ import org.firstinspires.ftc.teamcode.Hardware;
  * @author Anthony Rubick
  */
 @Autonomous(name="Blue Warehouse-side Autonomous", group="Needs Calibration" )
-//@Disabled //this line disables the autonomous from appearing on the driver station, remove it for your code
+@Disabled //this line disables the autonomous from appearing on the driver station, remove it for your code
 public class BlueWarehouseSideAutonomous extends org.firstinspires.ftc.teamcode.Autonomous.Autonomous {
 
     /*declare OpMode members, initialize some classes*/

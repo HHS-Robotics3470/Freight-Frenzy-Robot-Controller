@@ -1,5 +1,8 @@
 package org.firstinspires.ftc.teamcode;
 
+import androidx.core.app.RemoteInput;
+
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -9,6 +12,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * @author Anthony Rubick
  */
 @TeleOp(name="mecanum TeleOp", group="Competition")
+@Disabled
 public class MecanumTeleOp extends LinearOpMode {
     /*declare OpMode members, initialize some classes*/
     //an enum to represent output flipper states

@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.Templates;
+package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
@@ -11,9 +11,9 @@ import org.firstinspires.ftc.teamcode.Hardware;
  * Template for Autonomous routines
  * @author Anthony Rubick
  */
-@Autonomous(name="Auto Name goes here", group="opmode group goes here" )
-@Disabled //this line disables the autonomous from appearing on the driver station, remove it for your code
-public class warehouseParkingAuto extends LinearOpMode{
+@Autonomous(name="adeel competition auto", group="opmode group goes here" )
+//@Disabled //this line disables the autonomous from appearing on the driver station, remove it for your code
+public class tableParkingAutonomous extends LinearOpMode{
     /*declare OpMode members, initialize some classes*/
     Hardware robot          = new Hardware();
     ElapsedTime runtime     = new ElapsedTime();
@@ -49,15 +49,15 @@ public class warehouseParkingAuto extends LinearOpMode{
         //autonomous routine goes here step by step
 
         //Orient robot so that turn does not hit the field wall
-        robot.strafeToDistance(1, angle_one, init_move);
-        robot.rotateByAngle(angle_two, 1);
-        robot.strafeToDistance(1, angle_three, second_move);
+        robot.driveTrain.strafeToDistance(1, angle_one, init_move);
+        robot.driveTrain.rotateByAngle(angle_two, 1);
+        robot.driveTrain.strafeToDistance(1, angle_three, second_move);
         robot.turntableMotor.setPower(1);
         sleep(500);
         robot.turntableMotor.setPower(0);
-        robot.strafeToDistance(1, angle_three, -second_move);
-        robot.rotateByAngle(angle_four, 1);
-        robot.strafeToDistance(1, angle_one, third_move);
+        robot.driveTrain.strafeToDistance(1, angle_three, -second_move);
+        robot.driveTrain.rotateByAngle(angle_four, 1);
+        robot.driveTrain.strafeToDistance(1, angle_one, third_move);
 
 
 

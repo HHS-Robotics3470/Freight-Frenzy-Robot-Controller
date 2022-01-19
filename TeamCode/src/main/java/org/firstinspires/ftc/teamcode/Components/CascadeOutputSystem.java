@@ -26,9 +26,9 @@ public class CascadeOutputSystem implements Component {
     public final double ARM_EXTENDED_UP = 0.6;
     public final double ARM_EXTENDED_DOWN = 0.95;
     //grabber
-    public final double GRABBER_RECEIVE = .5;
+    public final double GRABBER_RECEIVE = .3;
     public final double GRABBER_DROP = 0.75;
-    public final double GRABBER_CLOSED = 1.0;
+    public final double GRABBER_CLOSED = 0.95;
     //TODO: recalculate at full battery
     //PID info
     //CALCULATED:

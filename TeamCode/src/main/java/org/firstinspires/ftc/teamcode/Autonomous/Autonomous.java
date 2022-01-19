@@ -27,6 +27,9 @@ public abstract class Autonomous extends LinearOpMode {
     }
     Hardware robot          = new Hardware();
 
+    double val1 = 0;
+    double val2 = 0;
+    double val3 = 0;
     //gameplan
     //TODO: there is not frieght on the other barcodes, remove references to it
     /*
@@ -118,8 +121,8 @@ public abstract class Autonomous extends LinearOpMode {
             List<Recognition> updatedRecognitions = robot.tfod.getUpdatedRecognitions();
             if (updatedRecognitions != null) {
 
-                recognition = updatedRecognitions.get(0);
-                loc = recognition.getLeft()/recognition.getRight();
+                Recognition recognition = updatedRecognitions.get(0);
+                double loc = recognition.getLeft()/recognition.getRight();
                 if (loc < val1){
                     level = 0;
                 }

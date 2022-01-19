@@ -3,7 +3,10 @@ package org.firstinspires.ftc.teamcode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.teamcode.Hardware;
+
+import java.util.List;
 
 /**
  * this is a superclass that only has basic bits that all other auto routines will need
@@ -23,10 +26,6 @@ public abstract class Autonomous extends LinearOpMode {
         this.startPos = startPos;
     }
     Hardware robot          = new Hardware();
-
-    robot.initVuforiaAndTfod();
-    robot.initVuforia();
-    robot.initTfod()
 
     //gameplan
     //TODO: there is not frieght on the other barcodes, remove references to it
@@ -113,10 +112,10 @@ public abstract class Autonomous extends LinearOpMode {
 
         //TODO: add logic to determine the level from the webcame using vuforia
 
-        if (tfod != null) {
+        if (robot.tfod != null) {
             // getUpdatedRecognitions() will return null if no new information is available since
             // the last time that call was made.
-            List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
+            List<Recognition> updatedRecognitions = robot.tfod.getUpdatedRecognitions();
             if (updatedRecognitions != null) {
 
                 recognition = updatedRecognitions.get(0);
@@ -131,7 +130,7 @@ public abstract class Autonomous extends LinearOpMode {
                     level = 2;
                 }
                 else {
-                    level = -1
+                    level = -1;
                 }
 
                 telemetry.addData("# Object Detected", updatedRecognitions.size());

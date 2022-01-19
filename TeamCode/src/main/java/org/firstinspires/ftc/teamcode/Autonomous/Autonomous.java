@@ -24,6 +24,10 @@ public abstract class Autonomous extends LinearOpMode {
     }
     Hardware robot          = new Hardware();
 
+    robot.initVuforiaAndTfod();
+    robot.initVuforia();
+    robot.initTfod()
+
     //gameplan
     //TODO: there is not frieght on the other barcodes, remove references to it
     /*
@@ -108,21 +112,32 @@ public abstract class Autonomous extends LinearOpMode {
          */
 
         //TODO: add logic to determine the level from the webcame using vuforia
-        switch (startPos) {
-            case BLUE_WAREHOUSE:
-                //do logic here to find level
-                break;
-            case RED_WAREHOUSE:
-                //do logic here to find level
-                break;
-            case BLUE_SHIPPING:
-                //do logic here to find level
-                break;
-            case RED_SHIPPING:
-                //do logic here to find level
-                break;
-            default:
-                break;
+
+        if (tfod != null) {
+            // getUpdatedRecognitions() will return null if no new information is available since
+            // the last time that call was made.
+            List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
+            if (updatedRecognitions != null) {
+
+                recognition = updatedRecognitions.get(0);
+                loc = recognition.getLeft()/recognition.getRight();
+                if (loc < val1){
+                    level = 0;
+                }
+                else if (loc < val2 && loc > val1){
+                    level = 1;
+                }
+                else if (loc < val3 && loc > val2){
+                    level = 2;
+                }
+                else {
+                    level = -1
+                }
+
+                telemetry.addData("# Object Detected", updatedRecognitions.size());
+                telemetry.update();
+
+            }
         }
 
         return level;

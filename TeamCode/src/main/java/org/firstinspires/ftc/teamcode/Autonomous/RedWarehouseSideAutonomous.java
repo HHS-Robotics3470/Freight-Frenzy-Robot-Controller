@@ -71,6 +71,7 @@ public class RedWarehouseSideAutonomous extends org.firstinspires.ftc.teamcode.A
         ////////////after driver presses play////////////
 
         //autonomous routine goes here step by step
+        //TODO: there is not frieght on the other barcodes, remove references to it
         /*
         assuming we start in the spot closer to the warehouse:
         1) (freight) max 26pts

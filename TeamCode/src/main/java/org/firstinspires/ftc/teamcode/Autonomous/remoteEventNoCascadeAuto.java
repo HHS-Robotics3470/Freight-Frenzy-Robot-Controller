@@ -39,17 +39,11 @@ public class remoteEventNoCascadeAuto  extends org.firstinspires.ftc.teamcode.Au
         //index 2, farthest from shipping hub
 
         //distances, in meters, needed for specific movements
-        double driveYMinusStep1_2   = 0.6096;   //2 ft
-        double driveXPlusStep1_2    = 0.1524;   //6 in
+        double driveYStep1_2   = 0.6096;   //2 ft
+        double driveXStep1_2   = 0.3556;   //1ft 2in
+        double driveXStep1_3   = 0.15; //around 6 in
 
-        double driveXPlusStep2_1    = 0.254;    //10 in
-        double driveYPlusStep2_1    = 0.3556;   //1ft 2in, added to during autonomous
-        double distanceBetweenBarcodes = 0.21336;   //8.4 in
-        double driveXStep2_2        = 0.0508;   //2 in
-        double driveXStep2_4        = 0.0762;   //3 in
-
-
-        double driveYPlusStep3_1 = 1.8288;//6 ft
+        double driveYStep2_1 = 1.8288;//6 ft
 
         //directions for various movements
 
@@ -61,8 +55,8 @@ public class remoteEventNoCascadeAuto  extends org.firstinspires.ftc.teamcode.Au
         /* Initialize the hardware variables.
          * The init() method of the hardware class does all the work here
          */
-        robot.init(hardwareMap);
-        robot.initVuforiaAndTfod(hardwareMap);
+        super.robot.init(hardwareMap);
+        super.robot.initVuforiaAndTfod(hardwareMap); //the super reference is redundant, just a reminder that the variable belongs to the superclass
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
@@ -79,17 +73,10 @@ public class remoteEventNoCascadeAuto  extends org.firstinspires.ftc.teamcode.Au
         -move to the shipping hub
         -place the pre-load box onto the shipping hub, on the level previously determined
 
-        2) other freight, max 12 pts
-        -move up to first piece of freight
-        -collect
-        -move equivalent distance as step 2.1, but opposite direction, back to in line w/ shipping hub
-        -move over to shipping hub and deposit (6pts each time)
-        -move equivalent distance as step 2.4, but opposite direction
-        -repeat 2.1-2.5 but for second piece of freight
-
-
-        3) (parking) max 10pts
+        2) (parking) max 10pts
         -park COMPLETELY in the warehouse closest to our alliance shipping hub (10pts)
+
+        TODO: future, grab freight from warehouse and put it in shipping hub
          */
 
         // this one is assuming we start on the blue alliance, in the start position closed to the warehouse
@@ -99,37 +86,21 @@ public class remoteEventNoCascadeAuto  extends org.firstinspires.ftc.teamcode.Au
         //1.1
         //todo: use vuforia to figure out which position the pre-loaded element needs to be delivered to, assign it to level, this will be done in the determineLevel() method of the Autonomous.java class that's in the same folder as this
         level = super.determineLevel(robot);
-        switch (level) { //depending on the level, set one of the indexes in barcodes to false to represent the position of the game element
-            //S - O + W
-            case 0:
-                barcodes[0] = false;
-                break;
-            case 2:
-                barcodes[2] = false;
-                break;
-            case 1:
-            default:
-                barcodes[1] = false;
-                break;
-        }
 
         //1.2
         //move to the shipping hub
         //y- movement to be in-line w/ shipping hub
         //robot facing: =>      needs to move:  V
-        robot.driveTrain.strafeToDistance(1, 0, driveYMinusStep1_2);
-        //x- movement if necessary (just make sure arm can extend long enough to drop off preloaded thing into shipping hub)
+        robot.driveTrain.strafeToDistance(1, 0, driveYStep1_2);
+        //x- movement
         //robot facing: =>      needs to move:  <=
-        robot.driveTrain.strafeToDistance(1, -pi/4.0, driveXPlusStep1_2);
+        robot.driveTrain.strafeToDistance(1, -pi/4.0, driveXStep1_2);
 
 
         robot.intakeSystem.intakeArmServo.setPosition(robot.intakeSystem.ARM_RAISED);//raise the arm while in transit
 
         //1.3
         //drop off into shipping hub
-        //extend cascade kit
-        robot.cascadeOutputSystem.extendCascadeToPosition(extendCascadeStep1_3, 1);
-
         //extend output flipping arm to proper level
         switch (level) {
             case 0: //bottom
@@ -137,6 +108,9 @@ public class remoteEventNoCascadeAuto  extends org.firstinspires.ftc.teamcode.Au
                 break;
             case 2: //top
                 robot.cascadeOutputSystem.outputArmServo.setPosition(robot.cascadeOutputSystem.ARM_EXTENDED_UP);
+                //move forward a bit to reach the top thing
+                //robot facing =>   needs to move =>
+                robot.driveTrain.strafeToDistance(0.5, pi/4, driveXStep1_3);
                 break;
             case 1: //middle and default
             default:
@@ -148,90 +122,21 @@ public class remoteEventNoCascadeAuto  extends org.firstinspires.ftc.teamcode.Au
         robot.cascadeOutputSystem.outputGrabberServo.setPosition(robot.cascadeOutputSystem.GRABBER_DROP);
         sleep(100); //give time to move
 
-        //retract output flipping arm
+        //retract output flipping arm, and prep for movement
         robot.cascadeOutputSystem.outputArmServo.setPosition(robot.cascadeOutputSystem.ARM_RETRACTED);
-
-        //retract cascade kit
-        robot.cascadeOutputSystem.extendCascadeToPosition(retractCascadeStep1_3, 1);
-
-        /*step 2*/
-        //pick up and deposit additional freight
-        //2.1
-        //x- (maybe x+ in future) movement until in-line with bar codes
-        //robot facing: =>      needs to move:  <=
-        robot.driveTrain.strafeToDistance(1, -pi/4.0, driveXPlusStep2_1);
-
-        //rotate 180 degrees so webcam is facing x+ direction (and output is facing shipping hub)
-        //robot facing: ->      needs to face:  <-
-        robot.driveTrain.rotateByAngle(pi, 0.75);
-
-        for (int i = 0; i < 2; i++) { //do twice
-            //2.1 continued
-            //y+ movement to next piece of freight, //distance depends on variables i and level
-            //robot facing: <=      needs to move:  ^
-            int j = 0;
-            for (j = 0; j < barcodes.length; j++) { //find closest block
-                if (barcodes[j]) {
-                    barcodes[j] = false;
-                    break;
-                }
-            }
-            robot.driveTrain.strafeToDistance(1, 0, driveYPlusStep2_1 + (distanceBetweenBarcodes * j));
-
-            //2.2
-            robot.intakeSystem.intakeArmServo.setPosition(robot.intakeSystem.ARM_DOWN);
-            robot.intakeSystem.intakeGrabberServo.setPosition(robot.intakeSystem.GRABBER_FULL_OPEN);
-            sleep(300);
-            //move forward, collect, then move back a bit
-            //robot facing: <=      needs to move:  <=
-            robot.driveTrain.strafeToDistance(1, pi/4.0, driveXStep2_2);
-
-            //collect
-            robot.intakeSystem.intakeGrabberServo.setPosition(robot.intakeSystem.GRABBER_CLOSED);
-            sleep(100);
-
-            robot.intakeSystem.intakeArmServo.setPosition(robot.intakeSystem.ARM_RAISED);
-            sleep(300);
-
-            //robot facing: <=      needs to move:  =>
-            robot.driveTrain.strafeToDistance(1, -pi/4.0, driveXStep2_2);
-
-            //2.3
-            //y- movement, equal distance, opposite direction, as step 2.1.     until inline w/ shipping hub again
-            //robot facing: <=      needs to move:  V
-            robot.driveTrain.strafeToDistance(1, pi, driveYPlusStep2_1 + (distanceBetweenBarcodes * j));
-
-            //2.4
-            //move to shipping hub and deposit
-            //x- movement until up to shipping hub
-            //robot facing: <=      needs to move:  <=
-            robot.driveTrain.strafeToDistance(1,pi/4.0, driveXStep2_4);
-
-            //drop off from input to bottom level
-            robot.intakeSystem.intakeGrabberServo.setPosition(robot.intakeSystem.GRABBER_PARTIAL_OPEN);
-            sleep(100);
-
-            //2.5
-            //move back to where we ended step 2.1
-            //x+ movement, equal distance, opposite direction as step 2.4
-            //robot facing: <=      needs to move:  =>
-            robot.driveTrain.strafeToDistance(1,-pi/4.0, driveXStep2_4);
-            robot.intakeSystem.intakeArmServo.setPosition(robot.intakeSystem.ARM_RAISED);
-        }//2.6, repeat
-
         robot.intakeSystem.intakeArmServo.setPosition(robot.intakeSystem.ARM_RAISED);
         robot.intakeSystem.intakeGrabberServo.setPosition(robot.intakeSystem.GRABBER_FULL_OPEN);
 
-        /*step 3*/
-        //3.1
+        /*step 2*/
+        //2.1
         //strafe into the warehouse and end
         //rotate to face warehouse
-        //robot facing: <-      needs to face:  ^
-        robot.driveTrain.rotateByAngle(-pi/4.0, 0.75);
+        //robot facing: ->      needs to face:  ^
+        robot.driveTrain.rotateByAngle(pi/4.0, 0.75);
 
         //y+ movement into warehouse
         //robot facing: ^       needs to move:  ^
-        robot.driveTrain.strafeToDistance(1, pi/4.0, driveYPlusStep3_1);
+        robot.driveTrain.strafeToDistance(1, pi/4.0, driveYStep2_1);
 
         ////////////after driver presses stop////////////
     }

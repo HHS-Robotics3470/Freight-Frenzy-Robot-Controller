@@ -25,6 +25,7 @@ public abstract class Autonomous extends LinearOpMode {
     Hardware robot          = new Hardware();
 
     //gameplan
+    //TODO: there is not frieght on the other barcodes, remove references to it
     /*
     assuming we start in the spot closer to the warehouse:
     1) (freight) max 26pts

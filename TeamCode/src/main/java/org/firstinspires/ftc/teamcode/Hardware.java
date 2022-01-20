@@ -148,7 +148,7 @@ public class Hardware implements Component {
     HardwareMap hwMap           =  null;
     private ElapsedTime runtime  = new ElapsedTime();
     private static final String VUFORIA_KEY = "AW/D8Tv/////AAABmaz//hdMn0Nmm2YoSrW8emZqrSTAb26m/pJRCgy4GeNX6aO6frTzk1FQ/y8IC0mbDWke8NXa87KACa/HR1kVRqaamTM60GJcobyaZaK1k0NAkVZ94iJY/RlWsIzESF3hql3ADHV9oHUuSvZWAVkF8f01xr4bzFtLrXgORIxOFKsT4TWSfHIr1pZel50uC0psgWIWpcDFGY3wTHlcfahX93OY8rqz98vwZC6b2u0MiikDwFjzKD2zxtSvQkYyIogyccKwZrC4z432K1GwxSvUanLJVsNypOcDqVrXWJdHKSmJSuQ8Zrl5SDvPXFewBpBYUTacsrdIx6bUykW+hSTcMxFzMo8MHjrv+FYgtJwaVsFT";
-
+    private boolean vuforiaEnabled = false;
     /* --Constructors-- */
     public Hardware(){
 
@@ -230,6 +230,8 @@ public class Hardware implements Component {
 
     //vuforia stuff
     public void initVuforiaAndTfod(HardwareMap ahwMap) {
+        //if vuforia already enabled, disable then re-enable
+
         if (hwMap == null) {
             hwMap=ahwMap;// Save reference to Hardware map
         }
@@ -240,6 +242,7 @@ public class Hardware implements Component {
         //vuforia and tensorflow
         initVuforia();
         initTfod();
+        vuforiaEnabled = true;
     }
     private void initVuforia() {
         /*
@@ -256,13 +259,29 @@ public class Hardware implements Component {
         // Loading trackables is not necessary for the TensorFlow Object Detection engine.
     }
     private void initTfod() {
+
         int tfodMonitorViewId = hwMap.appContext.getResources().getIdentifier(
                 "tfodMonitorViewId", "id", hwMap.appContext.getPackageName());
         TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
-        tfodParameters.minResultConfidence = 0.48f; //TODO: update and tune this value
+        tfodParameters.minResultConfidence = 0.4f; //TODO: update and tune this value
         tfodParameters.isModelTensorFlow2 = true;
         tfodParameters.inputSize = 320;
+
         tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);
+        // getUpdatedRecognitions() will return null if no new information is available since
+        // the last time that call was made.
+
+        tfod.activate();
+
+        // The TensorFlow software will scale the input images from the camera to a lower resolution.
+        // This can result in lower detection accuracy at longer distances (> 55cm or 22").
+        // If your target is at distance greater than 50 cm (20") you can adjust the magnification value
+        // to artificially zoom in to the center of image.  For best results, the "aspectRatio" argument
+        // should be set to the value of the images used to create the TensorFlow Object Detection model
+        // (typically 16/9).
+        tfod.setZoom(1, 16.0/9.0);
+
+
         tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABELS);
     }
 

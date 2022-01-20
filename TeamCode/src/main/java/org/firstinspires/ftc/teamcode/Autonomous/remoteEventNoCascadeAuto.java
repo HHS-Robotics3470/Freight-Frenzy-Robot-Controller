@@ -13,7 +13,7 @@ import org.firstinspires.ftc.teamcode.Hardware;
  * we use this at the remote events
  * @author Anthony Rubick
  */
-@Autonomous(name="Red Warehouse-side Autonomous", group="Needs Calibration" )
+@Autonomous(name="remote comp auto EXP", group="Needs Calibration" )
 //@Disabled //this line disables the autonomous from appearing on the driver station, remove it for your code
 public class remoteEventNoCascadeAuto  extends org.firstinspires.ftc.teamcode.Autonomous.Autonomous {
 
@@ -32,8 +32,8 @@ public class remoteEventNoCascadeAuto  extends org.firstinspires.ftc.teamcode.Au
         //TODO: all of these need to be calibrated, measured, tested, etc.
         // currently they are all either guesses, or make nothing happen
         //level of the shipping hub that the preloaded freight needs to be moved to
-        int level = 1; // 0 == bottom, 1 == middle, 2 == top    see appendix D (pg 42) of gm2 for details
-        boolean[] barcodes = {true, true, true};   //is there a freight element in each barcode
+        int level; // 0 == bottom, 1 == middle, 2 == top    see appendix D (pg 42) of gm2 for details
+        //boolean[] barcodes = {true, true, true};   //is there a freight element in each barcode
         //index 0, closest to shipping hub
         //index 1, middle
         //index 2, farthest from shipping hub
@@ -43,22 +43,24 @@ public class remoteEventNoCascadeAuto  extends org.firstinspires.ftc.teamcode.Au
         double driveXStep1_2   = 0.3556;   //1ft 2in
         double driveXStep1_3   = 0.15; //around 6 in
 
-        double driveYStep2_1 = 1.8288;//6 ft
+        double driveYStep2     = 1.8288;//6 ft
+
+        double driveYStep3_1 = 1.8288;//6 ft
 
         //directions for various movements
 
 
         //distances, in encoder ticks, needed for specific movements
-        int extendCascadeStep1_3 = robot.cascadeOutputSystem.CASCADE_EXTENDED;
-        int retractCascadeStep1_3 = robot.cascadeOutputSystem.CASCADE_RETRACTED;
 
         /* Initialize the hardware variables.
          * The init() method of the hardware class does all the work here
          */
-        super.robot.init(hardwareMap);
-        super.robot.initVuforiaAndTfod(hardwareMap); //the super reference is redundant, just a reminder that the variable belongs to the superclass
+        robot.init(hardwareMap);
+        robot.initVuforiaAndTfod(hardwareMap);
 
         // Wait for the game to start (driver presses PLAY)
+        telemetry.addData(">", "Press Play to start op mode");
+        telemetry.update();
         waitForStart();
         runtime.reset();
 
@@ -73,7 +75,12 @@ public class remoteEventNoCascadeAuto  extends org.firstinspires.ftc.teamcode.Au
         -move to the shipping hub
         -place the pre-load box onto the shipping hub, on the level previously determined
 
-        2) (parking) max 10pts
+        2) turntable
+        -strafe to the turntable
+        -turn turntable
+        -strafe back
+
+        3) (parking) max 10pts
         -park COMPLETELY in the warehouse closest to our alliance shipping hub (10pts)
 
         TODO: future, grab freight from warehouse and put it in shipping hub
@@ -88,6 +95,9 @@ public class remoteEventNoCascadeAuto  extends org.firstinspires.ftc.teamcode.Au
         level = super.determineLevel(robot);
 
         //1.2
+        telemetry.addData("level: ", level);
+        telemetry.addData("step: ",1.2);
+        telemetry.update();
         //move to the shipping hub
         //y- movement to be in-line w/ shipping hub
         //robot facing: =>      needs to move:  V
@@ -100,11 +110,14 @@ public class remoteEventNoCascadeAuto  extends org.firstinspires.ftc.teamcode.Au
         robot.intakeSystem.intakeArmServo.setPosition(robot.intakeSystem.ARM_RAISED);//raise the arm while in transit
 
         //1.3
+        telemetry.addData("level: ", level);
+        telemetry.addData("step: ",1.3);
+        telemetry.update();
         //drop off into shipping hub
         //extend output flipping arm to proper level
         switch (level) {
-            case 0: //bottom
-                robot.cascadeOutputSystem.outputArmServo.setPosition(robot.cascadeOutputSystem.ARM_EXTENDED_DOWN);
+            case 1: //middle
+                robot.cascadeOutputSystem.outputArmServo.setPosition(robot.cascadeOutputSystem.ARM_EXTENDED_FLAT);
                 break;
             case 2: //top
                 robot.cascadeOutputSystem.outputArmServo.setPosition(robot.cascadeOutputSystem.ARM_EXTENDED_UP);
@@ -112,9 +125,9 @@ public class remoteEventNoCascadeAuto  extends org.firstinspires.ftc.teamcode.Au
                 //robot facing =>   needs to move =>
                 robot.driveTrain.strafeToDistance(0.5, pi/4, driveXStep1_3);
                 break;
-            case 1: //middle and default
+            case 0: //bottom and default
             default:
-                robot.cascadeOutputSystem.outputArmServo.setPosition(robot.cascadeOutputSystem.ARM_EXTENDED_FLAT);
+                robot.cascadeOutputSystem.outputArmServo.setPosition(robot.cascadeOutputSystem.ARM_EXTENDED_DOWN);
                 break;
         }
         sleep(300); //give time to move
@@ -128,7 +141,17 @@ public class remoteEventNoCascadeAuto  extends org.firstinspires.ftc.teamcode.Au
         robot.intakeSystem.intakeGrabberServo.setPosition(robot.intakeSystem.GRABBER_FULL_OPEN);
 
         /*step 2*/
-        //2.1
+        //step 2.1
+
+        //step 2.2
+
+        //step 2.3
+
+
+        //3.1
+        telemetry.addData("level: ", level);
+        telemetry.addData("step: ",2.1);
+        telemetry.update();
         //strafe into the warehouse and end
         //rotate to face warehouse
         //robot facing: ->      needs to face:  ^
@@ -136,7 +159,7 @@ public class remoteEventNoCascadeAuto  extends org.firstinspires.ftc.teamcode.Au
 
         //y+ movement into warehouse
         //robot facing: ^       needs to move:  ^
-        robot.driveTrain.strafeToDistance(1, pi/4.0, driveYStep2_1);
+        robot.driveTrain.strafeToDistance(1, pi/4.0, driveYStep3_1);
 
         ////////////after driver presses stop////////////
     }

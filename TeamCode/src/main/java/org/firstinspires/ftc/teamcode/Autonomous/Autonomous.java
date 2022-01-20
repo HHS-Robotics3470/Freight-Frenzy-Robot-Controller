@@ -27,9 +27,8 @@ public abstract class Autonomous extends LinearOpMode {
     }
     Hardware robot          = new Hardware();
 
-    double val1 = 0;
-    double val2 = 0;
-    double val3 = 0;
+    double val1 = 245; //mm relative to camera
+    double val2 = 468; //mm relative to camera
     //gameplan
     //TODO: there is not frieght on the other barcodes, remove references to it
     /*
@@ -86,7 +85,7 @@ public abstract class Autonomous extends LinearOpMode {
      * @return level, 0 == bottom, 1 == middle, 2 == top    see appendix D (pg 42) of gm2 for details
      */
     public int determineLevel(Hardware robot) {
-        int level = 1; // 0 == bottom, 1 == middle, 2 == top    see appendix D (pg 42) of gm2 for details
+        int level = -1; // 0 == bottom, 1 == middle, 2 == top    see appendix D (pg 42) of gm2 for details
 
         //depending on the startPos, use vuforia to figure out which position the pre-loaded element needs to be delivered to, assign it to level
         // for doing this, best option is to find where the 2 boxes are, and assume the team element is in the remaining space
@@ -116,29 +115,23 @@ public abstract class Autonomous extends LinearOpMode {
         //TODO: add logic to determine the level from the webcame using vuforia
 
         if (robot.tfod != null) {
-            // getUpdatedRecognitions() will return null if no new information is available since
-            // the last time that call was made.
             List<Recognition> updatedRecognitions = robot.tfod.getUpdatedRecognitions();
             if (updatedRecognitions != null) {
-
-                Recognition recognition = updatedRecognitions.get(0);
-                double loc = recognition.getLeft()/recognition.getRight();
-                if (loc < val1){
-                    level = 0;
+                for (Recognition recognition : updatedRecognitions) {
+                    if (recognition.getLabel().toLowerCase().trim().equals("ball")) {
+                        double loc = (recognition.getLeft()+recognition.getRight())/2.0;
+                        if (loc < val1){
+                            level = 0;
+                        }
+                        else if (loc < val2 && loc > val1){
+                            level = 1;
+                        }
+                        else if (loc > val2){
+                            level = 2;
+                        }
+                        break;
+                    }
                 }
-                else if (loc < val2 && loc > val1){
-                    level = 1;
-                }
-                else if (loc < val3 && loc > val2){
-                    level = 2;
-                }
-                else {
-                    level = -1;
-                }
-
-                telemetry.addData("# Object Detected", updatedRecognitions.size());
-                telemetry.update();
-
             }
         }
 

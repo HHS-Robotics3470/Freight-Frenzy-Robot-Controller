@@ -142,6 +142,11 @@ public class MecanumDriveTrain implements Component {
         if (motorsBusy) return;
         else motorsBusy = true;
 
+        //fix angle issue
+        if (angle < 0) {
+            angle = 2.0*Math.PI - (Math.abs(angle) % 2.0*Math.PI);
+        }
+
         power = Math.abs(power);
         targetDistance = Math.abs(targetDistance);
         //DATA
@@ -159,19 +164,21 @@ public class MecanumDriveTrain implements Component {
 
         //stop and prep
         setPower(0);
+        setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         //set target
-        driveFrontRight.setTargetPosition(driveFrontRight.getCurrentPosition()+FrBlAxisTarget);
-        driveFrontLeft.setTargetPosition(driveFrontLeft.getCurrentPosition()+FlBrAxisTarget);
-        driveBackLeft.setTargetPosition(driveBackLeft.getCurrentPosition()+FrBlAxisTarget);
-        driveBackRight.setTargetPosition(driveBackRight.getCurrentPosition()+FlBrAxisTarget);
+        driveFrontRight.setTargetPosition(FrBlAxisTarget);
+        driveFrontLeft.setTargetPosition(FlBrAxisTarget);
+        driveBackLeft.setTargetPosition(FrBlAxisTarget);
+        driveBackRight.setTargetPosition(FlBrAxisTarget);
 
         //set to run to position
         setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
         //set power
-        setPower(FrBlPairPower, FlBrPairPower);
+        setPower(power);
+        //setPower(FrBlPairPower, FlBrPairPower);
 
         //let RUN_TO_POSITION PID do its thing
         while (moving) {

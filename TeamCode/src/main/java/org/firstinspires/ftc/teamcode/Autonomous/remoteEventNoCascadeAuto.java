@@ -104,7 +104,7 @@ public class remoteEventNoCascadeAuto  extends org.firstinspires.ftc.teamcode.Au
         robot.driveTrain.strafeToDistance(1, 0, driveYStep1_2);
         //x- movement
         //robot facing: =>      needs to move:  <=
-        robot.driveTrain.strafeToDistance(1, -pi/4.0, driveXStep1_2);
+        robot.driveTrain.strafeToDistance(1, -pi/2.0, driveXStep1_2);
 
 
         robot.intakeSystem.intakeArmServo.setPosition(robot.intakeSystem.ARM_RAISED);//raise the arm while in transit
@@ -123,7 +123,7 @@ public class remoteEventNoCascadeAuto  extends org.firstinspires.ftc.teamcode.Au
                 robot.cascadeOutputSystem.outputArmServo.setPosition(robot.cascadeOutputSystem.ARM_EXTENDED_UP);
                 //move forward a bit to reach the top thing
                 //robot facing =>   needs to move =>
-                robot.driveTrain.strafeToDistance(0.5, pi/4, driveXStep1_3);
+                robot.driveTrain.strafeToDistance(0.5, pi/2, driveXStep1_3);
                 break;
             case 0: //bottom and default
             default:
@@ -155,11 +155,11 @@ public class remoteEventNoCascadeAuto  extends org.firstinspires.ftc.teamcode.Au
         //strafe into the warehouse and end
         //rotate to face warehouse
         //robot facing: ->      needs to face:  ^
-        robot.driveTrain.rotateByAngle(pi/4.0, 0.75);
+        robot.driveTrain.rotateByAngle(pi/2.0, 0.75);
 
         //y+ movement into warehouse
         //robot facing: ^       needs to move:  ^
-        robot.driveTrain.strafeToDistance(1, pi/4.0, driveYStep3_1);
+        robot.driveTrain.strafeToDistance(1, pi/2.0, driveYStep3_1);
 
         ////////////after driver presses stop////////////
     }

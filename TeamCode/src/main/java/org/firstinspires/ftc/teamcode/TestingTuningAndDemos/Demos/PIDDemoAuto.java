@@ -58,14 +58,35 @@ public class PIDDemoAuto extends LinearOpMode {
     }
     private void demoDriveTrainPID() {
         double sqrt2 = Math.sqrt(2.0);
+        double dist = 0.5;
         //strafe in a square centered on where it initialized
-        robot.driveTrain.strafeToDistance(1, Math.PI/2.0, .5);              //      `|`                1,5
-        robot.driveTrain.strafeToDistance(.2, 5.0*Math.PI/4.0, sqrt2*.5);   //      ./               /  |  \
-        robot.driveTrain.strafeToDistance(.5, -Math.PI/4.0, sqrt2*.5);      //      \.             /    |    \
-        robot.driveTrain.strafeToDistance(1, Math.PI/4.0, sqrt2*.5);        //      /`          2,6----0,7     4
-        robot.driveTrain.strafeToDistance(1, -5.0*Math.PI/4.0, sqrt2*.5);   //      `\             \         /
-        robot.driveTrain.strafeToDistance(.2, -3.0*Math.PI/4.0, sqrt2*.5);  //      ./               \     /
-        robot.driveTrain.strafeToDistance(1, 0, 0.5);                       //      __.                 3
+        robot.driveTrain.strafeToDistance(1, Math.PI/2.0, dist);sleep(400);                         //0      `|`                1,5
+        robot.driveTrain.strafeToDistance(.2, 5.0*Math.PI/4.0, sqrt2*dist);sleep(400); //1      ./               /  |  \
+        robot.driveTrain.strafeToDistance(.5, -Math.PI/4.0, sqrt2*dist);sleep(400);    //2      \.             /    |    \
+        robot.driveTrain.strafeToDistance(1, Math.PI/4.0, sqrt2*dist);sleep(400);      //3      /`          2,6----0,7     4
+        robot.driveTrain.strafeToDistance(1, -5.0*Math.PI/4.0, sqrt2*dist);sleep(400); //4      `\             \         /
+        robot.driveTrain.strafeToDistance(.2, -3.0*Math.PI/4.0, sqrt2*dist);sleep(400);//5      ./               \     /
+        robot.driveTrain.strafeToDistance(1, 0, dist);sleep(400);                                   //6      __.                 3
+
+        /*
+        movements
+        0 y
+        '|'
+        1 y
+        ./
+        2 n
+        ./
+        3 y
+        /'
+        4 n
+        _.
+        /'
+        5 n
+        '|'
+        \.
+        6 y
+        _.
+         */
     }
     /**
      * causes the robot to strafe a given direction, at a given power, for a given distance using build in PID controllers

@@ -22,8 +22,8 @@ public class MecanumDriveTrain implements Component {
 
     //**info, measurements, known positions, etc.**//
     // stats for the TorqueNADO motors
-    public final double NADO_COUNTS_PER_MOTOR_REV = 1440;
-    public final double NADO_DRIVE_GEAR_REDUCTION = 1;  // This is < 1.0 if geared UP (to increase speed)
+    public final double NADO_COUNTS_PER_MOTOR_REV = 1440.0;
+    public final double NADO_DRIVE_GEAR_REDUCTION = 1.0;  // This is < 1.0 if geared UP (to increase speed)
     public final double NADO_WHEEL_DIAMETER_METERS= 0.2032; //(8") For figuring circumference
     public final double NADO_COUNTS_PER_METER      = (NADO_COUNTS_PER_MOTOR_REV * NADO_DRIVE_GEAR_REDUCTION) /
             (NADO_WHEEL_DIAMETER_METERS * Math.PI);
@@ -41,7 +41,7 @@ public class MecanumDriveTrain implements Component {
     // i: 3
     public PIDFCoefficients velocityPIDFCoefficients = new PIDFCoefficients(1.3884311033898306,0.13884311033898306,0,13.884311033898306);
     public PIDFCoefficients positionPIDFCoefficients = new PIDFCoefficients(5,0,0,0);// //TODO: initialize this once PIDF coefficients are known
-    public int targetPositionTolerance = 50;
+    public int targetPositionTolerance = 100;
 
     /* --Public OpMode members.-- */
     public DcMotorEx driveFrontRight,driveFrontLeft,driveBackLeft,driveBackRight; //drive motors
@@ -144,11 +144,11 @@ public class MecanumDriveTrain implements Component {
 
         //fix angle issue
         if (angle < 0) {
-            angle = 2.0*Math.PI - (Math.abs(angle) % 2.0*Math.PI);
+            angle = (2.0 * Math.PI) - (Math.abs(angle) % (2.0 * Math.PI));
         }
 
         power = Math.abs(power);
-        targetDistance = Math.abs(targetDistance);
+        targetDistance = Math.abs(targetDistance)*NADO_COUNTS_PER_METER; //make positive, and convert to counts
         //DATA
         boolean moving = true;
 
@@ -156,11 +156,11 @@ public class MecanumDriveTrain implements Component {
         double FrBlPairPower = Math.sin(angle - (Math.PI/4)); //this is just done to help convert the radial inputs (magnitude and angle) into target distances that the PID can use
         double FlBrPairPower = Math.sin(angle + (Math.PI/4));
         //find the desired target for each strafe PID
-        int FrBlAxisTarget = (int) (targetDistance * (FrBlPairPower) * NADO_COUNTS_PER_METER);
-        int FlBrAxisTarget = (int) (targetDistance * (FlBrPairPower) * NADO_COUNTS_PER_METER);
+        int FrBlAxisTarget = (int) (targetDistance * (FrBlPairPower));
+        int FlBrAxisTarget = (int) (targetDistance * (FlBrPairPower));
         //scale power appropriately
         FrBlPairPower *= power;
-        FrBlPairPower *= power;
+        FlBrPairPower *= power;
 
         //stop and prep
         setPower(0);
@@ -177,13 +177,13 @@ public class MecanumDriveTrain implements Component {
         setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
         //set power
-        setPower(power);
-        //setPower(FrBlPairPower, FlBrPairPower);
+        //setPower(power);
+        setPower(Math.abs(FrBlPairPower), Math.abs(FlBrPairPower));
 
         //let RUN_TO_POSITION PID do its thing
         while (moving) {
             //are any of the motors busy?
-            moving = driveFrontRight.isBusy() || driveFrontLeft.isBusy(); //save 6ms per loop by only reading from one motor of each diagonal pair
+            moving = driveFrontRight.isBusy() || driveFrontLeft.isBusy(); //save 6ms per loop by only reading from one motor of each diagonal pair'
         }
 
         //stop and go back to normal

@@ -79,10 +79,9 @@ public abstract class Autonomous extends LinearOpMode {
 
     /**
      * depending on the startPos, use vuforia to figure out which position the pre-loaded element needs to be delivered to, assign it to level
-     * @param robot the robot ... we need to access vuforia somehow
      * @return level, 0 == bottom, 1 == middle, 2 == top    see appendix D (pg 42) of gm2 for details
      */
-    public int determineLevel(Hardware robot) {
+    public int determineLevel() {
         int level = -1; // 0 == bottom, 1 == middle, 2 == top    see appendix D (pg 42) of gm2 for details
 
         //depending on the startPos, use vuforia to figure out which position the pre-loaded element needs to be delivered to, assign it to level

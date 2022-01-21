@@ -94,7 +94,7 @@ public class remoteEventNoCascadeAuto  extends org.firstinspires.ftc.teamcode.Au
         /*step 1*/
         //1.1
         sleep(1000); //give it time to find it
-        level = super.determineLevel(robot);
+        level = super.determineLevel();
 
         //1.2
         telemetry.addData("level: ", level);

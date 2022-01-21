@@ -43,6 +43,7 @@ public class remoteEventNoCascadeAuto  extends org.firstinspires.ftc.teamcode.Au
         double driveYStep1_2   = 0.9144;//m
         double driveXStep1_2   = 0.3556;   //1ft 2in
         double driveXStep1_3   = 0.1524; //around 6 in
+        double driveXlevel0    = 0.1;
 
         double driveYStep2     = 1.8288;//6 ft
 
@@ -116,7 +117,8 @@ public class remoteEventNoCascadeAuto  extends org.firstinspires.ftc.teamcode.Au
         switch (level) {
             case 1: //middle
                 robot.cascadeOutputSystem.outputArmServo.setPosition(robot.cascadeOutputSystem.ARM_EXTENDED_FLAT);
-                //robot.driveTrain.strafeToDistance(movementSpeed/2.0, pi/2, driveXStep1_3);
+                //robot facing: =>      needs to move:  <=
+                robot.driveTrain.strafeToDistance(movementSpeed/2.0, -pi/2, driveXlevel0);
                 break;
             case 2: //top
                 robot.cascadeOutputSystem.outputArmServo.setPosition(robot.cascadeOutputSystem.ARM_EXTENDED_UP);
@@ -143,13 +145,14 @@ public class remoteEventNoCascadeAuto  extends org.firstinspires.ftc.teamcode.Au
 
         //robot facing =>   needs to move =>
         robot.driveTrain.strafeToDistance(movementSpeed, pi/2, driveXStep1_3);
+        sleep(1000);
 
         //retract output flipping arm, and prep for movement
         robot.cascadeOutputSystem.outputArmServo.setPosition(robot.cascadeOutputSystem.ARM_RETRACTED);
         robot.intakeSystem.intakeArmServo.setPosition(robot.intakeSystem.ARM_RAISED);
         robot.intakeSystem.intakeGrabberServo.setPosition(robot.intakeSystem.GRABBER_FULL_OPEN);
 
-        /*step 2*/ /*
+        /*step 2*/
         //step 2.1
 
         //step 2.2
@@ -159,17 +162,17 @@ public class remoteEventNoCascadeAuto  extends org.firstinspires.ftc.teamcode.Au
 
         //3.1
         telemetry.addData("level: ", level);
-        telemetry.addData("step: ",2.1);
+        telemetry.addData("step: ",3.1);
         telemetry.update();
         //strafe into the warehouse and end
         //rotate to face warehouse
         //robot facing: ->      needs to face:  ^
-        robot.driveTrain.rotateByAngle(pi/2.0, movementSpeed);
+        robot.driveTrain.rotateByAngle(pi/2.0, movementSpeed/4);
 
         //y+ movement into warehouse
         //robot facing: ^       needs to move:  ^
         robot.driveTrain.strafeToDistance(movementSpeed, pi/2.0, driveYStep3_1);
-        */
+
         while (opModeIsActive()) {}
         ////////////after driver presses stop////////////
 

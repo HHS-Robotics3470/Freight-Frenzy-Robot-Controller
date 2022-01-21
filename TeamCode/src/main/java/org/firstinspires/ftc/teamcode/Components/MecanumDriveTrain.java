@@ -29,7 +29,7 @@ public class MecanumDriveTrain implements Component {
     public final double NADO_COUNTS_PER_METER      = (NADO_COUNTS_PER_MOTOR_REV * NADO_DRIVE_GEAR_REDUCTION) /
             (NADO_WHEEL_DIAMETER_METERS * Math.PI);
     public final double NADO_METERS_PER_COUNT = 1.0 / NADO_COUNTS_PER_METER;
-    public final double ROBOT_WIDTH = 0.362; //width of the robot, distance between wheels
+    public final double ROBOT_WIDTH = 0.3682; //width of the robot, distance between wheels
     //TODO: recalculate at full battery
     //PID info
     //CALCULATED: (as of 12/14/2021, battery voltage: 12.77
@@ -211,7 +211,6 @@ public class MecanumDriveTrain implements Component {
      * @param signedPower determines the directions and power of rotation, larger values result in faster movement, and the sign (positive or negative) of this value determine direction
      */
     public void rotateByCorrection(double signedPower) {
-        if (motorsBusy) return;
         //largest current power + signedPower, or 1
         double denom = Math.max(
                 Math.max(
@@ -255,6 +254,7 @@ public class MecanumDriveTrain implements Component {
         boolean moving = true;
         power = Math.abs(power);
 
+        angle *=2; //test
         //calculate desired distance for each motor pair to move
         //+ angle == turn CCW;   - angle == turn CW
         double leftPairDistance = -angle * (ROBOT_WIDTH/2); // theta * r = arc length

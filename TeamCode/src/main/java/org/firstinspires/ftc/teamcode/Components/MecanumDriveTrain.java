@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.hardware.HardwareDevice;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.MotorControlAlgorithm;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -36,10 +37,17 @@ public class MecanumDriveTrain implements Component {
     // i:0.13884311033898306
     // d:
     // f:13.884311033898306
+    //CALCULATED: (as of 1/20/2021, battery voltage: 13.64
+    // p:f/10
+    // i:f/100
+    // d:
+    // f:11.95875912408759
     //Default:
     // p: 10
     // i: 3
-    public PIDFCoefficients velocityPIDFCoefficients = new PIDFCoefficients(1.3884311033898306,0.13884311033898306,0,13.884311033898306);
+    private final double f = 13.884311033898306;
+    //public PIDFCoefficients velocityPIDFCoefficients = new PIDFCoefficients(f/10.0,f/100.0,0,f);
+    public PIDFCoefficients velocityPIDFCoefficients = new PIDFCoefficients(10,3,0,0);
     public PIDFCoefficients positionPIDFCoefficients = new PIDFCoefficients(5,0,0,0);// //TODO: initialize this once PIDF coefficients are known
     public int targetPositionTolerance = 100;
 
@@ -148,6 +156,7 @@ public class MecanumDriveTrain implements Component {
         }
 
         power = Math.abs(power);
+        if (power < 0.4) power = 0.4;
         targetDistance = Math.abs(targetDistance)*NADO_COUNTS_PER_METER; //make positive, and convert to counts
         //DATA
         boolean moving = true;
@@ -158,9 +167,14 @@ public class MecanumDriveTrain implements Component {
         //find the desired target for each strafe PID
         int FrBlAxisTarget = (int) (targetDistance * (FrBlPairPower));
         int FlBrAxisTarget = (int) (targetDistance * (FlBrPairPower));
-        //scale power appropriately
-        FrBlPairPower *= power;
-        FlBrPairPower *= power;
+
+        //scale power appropriately, and ensure it's positive
+        FrBlPairPower = Math.abs(FrBlPairPower) * power;
+        FlBrPairPower = Math.abs(FlBrPairPower) * power;
+
+        //make sure are not set to zero power, that causes an error where the robot gets to its position and then freezes indefinitely because there are motors with a target being told to get to that target w/o moving
+        //if (FrBlPairPower <= 0.3) FrBlPairPower = 0.3;
+        //if (FlBrPairPower <= 0.3) FrBlPairPower = 0.3;
 
         //stop and prep
         setPower(0);
@@ -178,12 +192,12 @@ public class MecanumDriveTrain implements Component {
 
         //set power
         //setPower(power);
-        setPower(Math.abs(FrBlPairPower), Math.abs(FlBrPairPower));
+        setPower(FrBlPairPower, FlBrPairPower);
 
         //let RUN_TO_POSITION PID do its thing
         while (moving) {
             //are any of the motors busy?
-            moving = driveFrontRight.isBusy() || driveFrontLeft.isBusy(); //save 6ms per loop by only reading from one motor of each diagonal pair'
+            moving = (driveFrontRight.isBusy() || driveFrontLeft.isBusy()); //save 6ms per loop by only reading from one motor of each diagonal pair'
         }
 
         //stop and go back to normal
@@ -251,13 +265,14 @@ public class MecanumDriveTrain implements Component {
 
         //stop and prep
         setPower(0);
+        setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         //set target
-        driveFrontRight.setTargetPosition(driveFrontRight.getCurrentPosition()+rightAxisTarget);
-        driveFrontLeft.setTargetPosition(driveFrontLeft.getCurrentPosition()+leftAxisTarget);
-        driveBackLeft.setTargetPosition(driveBackLeft.getCurrentPosition()+leftAxisTarget);
-        driveBackRight.setTargetPosition(driveBackRight.getCurrentPosition()+rightAxisTarget);
+        driveFrontRight.setTargetPosition(rightAxisTarget);
+        driveFrontLeft.setTargetPosition(leftAxisTarget);
+        driveBackLeft.setTargetPosition(leftAxisTarget);
+        driveBackRight.setTargetPosition(rightAxisTarget);
 
         //set to run to position
         setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -268,7 +283,7 @@ public class MecanumDriveTrain implements Component {
         //let RUN_TO_POSITION PID do its thing
         while (moving) {
             //are any of the motors busy?
-            moving = driveFrontRight.isBusy() || driveFrontLeft.isBusy(); //save 6ms per loop by only reading from one motor of each pair
+            moving = driveFrontRight.isBusy(); //save 9ms per loop by only reading from one motor of each pair
         }
 
         //stop and go back to normal

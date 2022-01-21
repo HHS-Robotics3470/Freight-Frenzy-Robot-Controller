@@ -104,7 +104,7 @@ public class remoteEventNoCascadeAuto  extends org.firstinspires.ftc.teamcode.Au
         robot.driveTrain.strafeToDistance(movementSpeed, 0, driveYStep1_2);
         //x- movement
         //robot facing: =>      needs to move:  <=
-        robot.driveTrain.strafeToDistance(movementSpeed, -pi/2.0, driveXStep1_2);
+        robot.driveTrain.strafeToDistance(movementSpeed, -pi/2.0, driveXStep1_2-driveXStep1_3);
 
         robot.intakeSystem.intakeArmServo.setPosition(robot.intakeSystem.ARM_RAISED);//raise the arm while in transit
 
@@ -117,12 +117,13 @@ public class remoteEventNoCascadeAuto  extends org.firstinspires.ftc.teamcode.Au
         switch (level) {
             case 1: //middle
                 robot.cascadeOutputSystem.outputArmServo.setPosition(robot.cascadeOutputSystem.ARM_EXTENDED_FLAT);
+                robot.driveTrain.strafeToDistance(movementSpeed/2.0, pi/2, driveXStep1_3);
                 break;
             case 2: //top
                 robot.cascadeOutputSystem.outputArmServo.setPosition(robot.cascadeOutputSystem.ARM_EXTENDED_UP);
                 //move forward a bit to reach the top thing
                 //robot facing =>   needs to move =>
-                robot.driveTrain.strafeToDistance(movementSpeed/2.0, pi/2, driveXStep1_3);
+                robot.driveTrain.strafeToDistance(movementSpeed/2.0, pi/2, driveXStep1_3*2.0);
                 break;
             case 0: //bottom and default
             default:

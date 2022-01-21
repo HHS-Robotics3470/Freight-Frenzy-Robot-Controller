@@ -118,7 +118,7 @@ public abstract class Autonomous extends LinearOpMode {
             List<Recognition> updatedRecognitions = robot.tfod.getUpdatedRecognitions();
             if (updatedRecognitions != null) {
                 for (Recognition recognition : updatedRecognitions) {
-                    if (recognition.getLabel().toLowerCase().trim().equals("ball")) {
+                    if (!recognition.getLabel().equals("Marker")) {
                         double loc = (recognition.getLeft()+recognition.getRight())/2.0;
                         if (loc < val1){
                             level = 0;

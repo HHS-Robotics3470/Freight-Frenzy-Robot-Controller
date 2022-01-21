@@ -41,9 +41,10 @@ public class remoteEventNoCascadeAuto  extends org.firstinspires.ftc.teamcode.Au
 
         //distances, in meters, needed for specific movements
         double driveYStep1_2   = 0.9144;//m
-        double driveXStep1_2   = 0.3556;   //1ft 2in
+        double driveXlevel0   = 0.3556;   //1ft 2in
+        double driveXlevel1   = 0.3556;
+        double driveXLevel2   = 0.3556+.1;
         double driveXStep1_3   = 0.1524; //around 6 in
-        double driveXlevel0    = 0.1;
 
         double driveYStep2     = 1.8288;//6 ft
 
@@ -117,25 +118,25 @@ public class remoteEventNoCascadeAuto  extends org.firstinspires.ftc.teamcode.Au
         switch (level) {
             case 1: //middle
                 robot.cascadeOutputSystem.outputArmServo.setPosition(robot.cascadeOutputSystem.ARM_EXTENDED_FLAT);
+                sleep(500);
                 //robot facing: =>      needs to move:  <=
-                robot.driveTrain.strafeToDistance(movementSpeed/2.0, -pi/2, driveXlevel0);
+                robot.driveTrain.strafeToDistance(movementSpeed, -pi/2, driveXlevel1);
                 break;
             case 2: //top
                 robot.cascadeOutputSystem.outputArmServo.setPosition(robot.cascadeOutputSystem.ARM_EXTENDED_UP);
+                sleep(500);
                 //move forward a bit to reach the top thing
                 //robot facing =>   needs to move <=
-                robot.driveTrain.strafeToDistance(movementSpeed/2.0, -pi/2, driveXStep1_3);
+                robot.driveTrain.strafeToDistance(movementSpeed, -pi/2, driveXLevel2);
                 break;
             case 0: //bottom and default
             default:
-                //robot.driveTrain.strafeToDistance(movementSpeed/2.0, pi/2, driveXStep1_3);
                 robot.cascadeOutputSystem.outputArmServo.setPosition(robot.cascadeOutputSystem.ARM_EXTENDED_DOWN);
+                sleep(500);
+                //robot facing =>   needs to move <=
+                robot.driveTrain.strafeToDistance(movementSpeed, -pi/2, driveXlevel0);
                 break;
         }
-        sleep(500); //give time to move
-        //x- movement
-        //robot facing: =>      needs to move:  <=
-        robot.driveTrain.strafeToDistance(movementSpeed, -pi/2.0, driveXStep1_2);
 
 
 
@@ -145,7 +146,7 @@ public class remoteEventNoCascadeAuto  extends org.firstinspires.ftc.teamcode.Au
 
         //robot facing =>   needs to move =>
         robot.driveTrain.strafeToDistance(movementSpeed, pi/2, driveXStep1_3);
-        sleep(1000);
+        sleep(500);
 
         //retract output flipping arm, and prep for movement
         robot.cascadeOutputSystem.outputArmServo.setPosition(robot.cascadeOutputSystem.ARM_RETRACTED);

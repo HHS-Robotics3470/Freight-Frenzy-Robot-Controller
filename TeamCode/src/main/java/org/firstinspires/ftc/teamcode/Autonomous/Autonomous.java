@@ -27,8 +27,6 @@ public abstract class Autonomous extends LinearOpMode {
     }
     Hardware robot          = new Hardware();
 
-    double val1 = 245; //mm relative to camera
-    double val2 = 468; //mm relative to camera
     //gameplan
     //TODO: there is not frieght on the other barcodes, remove references to it
     /*
@@ -113,7 +111,8 @@ public abstract class Autonomous extends LinearOpMode {
          */
 
         //TODO: add logic to determine the level from the webcame using vuforia
-
+        double val1 = 245; //mm relative to camera
+        double val2 = 468; //mm relative to camera
         if (robot.tfod != null) {
             List<Recognition> updatedRecognitions = robot.tfod.getUpdatedRecognitions();
             if (updatedRecognitions != null) {
@@ -129,7 +128,10 @@ public abstract class Autonomous extends LinearOpMode {
                         else if (loc > val2){
                             level = 2;
                         }
-                        break;
+                        else {
+                            level = -1;
+                        }
+                        //break;
                     }
                 }
             }

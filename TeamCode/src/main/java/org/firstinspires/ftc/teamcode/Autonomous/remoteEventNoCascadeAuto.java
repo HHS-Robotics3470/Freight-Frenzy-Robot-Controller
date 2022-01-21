@@ -40,7 +40,7 @@ public class remoteEventNoCascadeAuto  extends org.firstinspires.ftc.teamcode.Au
         //index 2, farthest from shipping hub
 
         //distances, in meters, needed for specific movements
-        double driveYStep1_2   = 0.762;   //2 ft 6in
+        double driveYStep1_2   = 0.9144;//m
         double driveXStep1_2   = 0.3556;   //1ft 2in
         double driveXStep1_3   = 0.1524; //around 6 in
 
@@ -92,6 +92,7 @@ public class remoteEventNoCascadeAuto  extends org.firstinspires.ftc.teamcode.Au
 
         /*step 1*/
         //1.1
+        sleep(1000); //give it time to find it
         level = super.determineLevel(robot);
 
         //1.2
@@ -99,12 +100,10 @@ public class remoteEventNoCascadeAuto  extends org.firstinspires.ftc.teamcode.Au
         telemetry.addData("step: ",1.2);
         telemetry.update();
         //move to the shipping hub
+
         //y- movement to be in-line w/ shipping hub
         //robot facing: =>      needs to move:  V
         robot.driveTrain.strafeToDistance(movementSpeed, 0, driveYStep1_2);
-        //x- movement
-        //robot facing: =>      needs to move:  <=
-        robot.driveTrain.strafeToDistance(movementSpeed, -pi/2.0, driveXStep1_2-driveXStep1_3);
 
         robot.intakeSystem.intakeArmServo.setPosition(robot.intakeSystem.ARM_RAISED);//raise the arm while in transit
 
@@ -117,30 +116,39 @@ public class remoteEventNoCascadeAuto  extends org.firstinspires.ftc.teamcode.Au
         switch (level) {
             case 1: //middle
                 robot.cascadeOutputSystem.outputArmServo.setPosition(robot.cascadeOutputSystem.ARM_EXTENDED_FLAT);
-                robot.driveTrain.strafeToDistance(movementSpeed/2.0, pi/2, driveXStep1_3);
+                //robot.driveTrain.strafeToDistance(movementSpeed/2.0, pi/2, driveXStep1_3);
                 break;
             case 2: //top
                 robot.cascadeOutputSystem.outputArmServo.setPosition(robot.cascadeOutputSystem.ARM_EXTENDED_UP);
                 //move forward a bit to reach the top thing
-                //robot facing =>   needs to move =>
-                robot.driveTrain.strafeToDistance(movementSpeed/2.0, pi/2, driveXStep1_3*2.0);
+                //robot facing =>   needs to move <=
+                robot.driveTrain.strafeToDistance(movementSpeed/2.0, -pi/2, driveXStep1_3);
                 break;
             case 0: //bottom and default
             default:
+                //robot.driveTrain.strafeToDistance(movementSpeed/2.0, pi/2, driveXStep1_3);
                 robot.cascadeOutputSystem.outputArmServo.setPosition(robot.cascadeOutputSystem.ARM_EXTENDED_DOWN);
                 break;
         }
-        /*
-        sleep(1000); //give time to move
+        sleep(500); //give time to move
+        //x- movement
+        //robot facing: =>      needs to move:  <=
+        robot.driveTrain.strafeToDistance(movementSpeed, -pi/2.0, driveXStep1_2);
+
+
+
         //drop off element
         robot.cascadeOutputSystem.outputGrabberServo.setPosition(robot.cascadeOutputSystem.GRABBER_DROP);
         sleep(250); //give time to move
+
+        //robot facing =>   needs to move =>
+        robot.driveTrain.strafeToDistance(movementSpeed, pi/2, driveXStep1_3);
 
         //retract output flipping arm, and prep for movement
         robot.cascadeOutputSystem.outputArmServo.setPosition(robot.cascadeOutputSystem.ARM_RETRACTED);
         robot.intakeSystem.intakeArmServo.setPosition(robot.intakeSystem.ARM_RAISED);
         robot.intakeSystem.intakeGrabberServo.setPosition(robot.intakeSystem.GRABBER_FULL_OPEN);
-        */
+
         /*step 2*/ /*
         //step 2.1
 

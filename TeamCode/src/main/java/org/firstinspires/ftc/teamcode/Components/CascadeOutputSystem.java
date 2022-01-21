@@ -24,7 +24,7 @@ public class CascadeOutputSystem implements Component {
     public final double ARM_RETRACTED = 0.125;
     public final double ARM_EXTENDED_FLAT = 0.8;
     public final double ARM_EXTENDED_UP = 0.6;
-    public final double ARM_EXTENDED_DOWN = 0.95;
+    public final double ARM_EXTENDED_DOWN = 0.9;
     //grabber
     public final double GRABBER_RECEIVE = .3;
     public final double GRABBER_DROP = 0.75;

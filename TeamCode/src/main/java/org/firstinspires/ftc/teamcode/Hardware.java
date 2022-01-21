@@ -270,6 +270,8 @@ public class Hardware implements Component {
         tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);
         // getUpdatedRecognitions() will return null if no new information is available since
         // the last time that call was made.
+        tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABELS);
+
 
         tfod.activate();
 
@@ -282,7 +284,6 @@ public class Hardware implements Component {
         tfod.setZoom(1, 16.0/9.0);
 
 
-        tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABELS);
     }
 
     ////////////////////////////// Methods //////////////////////////////

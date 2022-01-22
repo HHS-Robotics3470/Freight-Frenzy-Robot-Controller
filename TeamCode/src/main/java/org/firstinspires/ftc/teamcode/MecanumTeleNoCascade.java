@@ -278,6 +278,10 @@ public class   MecanumTeleNoCascade  extends LinearOpMode {
                         outputState = IOState.CLOSED;
                         break;
                     case CLOSED:
+                        if (outputArmState == OutputArmState.UP) {
+                            robot.cascadeOutputSystem.outputGrabberServo.setPosition(robot.cascadeOutputSystem.GRABBER_RECEIVE);
+                            sleep(100);
+                        }
                         robot.cascadeOutputSystem.outputGrabberServo.setPosition(robot.cascadeOutputSystem.GRABBER_DROP);
                         outputState = IOState.OPEN;
                         break;
@@ -353,7 +357,7 @@ public class   MecanumTeleNoCascade  extends LinearOpMode {
                 } else {
                     robot.cascadeOutputSystem.cascadeLiftMotor.setPower(1);
                 }*/
-                robot.turntableMotor.setPower(0.75);
+                robot.turntableMotor.setPower(0.5);
             }
             //RIGHT
             else if (gamepad1.dpad_right) {
@@ -363,7 +367,7 @@ public class   MecanumTeleNoCascade  extends LinearOpMode {
                 } else {
                     robot.cascadeOutputSystem.cascadeLiftMotor.setPower(-1);
                 }*/
-                robot.turntableMotor.setPower(-0.75);
+                robot.turntableMotor.setPower(-0.5);
             } else robot.turntableMotor.setPower(0);//robot.cascadeOutputSystem.cascadeLiftMotor.setPower(0);
 
             //telemetry on robot state

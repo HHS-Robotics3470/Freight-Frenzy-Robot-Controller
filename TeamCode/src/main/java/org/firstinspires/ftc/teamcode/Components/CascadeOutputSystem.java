@@ -22,7 +22,7 @@ public class CascadeOutputSystem implements Component {
     public final int CASCADE_RETRACTED = 0;
     //arm
     public final double ARM_RETRACTED = .2;//0.15;
-    public final double ARM_EXTENDED_FLAT = .79;//0.73;
+    public final double ARM_EXTENDED_FLAT = .82;//0.73;
     public final double ARM_EXTENDED_UP = .65;//0.6;
     public final double ARM_EXTENDED_DOWN = .93;//0.9;
     //grabber

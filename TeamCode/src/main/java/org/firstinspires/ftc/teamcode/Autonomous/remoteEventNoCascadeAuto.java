@@ -41,12 +41,10 @@ public class remoteEventNoCascadeAuto  extends org.firstinspires.ftc.teamcode.Au
 
         //distances, in meters, needed for specific movements
         double driveYStep1_2   = 0.9144;//m
-        double driveXlevel0   = 0.3556;   //1ft 2in
-        double driveXlevel1   = 0.3556;
-        double driveXLevel2   = 0.3556+.1;
-        double driveXStep1_3   = 0.1524; //around 6 in
-
-        double driveYStep2     = 1.8288;//6 ft
+        double driveXLevel0   = 0.4056;   //m
+        double driveXLevel1   = 0.4056;
+        double driveXLevel2   = 0.4056+.1;
+        double driveXStep1_3   = 0.2032; //around 8 in
 
         double driveYStep3_1 = 1.8288;//6 ft
 
@@ -62,6 +60,7 @@ public class remoteEventNoCascadeAuto  extends org.firstinspires.ftc.teamcode.Au
         robot.initVuforiaAndTfod(hardwareMap);
 
         // Wait for the game to start (driver presses PLAY)
+        sleep(3000);
         telemetry.addData(">", "Press Play to start op mode");
         telemetry.update();
         waitForStart();
@@ -107,8 +106,6 @@ public class remoteEventNoCascadeAuto  extends org.firstinspires.ftc.teamcode.Au
         //robot facing: =>      needs to move:  V
         robot.driveTrain.strafeToDistance(movementSpeed, 0, driveYStep1_2);
 
-        robot.intakeSystem.intakeArmServo.setPosition(robot.intakeSystem.ARM_RAISED);//raise the arm while in transit
-
         //1.3
         telemetry.addData("level: ", level);
         telemetry.addData("step: ",1.3);
@@ -120,26 +117,29 @@ public class remoteEventNoCascadeAuto  extends org.firstinspires.ftc.teamcode.Au
                 robot.cascadeOutputSystem.outputArmServo.setPosition(robot.cascadeOutputSystem.ARM_EXTENDED_FLAT);
                 sleep(500);
                 //robot facing: =>      needs to move:  <=
-                robot.driveTrain.strafeToDistance(movementSpeed, -pi/2, driveXlevel1);
+                robot.driveTrain.strafeToDistance(movementSpeed, -pi/2, driveXLevel1);
                 break;
             case 2: //top
                 robot.cascadeOutputSystem.outputArmServo.setPosition(robot.cascadeOutputSystem.ARM_EXTENDED_UP);
-                sleep(500);
+                sleep(250);
                 //move forward a bit to reach the top thing
                 //robot facing =>   needs to move <=
                 robot.driveTrain.strafeToDistance(movementSpeed, -pi/2, driveXLevel2);
+                robot.cascadeOutputSystem.outputGrabberServo.setPosition(robot.cascadeOutputSystem.GRABBER_RECEIVE);
+
+                //open output all the way (receive) then let the normal opening effectively close it
+                sleep(250);
                 break;
             case 0: //bottom and default
             default:
                 robot.cascadeOutputSystem.outputArmServo.setPosition(robot.cascadeOutputSystem.ARM_EXTENDED_DOWN);
                 sleep(500);
                 //robot facing =>   needs to move <=
-                robot.driveTrain.strafeToDistance(movementSpeed, -pi/2, driveXlevel0);
+                robot.driveTrain.strafeToDistance(movementSpeed, -pi/2, driveXLevel0);
                 break;
         }
 
-
-
+        robot.intakeSystem.intakeArmServo.setPosition(robot.intakeSystem.ARM_RAISED);//raise the arm while in transit
         //drop off element
         robot.cascadeOutputSystem.outputGrabberServo.setPosition(robot.cascadeOutputSystem.GRABBER_DROP);
         sleep(250); //give time to move

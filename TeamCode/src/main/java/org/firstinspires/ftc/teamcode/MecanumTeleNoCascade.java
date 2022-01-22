@@ -353,7 +353,7 @@ public class   MecanumTeleNoCascade  extends LinearOpMode {
                 } else {
                     robot.cascadeOutputSystem.cascadeLiftMotor.setPower(1);
                 }*/
-                robot.turntableMotor.setPower(1);
+                robot.turntableMotor.setPower(0.75);
             }
             //RIGHT
             else if (gamepad1.dpad_right) {
@@ -363,7 +363,7 @@ public class   MecanumTeleNoCascade  extends LinearOpMode {
                 } else {
                     robot.cascadeOutputSystem.cascadeLiftMotor.setPower(-1);
                 }*/
-                robot.turntableMotor.setPower(-1);
+                robot.turntableMotor.setPower(-0.75);
             } else robot.turntableMotor.setPower(0);//robot.cascadeOutputSystem.cascadeLiftMotor.setPower(0);
 
             //telemetry on robot state

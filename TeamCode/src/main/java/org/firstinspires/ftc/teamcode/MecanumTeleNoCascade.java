@@ -247,6 +247,7 @@ public class   MecanumTeleNoCascade  extends LinearOpMode {
                         //robot.cascadeOutputSystem.cascadeLiftMotor.setPower(1);
 
                         bState = BProcess.ENDED; //go to next stage
+                        bProcessTimer.reset();
                     }
                     break;
                 case ENDED:
@@ -280,7 +281,7 @@ public class   MecanumTeleNoCascade  extends LinearOpMode {
                     case CLOSED:
                         if (outputArmState == OutputArmState.UP) {
                             robot.cascadeOutputSystem.outputGrabberServo.setPosition(robot.cascadeOutputSystem.GRABBER_RECEIVE);
-                            sleep(100);
+                            sleep(200);
                         }
                         robot.cascadeOutputSystem.outputGrabberServo.setPosition(robot.cascadeOutputSystem.GRABBER_DROP);
                         outputState = IOState.OPEN;

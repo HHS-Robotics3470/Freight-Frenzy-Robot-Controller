@@ -18,7 +18,7 @@ public class IntakeSystem  implements Component {
     ////////////////////////////// class variables //////////////////////////////
     //**info, measurements, known positions, etc.**//
     //arm positions
-    public final double ARM_DOWN = 0.3; //0.05
+    public final double ARM_DOWN = 0.34;//0.3; //0.05
     public final double ARM_UP = 1.0; //.7
     public final double ARM_RAISED = 0.55;//.2
     //grabber positions

@@ -6,6 +6,7 @@ import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareDevice;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
@@ -143,6 +144,8 @@ public class Hardware implements Component {
     public final double NADO_COUNTS_PER_METER      = (NADO_COUNTS_PER_MOTOR_REV * NADO_DRIVE_GEAR_REDUCTION) /
             (NADO_WHEEL_DIAMETER_METERS * Math.PI);
     public final double NADO_METERS_PER_COUNT = 1.0 / NADO_COUNTS_PER_METER;
+    public final double SERVO_STEP_SIZE = 0.01; //step size of steps to take [0.0,1.0]
+    public final int SERVO_STEP_TIME = 15; //time between steps (ms)
 
     /* --local OpMode members.-- */
     HardwareMap hwMap           =  null;
@@ -293,6 +296,44 @@ public class Hardware implements Component {
     @Override
     public List<HardwareDevice> getAll() {
         return null;
+    }
+
+    /**
+     * steps servo toward the target by 1 step, used in a loop like so:
+     * //in game loop
+     * while (!stepServoTowardTarget(target,step,servo)) {sleep(50);}
+     * @param servo servo to move
+     * @param target target position [0.0,1.0]
+     * @param step size of steps to take [0.0,1.0]
+     * @return true if within step of target position, false otherwise
+     */
+    public boolean stepServoTowardTarget(Servo servo, double target, double step) {
+        double currPosition = servo.getPosition();
+        target = Math.abs(target);
+        double diff = currPosition - target;
+        step = Math.abs(step);
+
+        //redundant?
+        if (Math.abs(diff) < step) { //if within step of target,
+            // set to target and return true
+            servo.setPosition(target);
+            return true;
+        }
+        else if (diff > step) { //if difference is positive, and greater than step
+            //step toward target +
+            servo.setPosition(currPosition+step);
+            return false;
+        }
+        else if (diff < -step) { // if difference is negative, and less than step
+            //step toward target -
+            servo.setPosition(currPosition+step);
+            return false;
+        }
+        else { //contingency, default to true
+            // set to target and return true
+            servo.setPosition(target);
+            return true;
+        }
     }
     ////////////////////////////// Set Methods //////////////////////////////
 

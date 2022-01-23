@@ -1,11 +1,7 @@
 package org.firstinspires.ftc.teamcode.Autonomous;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
-
-import org.firstinspires.ftc.teamcode.Hardware;
 
 /**
  * copied version of BlueWarehouseSideAutonomous.java, changed up to work for the other side,
@@ -114,14 +110,23 @@ public class remoteEventNoCascadeAuto  extends org.firstinspires.ftc.teamcode.Au
         //extend output flipping arm to proper level
         switch (level) {
             case 1: //middle
-                robot.cascadeOutputSystem.outputArmServo.setPosition(robot.cascadeOutputSystem.ARM_EXTENDED_FLAT);
-                sleep(500);
+                this.moveServoTowardTarget(
+                        robot.cascadeOutputSystem.outputArmServo,
+                        robot.cascadeOutputSystem.ARM_EXTENDED_FLAT,
+                        robot.SERVO_STEP_SIZE,
+                        robot.SERVO_STEP_TIME
+                );
                 //robot facing: =>      needs to move:  <=
                 robot.driveTrain.strafeToDistance(movementSpeed, -pi/2, driveXLevel1);
                 break;
             case 2: //top
-                robot.cascadeOutputSystem.outputArmServo.setPosition(robot.cascadeOutputSystem.ARM_EXTENDED_UP);
-                sleep(250);
+                //move servo to position
+                this.moveServoTowardTarget(
+                        robot.cascadeOutputSystem.outputArmServo,
+                        robot.cascadeOutputSystem.ARM_EXTENDED_UP,
+                        robot.SERVO_STEP_SIZE,
+                        robot.SERVO_STEP_TIME
+                );
                 //move forward a bit to reach the top thing
                 //robot facing =>   needs to move <=
                 robot.driveTrain.strafeToDistance(movementSpeed, -pi/2, driveXLevel2);
@@ -132,8 +137,13 @@ public class remoteEventNoCascadeAuto  extends org.firstinspires.ftc.teamcode.Au
                 break;
             case 0: //bottom and default
             default:
-                robot.cascadeOutputSystem.outputArmServo.setPosition(robot.cascadeOutputSystem.ARM_EXTENDED_DOWN);
-                sleep(500);
+                //move servo to position
+                this.moveServoTowardTarget(
+                        robot.cascadeOutputSystem.outputArmServo,
+                        robot.cascadeOutputSystem.ARM_EXTENDED_DOWN,
+                        robot.SERVO_STEP_SIZE,
+                        robot.SERVO_STEP_TIME
+                );
                 //robot facing =>   needs to move <=
                 robot.driveTrain.strafeToDistance(movementSpeed, -pi/2, driveXLevel0);
                 break;
@@ -149,9 +159,15 @@ public class remoteEventNoCascadeAuto  extends org.firstinspires.ftc.teamcode.Au
         sleep(500);
 
         //retract output flipping arm, and prep for movement
-        robot.cascadeOutputSystem.outputArmServo.setPosition(robot.cascadeOutputSystem.ARM_RETRACTED);
         robot.intakeSystem.intakeArmServo.setPosition(robot.intakeSystem.ARM_RAISED);
         robot.intakeSystem.intakeGrabberServo.setPosition(robot.intakeSystem.GRABBER_FULL_OPEN);
+        //move servo to position
+        this.moveServoTowardTarget(
+                robot.cascadeOutputSystem.outputArmServo,
+                robot.cascadeOutputSystem.ARM_RETRACTED,
+                robot.SERVO_STEP_SIZE,
+                robot.SERVO_STEP_TIME
+        );
 
         /*step 2*/
         //step 2.1

@@ -6,11 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.robotcore.external.ClassFactory;
-import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
-import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 
 import java.util.List;
 
@@ -277,7 +273,7 @@ public class MecanumVuforiaTeleOp extends LinearOpMode {
                     //wait for cascadeLiftMotor to finish moving
                     if (!robot.cascadeOutputSystem.cascadeLiftMotor.isBusy()) {
                         //move output flipper back to level it was at previously
-                        robot.cascadeOutputSystem.outputArmServo.setPosition(robot.cascadeOutputSystem.ARM_EXTENDED_FLAT);
+                        robot.cascadeOutputSystem.outputArmServo.setPosition(robot.cascadeOutputSystem.ARM_EXTENDED_MIDDLE);
 
                         //reset motor, get out of RUN_TO_POSITION mode
                         robot.cascadeOutputSystem.cascadeLiftMotor.setPower(0);
@@ -317,7 +313,7 @@ public class MecanumVuforiaTeleOp extends LinearOpMode {
             switch (outputArmState) {
                 case RETRACTED:
                     if (yC && !yP) {
-                        robot.cascadeOutputSystem.outputArmServo.setPosition(robot.cascadeOutputSystem.ARM_EXTENDED_FLAT); //extend flat
+                        robot.cascadeOutputSystem.outputArmServo.setPosition(robot.cascadeOutputSystem.ARM_EXTENDED_MIDDLE); //extend flat
                         outputArmState = OutputArmState.FLAT;
                     }
                     break;
@@ -338,7 +334,7 @@ public class MecanumVuforiaTeleOp extends LinearOpMode {
                         robot.cascadeOutputSystem.outputArmServo.setPosition(robot.cascadeOutputSystem.ARM_EXTENDED_DOWN); //down
                         outputArmState = OutputArmState.DOWN;
                     } else if (downC && !downP) {
-                        robot.cascadeOutputSystem.outputArmServo.setPosition(robot.cascadeOutputSystem.ARM_EXTENDED_FLAT); //flat
+                        robot.cascadeOutputSystem.outputArmServo.setPosition(robot.cascadeOutputSystem.ARM_EXTENDED_MIDDLE); //flat
                         outputArmState = OutputArmState.FLAT;
                     } else if (yC && !yP) {
                         robot.cascadeOutputSystem.outputArmServo.setPosition(robot.cascadeOutputSystem.ARM_RETRACTED); //retract
@@ -347,7 +343,7 @@ public class MecanumVuforiaTeleOp extends LinearOpMode {
                     break;
                 case DOWN:
                     if (upC && !upP) {
-                        robot.cascadeOutputSystem.outputArmServo.setPosition(robot.cascadeOutputSystem.ARM_EXTENDED_FLAT); //flat
+                        robot.cascadeOutputSystem.outputArmServo.setPosition(robot.cascadeOutputSystem.ARM_EXTENDED_MIDDLE); //flat
                         outputArmState = OutputArmState.FLAT;
                     } else if (downC && !downP) {
                         robot.cascadeOutputSystem.outputArmServo.setPosition(robot.cascadeOutputSystem.ARM_EXTENDED_UP); //up

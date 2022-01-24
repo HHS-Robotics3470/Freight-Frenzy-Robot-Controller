@@ -112,7 +112,7 @@ public class remoteEventNoCascadeAuto  extends org.firstinspires.ftc.teamcode.Au
             case 1: //middle
                 this.moveServoTowardTarget(
                         robot.cascadeOutputSystem.outputArmServo,
-                        robot.cascadeOutputSystem.ARM_EXTENDED_FLAT,
+                        robot.cascadeOutputSystem.ARM_EXTENDED_MIDDLE,
                         robot.SERVO_STEP_SIZE,
                         robot.SERVO_STEP_TIME
                 );

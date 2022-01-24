@@ -2,10 +2,7 @@ package org.firstinspires.ftc.teamcode.Autonomous;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
-
-import org.firstinspires.ftc.teamcode.Hardware;
 
 /**
  * Currently just psuedo code, comments\
@@ -152,7 +149,7 @@ public class BlueWarehouseSideAutonomous extends org.firstinspires.ftc.teamcode.
                 break;
             case 1: //middle and default
             default:
-                robot.cascadeOutputSystem.outputArmServo.setPosition(robot.cascadeOutputSystem.ARM_EXTENDED_FLAT);
+                robot.cascadeOutputSystem.outputArmServo.setPosition(robot.cascadeOutputSystem.ARM_EXTENDED_MIDDLE);
                 break;
         }
         sleep(300); //give time to move

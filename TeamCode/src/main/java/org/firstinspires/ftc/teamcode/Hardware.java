@@ -313,18 +313,12 @@ public class Hardware implements Component {
         double diff = currPosition - target;
         step = Math.abs(step);
 
-        //redundant?
-        if (Math.abs(diff) < step) { //if within step of target,
-            // set to target and return true
-            servo.setPosition(target);
-            return true;
-        }
-        else if (diff > step) { //if difference is positive, and greater than step
+        if (diff >= step) { //if difference is positive, and greater than step
             //step toward target +
             servo.setPosition(currPosition+step);
             return false;
         }
-        else if (diff < -step) { // if difference is negative, and less than step
+        else if (diff <= -step) { // if difference is negative, and less than step
             //step toward target -
             servo.setPosition(currPosition+step);
             return false;

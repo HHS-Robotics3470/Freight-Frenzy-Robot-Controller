@@ -16,6 +16,7 @@ import java.util.List;
  */
 @TeleOp(name="mecanum TeleOp w/ Vuforia", group="Competition")
 @Disabled
+@Deprecated
 public class MecanumVuforiaTeleOp extends LinearOpMode {
     /*declare OpMode members, initialize some classes*/
     //an enum to represent output flipper states
@@ -134,6 +135,7 @@ public class MecanumVuforiaTeleOp extends LinearOpMode {
                 Right: retract cascade kit
 
              */
+
             //update button locks
             aC = gamepad1.a;
             bC = gamepad1.b;
@@ -157,7 +159,7 @@ public class MecanumVuforiaTeleOp extends LinearOpMode {
                     (y - x + r) / denom,
                     (y + x - r) / denom
             ); //+12ms
-
+            /*
 
             /////TRIGGERS AND BUMPERS/////
 
@@ -413,12 +415,14 @@ public class MecanumVuforiaTeleOp extends LinearOpMode {
                 }
             }
             runTelemetry(outputArmState, outputState, inputState, aState, bState);
+        */
         }
         ////////////after driver presses stop////////////
 
     }
 
     ////////////other methods and whatnot below here////////////
+        /*
     public void runTelemetry(OutputArmState outputArmState, IOState outputState, IOState inputState, AProcess aState, BProcess bState) {
         telemetry.addLine("---====STATES====---");
         telemetry.addData("Output Arm: ", outputArmState.toString());
@@ -428,5 +432,7 @@ public class MecanumVuforiaTeleOp extends LinearOpMode {
         telemetry.addData("B-button process: ", bState.toString());
         telemetry.update();
     }
+
+         */
 
 }

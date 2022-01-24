@@ -19,6 +19,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  */
 @Autonomous(name="Blue Warehouse-side Autonomous", group="Needs Calibration" )
 @Disabled //this line disables the autonomous from appearing on the driver station, remove it for your code
+@Deprecated
 public class BlueWarehouseSideAutonomous extends org.firstinspires.ftc.teamcode.Autonomous.Autonomous {
 
     /*declare OpMode members, initialize some classes*/
@@ -137,19 +138,19 @@ public class BlueWarehouseSideAutonomous extends org.firstinspires.ftc.teamcode.
         //1.3
         //drop off into shipping hub
         //extend cascade kit
-        robot.cascadeOutputSystem.extendCascadeToPosition(extendCascadeStep1_3, 1);
+        //robot.cascadeOutputSystem.extendCascadeToPosition(extendCascadeStep1_3, 1);
 
         //extend output flipping arm to proper level
         switch (level) {
             case 0: //bottom
-                robot.cascadeOutputSystem.outputArmServo.setPosition(robot.cascadeOutputSystem.ARM_EXTENDED_DOWN);
+                //robot.cascadeOutputSystem.outputArmServo.setPosition(robot.cascadeOutputSystem.ARM_EXTENDED_DOWN);
                 break;
             case 2: //top
-                robot.cascadeOutputSystem.outputArmServo.setPosition(robot.cascadeOutputSystem.ARM_EXTENDED_UP);
+                //robot.cascadeOutputSystem.outputArmServo.setPosition(robot.cascadeOutputSystem.ARM_EXTENDED_UP);
                 break;
             case 1: //middle and default
             default:
-                robot.cascadeOutputSystem.outputArmServo.setPosition(robot.cascadeOutputSystem.ARM_EXTENDED_MIDDLE);
+                //robot.cascadeOutputSystem.outputArmServo.setPosition(robot.cascadeOutputSystem.ARM_EXTENDED_MIDDLE);
                 break;
         }
         sleep(300); //give time to move
@@ -158,10 +159,10 @@ public class BlueWarehouseSideAutonomous extends org.firstinspires.ftc.teamcode.
         sleep(100); //give time to move
 
         //retract output flipping arm
-        robot.cascadeOutputSystem.outputArmServo.setPosition(robot.cascadeOutputSystem.ARM_RETRACTED);
+        //robot.cascadeOutputSystem.outputArmServo.setPosition(robot.cascadeOutputSystem.ARM_RETRACTED);
 
         //retract cascade kit
-        robot.cascadeOutputSystem.extendCascadeToPosition(retractCascadeStep1_3, 1);
+        //robot.cascadeOutputSystem.extendCascadeToPosition(retractCascadeStep1_3, 1);
 
         /*step 2*/
         //pick up and deposit additional freight

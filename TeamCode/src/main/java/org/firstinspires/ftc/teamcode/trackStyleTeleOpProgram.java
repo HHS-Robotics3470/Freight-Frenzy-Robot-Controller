@@ -11,6 +11,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  */
 @TeleOp(name="trackStyleTeleOpProgram", group="Demos")
 @Disabled
+@Deprecated
 public class trackStyleTeleOpProgram extends LinearOpMode {
     /*declare OpMode members, initialize some classes*/
     Hardware robot          = new Hardware();
@@ -96,6 +97,7 @@ public class trackStyleTeleOpProgram extends LinearOpMode {
 
             //D-Pad
             //up & down
+            /*
             if (gamepad1.dpad_up && robot.cascadeOutputSystem.cascadeLiftMotor.getCurrentPosition() < 2400) {
                 robot.cascadeOutputSystem.cascadeLiftMotor.setPower(1);
             }
@@ -106,7 +108,11 @@ public class trackStyleTeleOpProgram extends LinearOpMode {
                 robot.cascadeOutputSystem.cascadeLiftMotor.setPower(0);
             }
 
+
+
             telemetry.addData("cascade lift motor encoder count: ", robot.cascadeOutputSystem.cascadeLiftMotor.getCurrentPosition());
+
+             */
             telemetry.update();
         }
 

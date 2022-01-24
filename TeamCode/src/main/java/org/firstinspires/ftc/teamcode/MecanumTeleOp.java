@@ -11,6 +11,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  */
 @TeleOp(name="mecanum TeleOp", group="Competition")
 @Disabled
+@Deprecated
 public class MecanumTeleOp extends LinearOpMode {
     /*declare OpMode members, initialize some classes*/
     //an enum to represent output flipper states
@@ -116,6 +117,7 @@ public class MecanumTeleOp extends LinearOpMode {
                 Right: retract cascade kit
 
              */
+            /*
             //update button locks
             aC = gamepad1.a;
             bC = gamepad1.b;
@@ -376,6 +378,7 @@ public class MecanumTeleOp extends LinearOpMode {
             yP=yC;
             upP = upC;
             downP = downC;
+            */
         }
         ////////////after driver presses stop////////////
 

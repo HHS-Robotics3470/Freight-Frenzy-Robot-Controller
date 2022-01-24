@@ -137,19 +137,20 @@ public class Hardware implements Component {
     List<LynxModule> allHubs;
 
     //**hardware stats**//
+    public static final double ROBOT_WIDTH = 0.3682; //width of the robot, distance between wheels
     // stats for the TorqueNADO motors
-    public final double NADO_COUNTS_PER_MOTOR_REV = 1440;
-    public final double NADO_DRIVE_GEAR_REDUCTION = 1;  // This is < 1.0 if geared UP (to increase speed)
-    public final double NADO_WHEEL_DIAMETER_METERS= 0.2032; //(8") For figuring circumference
-    public final double NADO_COUNTS_PER_METER      = (NADO_COUNTS_PER_MOTOR_REV * NADO_DRIVE_GEAR_REDUCTION) /
+    public static final double NADO_COUNTS_PER_MOTOR_REV = 1440;
+    public static final double NADO_DRIVE_GEAR_REDUCTION = 1;  // This is < 1.0 if geared UP (to increase speed)
+    public static final double NADO_WHEEL_DIAMETER_METERS= 0.2032; //(8") For figuring circumference
+    public static final double NADO_COUNTS_PER_METER      = (NADO_COUNTS_PER_MOTOR_REV * NADO_DRIVE_GEAR_REDUCTION) /
             (NADO_WHEEL_DIAMETER_METERS * Math.PI);
-    public final double NADO_METERS_PER_COUNT = 1.0 / NADO_COUNTS_PER_METER;
-    public final double SERVO_STEP_SIZE = 0.01; //step size of steps to take [0.0,1.0]
-    public final int SERVO_STEP_TIME = 15; //time between steps (ms)
+    public static final double NADO_METERS_PER_COUNT = 1.0 / NADO_COUNTS_PER_METER;
+    public static final double SERVO_STEP_SIZE = 0.01; //step size of steps to take [0.0,1.0]
+    public static final int SERVO_STEP_TIME = 15; //time between steps (ms)
 
     /* --local OpMode members.-- */
     HardwareMap hwMap           =  null;
-    private ElapsedTime runtime  = new ElapsedTime();
+    //private ElapsedTime runtime  = new ElapsedTime();
     private static final String VUFORIA_KEY = "AW/D8Tv/////AAABmaz//hdMn0Nmm2YoSrW8emZqrSTAb26m/pJRCgy4GeNX6aO6frTzk1FQ/y8IC0mbDWke8NXa87KACa/HR1kVRqaamTM60GJcobyaZaK1k0NAkVZ94iJY/RlWsIzESF3hql3ADHV9oHUuSvZWAVkF8f01xr4bzFtLrXgORIxOFKsT4TWSfHIr1pZel50uC0psgWIWpcDFGY3wTHlcfahX93OY8rqz98vwZC6b2u0MiikDwFjzKD2zxtSvQkYyIogyccKwZrC4z432K1GwxSvUanLJVsNypOcDqVrXWJdHKSmJSuQ8Zrl5SDvPXFewBpBYUTacsrdIx6bUykW+hSTcMxFzMo8MHjrv+FYgtJwaVsFT";
     private boolean vuforiaEnabled = false;
     /* --Constructors-- */
@@ -160,7 +161,7 @@ public class Hardware implements Component {
     /* --Initialize standard Hardware interfaces-- */
     @Override
     public void init(HardwareMap ahwMap) {
-        runtime.reset();
+        //runtime.reset();
 
         // Save reference to Hardware map
         hwMap = ahwMap;
@@ -307,7 +308,7 @@ public class Hardware implements Component {
      * @param step size of steps to take [0.0,1.0]
      * @return true if within step of target position, false otherwise
      */
-    public boolean stepServoTowardTarget(Servo servo, double target, double step) {
+    public static boolean stepServoTowardTarget(Servo servo, double target, double step) {
         double currPosition = servo.getPosition();
         target = Math.abs(target);
         double diff = currPosition - target;

@@ -77,16 +77,6 @@ public abstract class Autonomous extends LinearOpMode {
 
 
     ///Methods///
-    /**
-     * moves the servo toward target by step, each delayed by stepTime
-     * @param servo servo to move
-     * @param target target position [0.0,1.0]
-     * @param step step size of steps to take [0.0,1.0]
-     * @param stepTime time between steps (ms)
-     */
-    public void moveServoTowardTarget(Servo servo, double target, double step, int stepTime) {
-        while (!robot.stepServoTowardTarget(servo, target, step)) {sleep(stepTime);}
-    }
 
     //vuforia bits
 

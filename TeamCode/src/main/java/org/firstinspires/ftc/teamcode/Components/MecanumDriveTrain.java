@@ -8,6 +8,8 @@ import com.qualcomm.robotcore.hardware.MotorControlAlgorithm;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.Hardware;
+
 import java.util.LinkedList;
 import java.util.List;
 
@@ -22,14 +24,6 @@ public class MecanumDriveTrain implements Component {
     private boolean motorsBusy = false; //are drive motors busy running to position?
 
     //**info, measurements, known positions, etc.**//
-    // stats for the TorqueNADO motors
-    public final double NADO_COUNTS_PER_MOTOR_REV = 1440.0;
-    public final double NADO_DRIVE_GEAR_REDUCTION = 1.0;  // This is < 1.0 if geared UP (to increase speed)
-    public final double NADO_WHEEL_DIAMETER_METERS= 0.2032; //(8") For figuring circumference
-    public final double NADO_COUNTS_PER_METER      = (NADO_COUNTS_PER_MOTOR_REV * NADO_DRIVE_GEAR_REDUCTION) /
-            (NADO_WHEEL_DIAMETER_METERS * Math.PI);
-    public final double NADO_METERS_PER_COUNT = 1.0 / NADO_COUNTS_PER_METER;
-    public final double ROBOT_WIDTH = 0.3682; //width of the robot, distance between wheels
     //TODO: recalculate at full battery
     //PID info
     //CALCULATED: (as of 12/14/2021, battery voltage: 12.77
@@ -157,7 +151,7 @@ public class MecanumDriveTrain implements Component {
 
         power = Math.abs(power);
         if (power < 0.4) power = 0.4;
-        targetDistance = Math.abs(targetDistance)*NADO_COUNTS_PER_METER; //make positive, and convert to counts
+        targetDistance = Math.abs(targetDistance)* Hardware.NADO_COUNTS_PER_METER; //make positive, and convert to counts
         //DATA
         boolean moving = true;
 
@@ -257,11 +251,11 @@ public class MecanumDriveTrain implements Component {
         angle *=2; //test
         //calculate desired distance for each motor pair to move
         //+ angle == turn CCW;   - angle == turn CW
-        double leftPairDistance = -angle * (ROBOT_WIDTH/2); // theta * r = arc length
-        double rightPairDistance = angle * (ROBOT_WIDTH/2); // theta * r = arc length
+        double leftPairDistance = -angle * (Hardware.ROBOT_WIDTH/2); // theta * r = arc length
+        double rightPairDistance = angle * (Hardware.ROBOT_WIDTH/2); // theta * r = arc length
         //find the desired target for each strafe PID
-        int leftAxisTarget = (int) (leftPairDistance * NADO_COUNTS_PER_METER);
-        int rightAxisTarget = (int) (rightPairDistance * NADO_COUNTS_PER_METER);
+        int leftAxisTarget = (int) (leftPairDistance * Hardware.NADO_COUNTS_PER_METER);
+        int rightAxisTarget = (int) (rightPairDistance * Hardware.NADO_COUNTS_PER_METER);
 
         //stop and prep
         setPower(0);

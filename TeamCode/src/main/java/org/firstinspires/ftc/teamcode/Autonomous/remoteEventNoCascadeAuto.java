@@ -3,6 +3,8 @@ package org.firstinspires.ftc.teamcode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.Components.CascadeOutputSystem;
+
 /**
  * copied version of BlueWarehouseSideAutonomous.java, changed up to work for the other side,
  * TODO: calibrate every distance, angle, etc. to be accurate
@@ -15,7 +17,7 @@ public class remoteEventNoCascadeAuto  extends org.firstinspires.ftc.teamcode.Au
 
     /*declare OpMode members, initialize some classes*/
     //Hardware robot          = new Hardware(); // moved to superclass
-    ElapsedTime runtime     = new ElapsedTime();
+    //ElapsedTime runtime     = new ElapsedTime();
 
     //this is the control loop, basically the equivalent of a main function almost
     @Override
@@ -60,7 +62,7 @@ public class remoteEventNoCascadeAuto  extends org.firstinspires.ftc.teamcode.Au
         telemetry.addData(">", "Press Play to start op mode");
         telemetry.update();
         waitForStart();
-        runtime.reset();
+        //runtime.reset();
 
         ////////////after driver presses play////////////
 
@@ -110,23 +112,13 @@ public class remoteEventNoCascadeAuto  extends org.firstinspires.ftc.teamcode.Au
         //extend output flipping arm to proper level
         switch (level) {
             case 1: //middle
-                this.moveServoTowardTarget(
-                        robot.cascadeOutputSystem.outputArmServo,
-                        robot.cascadeOutputSystem.ARM_EXTENDED_MIDDLE,
-                        robot.SERVO_STEP_SIZE,
-                        robot.SERVO_STEP_TIME
-                );
+                robot.cascadeOutputSystem.moveArmToPosition(CascadeOutputSystem.OutputArmPosition.MIDDLE);
                 //robot facing: =>      needs to move:  <=
                 robot.driveTrain.strafeToDistance(movementSpeed, -pi/2, driveXLevel1);
                 break;
             case 2: //top
                 //move servo to position
-                this.moveServoTowardTarget(
-                        robot.cascadeOutputSystem.outputArmServo,
-                        robot.cascadeOutputSystem.ARM_EXTENDED_UP,
-                        robot.SERVO_STEP_SIZE,
-                        robot.SERVO_STEP_TIME
-                );
+                robot.cascadeOutputSystem.moveArmToPosition(CascadeOutputSystem.OutputArmPosition.UP);
                 //move forward a bit to reach the top thing
                 //robot facing =>   needs to move <=
                 robot.driveTrain.strafeToDistance(movementSpeed, -pi/2, driveXLevel2);
@@ -138,12 +130,7 @@ public class remoteEventNoCascadeAuto  extends org.firstinspires.ftc.teamcode.Au
             case 0: //bottom and default
             default:
                 //move servo to position
-                this.moveServoTowardTarget(
-                        robot.cascadeOutputSystem.outputArmServo,
-                        robot.cascadeOutputSystem.ARM_EXTENDED_DOWN,
-                        robot.SERVO_STEP_SIZE,
-                        robot.SERVO_STEP_TIME
-                );
+                robot.cascadeOutputSystem.moveArmToPosition(CascadeOutputSystem.OutputArmPosition.DOWN);
                 //robot facing =>   needs to move <=
                 robot.driveTrain.strafeToDistance(movementSpeed, -pi/2, driveXLevel0);
                 break;
@@ -162,12 +149,7 @@ public class remoteEventNoCascadeAuto  extends org.firstinspires.ftc.teamcode.Au
         robot.intakeSystem.intakeArmServo.setPosition(robot.intakeSystem.ARM_RAISED);
         robot.intakeSystem.intakeGrabberServo.setPosition(robot.intakeSystem.GRABBER_FULL_OPEN);
         //move servo to position
-        this.moveServoTowardTarget(
-                robot.cascadeOutputSystem.outputArmServo,
-                robot.cascadeOutputSystem.ARM_RETRACTED,
-                robot.SERVO_STEP_SIZE,
-                robot.SERVO_STEP_TIME
-        );
+        robot.cascadeOutputSystem.moveArmToPosition(CascadeOutputSystem.OutputArmPosition.RETRACTED);
 
         /*step 2*/
         //step 2.1

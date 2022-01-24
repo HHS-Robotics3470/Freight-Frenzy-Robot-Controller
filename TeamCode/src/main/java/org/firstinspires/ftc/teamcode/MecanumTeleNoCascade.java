@@ -4,20 +4,14 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.Components.CascadeOutputSystem;
+
 /**
  * @author Anthony Rubick
  */
 @TeleOp(name="mecanum TeleOp no cascade", group="Competition")
 public class   MecanumTeleNoCascade  extends LinearOpMode {
     /*declare OpMode members, initialize some classes*/
-    //an enum to represent output flipper states
-    public enum OutputArmState {
-        RETRACTED,
-        UP,
-        MIDDLE,
-        DOWN,
-        RESTRICTED
-    }
     //an enum to represent states of input and output grabbers
     public enum IOState {
         /**
@@ -49,22 +43,12 @@ public class   MecanumTeleNoCascade  extends LinearOpMode {
         STAGE_THREE,
         ENDING
     }
-    //an enum to represent the states of the processes attached to the up, down, and y buttons
-    public enum OutputArmServoMovementProcess {
-        AT_TARGET_POSITION,
-        MOVING_TO_RETRACTED,
-        MOVING_TO_UP,
-        MOVING_TO_MIDDLE,
-        MOVING_TO_DOWN,
-        ENDING
-    }
 
 
     Hardware robot          = new Hardware();
-    ElapsedTime runtime     = new ElapsedTime();
+    //ElapsedTime runtime     = new ElapsedTime();
     ElapsedTime bProcessTimer = new ElapsedTime();
     ElapsedTime inputTimer = new ElapsedTime();
-    ElapsedTime servoTimer = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
 
     //this is the control loop, basically the equivalent of a main function almost
     @Override
@@ -73,17 +57,16 @@ public class   MecanumTeleNoCascade  extends LinearOpMode {
         ////////////before driver presses play////////////
         //Variables
         //state enums
-        OutputArmState outputArmState = OutputArmState.RETRACTED;
         IOState inputState = IOState.OPEN;
         IOState outputState = IOState.CLOSED;
         AProcess aState = AProcess.NOT_STARTED; //state of the process attached to the 'a' button
         BProcess bState = BProcess.NOT_STARTED; //state of the process attached to the 'b' button
-        OutputArmServoMovementProcess outputArmServoMovementProcess = OutputArmServoMovementProcess.AT_TARGET_POSITION;
         //button locks
         boolean aC, bC, yC, xC, upC, downC; //is currently pressed
         boolean aP = false, bP = false, yP = false, xP = false, upP = false, downP = false; //was previously pressed
         //other
-        double tempOutArmPos;
+        //CascadeOutputSystem.OutputArmPosition tempOutArmPos;
+        boolean outputArmRestricted = false;
         //int cascadeCount = 0;
 
         /* Initialize the hardware variables.
@@ -91,13 +74,12 @@ public class   MecanumTeleNoCascade  extends LinearOpMode {
          */
         robot.init(hardwareMap);
         //robot.initVuforiaAndTfod(hardwareMap); //uncomment if necessary
-        tempOutArmPos = robot.cascadeOutputSystem.ARM_RETRACTED; //initialize this as the retracted position
+        //tempOutArmPos = CascadeOutputSystem.OutputArmPosition.RETRACTED; //initialize this as the retracted position
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
-        runtime.reset();
+        //runtime.reset();
         bProcessTimer.reset();
         inputTimer.reset();
-        servoTimer.reset();
 
 
         ////////////after driver presses play////////////
@@ -196,26 +178,28 @@ public class   MecanumTeleNoCascade  extends LinearOpMode {
                 case NOT_STARTED:
                     if (bC&&!bP) {
                         //save some info about the robots state so we can return to it at the end
-                        tempOutArmPos = robot.cascadeOutputSystem.outputArmServo.getPosition();
+                        //tempOutArmPos = robot.cascadeOutputSystem.getOutputArmPosition();
 
                         if (inputState != IOState.CLOSED) {
                             robot.intakeSystem.intakeGrabberServo.setPosition(robot.intakeSystem.GRABBER_CLOSED);//close input
                         }
                         robot.cascadeOutputSystem.outputGrabberServo.setPosition(robot.cascadeOutputSystem.GRABBER_RECEIVE);//open output
+
+                        //retract
                         //robot.cascadeOutputSystem.outputArmServo.setPosition(robot.cascadeOutputSystem.ARM_RETRACTED);//fold back
-                        outputArmServoMovementProcess = OutputArmServoMovementProcess.MOVING_TO_RETRACTED;
+                        robot.cascadeOutputSystem.stepArmTowardTarget(CascadeOutputSystem.OutputArmPosition.RETRACTED);
 
                         //restrict relevant systems
                         inputState = IOState.RESTRICTED;
                         outputState = IOState.RESTRICTED;
-                        outputArmState = OutputArmState.RESTRICTED;
+                        outputArmRestricted = true;
                         bState = BProcess.STAGE_ONE; //go to next stage
                         bProcessTimer.reset();
                     }
                     break;
                 case STAGE_ONE:
                     //wait for retraction
-                    if (outputArmServoMovementProcess.equals(OutputArmServoMovementProcess.AT_TARGET_POSITION)) {
+                    if (robot.cascadeOutputSystem.stepArmTowardTarget(CascadeOutputSystem.OutputArmPosition.RETRACTED)) {
                         //raise front input flipper to drop off element
                         robot.intakeSystem.intakeArmServo.setPosition(robot.intakeSystem.ARM_UP);
                         bState = BProcess.STAGE_TWO; //go to next stage
@@ -239,16 +223,17 @@ public class   MecanumTeleNoCascade  extends LinearOpMode {
                         robot.intakeSystem.intakeGrabberServo.setPosition(robot.intakeSystem.GRABBER_FULL_OPEN); //fully open input
 
                         //re-extend output flipper
-                        outputArmServoMovementProcess = OutputArmServoMovementProcess.MOVING_TO_MIDDLE;
+                        robot.cascadeOutputSystem.stepArmTowardTarget(CascadeOutputSystem.OutputArmPosition.MIDDLE);
+
                         bState = BProcess.ENDING; //go to next stage
                         bProcessTimer.reset();
                     }
                     break;
                 case ENDING:
                     //wait for re-extension, then ...
-                    if (outputArmServoMovementProcess == OutputArmServoMovementProcess.AT_TARGET_POSITION) {
+                    if (robot.cascadeOutputSystem.stepArmTowardTarget(CascadeOutputSystem.OutputArmPosition.MIDDLE)) {
                         //update robot state
-                        outputArmState = OutputArmState.MIDDLE;
+                        outputArmRestricted = false;
                         outputState = IOState.CLOSED;
                         inputState = IOState.OPEN;
                         bState = BProcess.NOT_STARTED; //back to start
@@ -267,7 +252,7 @@ public class   MecanumTeleNoCascade  extends LinearOpMode {
                         outputState = IOState.CLOSED;
                         break;
                     case CLOSED:
-                        if (outputArmState == OutputArmState.UP) {
+                        if (robot.cascadeOutputSystem.getOutputArmPosition().equals(CascadeOutputSystem.OutputArmPosition.UP)) {
                             robot.cascadeOutputSystem.outputGrabberServo.setPosition(robot.cascadeOutputSystem.GRABBER_RECEIVE);
                             sleep(200);
                         }
@@ -283,67 +268,56 @@ public class   MecanumTeleNoCascade  extends LinearOpMode {
 
             /////D-Pad/////
             //UP DOWN Y
-            switch (outputArmState) {
-                case RETRACTED:
-                    if (yC&&!yP) {
-                        //robot.cascadeOutputSystem.outputArmServo.setPosition(robot.cascadeOutputSystem.ARM_EXTENDED_MIDDLE); //extend MIDDLE
-                        outputArmServoMovementProcess = OutputArmServoMovementProcess.MOVING_TO_MIDDLE;
-                        outputArmState = OutputArmState.MIDDLE;
-                    }
-                    break;
-                case UP:
-                    if (upC&&!upP) {
-                        //robot.cascadeOutputSystem.outputArmServo.setPosition(robot.cascadeOutputSystem.ARM_EXTENDED_DOWN); //down
-                        outputArmServoMovementProcess = OutputArmServoMovementProcess.MOVING_TO_DOWN;
-                        outputArmState = OutputArmState.DOWN;
-                    } else if (downC&&!downP) {
-                        //robot.cascadeOutputSystem.outputArmServo.setPosition(robot.cascadeOutputSystem.ARM_EXTENDED_MIDDLE); //MIDDLE
-                        outputArmServoMovementProcess = OutputArmServoMovementProcess.MOVING_TO_MIDDLE;
-                        outputArmState = OutputArmState.MIDDLE;
-                    } else if (yC&&!yP) {
+            if (!outputArmRestricted) {
+                switch (robot.cascadeOutputSystem.getOutputArmPosition()) {
+                    case RETRACTED:
+                        if (yC && !yP) {
+                            //robot.cascadeOutputSystem.outputArmServo.setPosition(robot.cascadeOutputSystem.ARM_EXTENDED_MIDDLE); //extend MIDDLE
+                            robot.cascadeOutputSystem.stepArmTowardTarget(CascadeOutputSystem.OutputArmPosition.MIDDLE);
+                        }
+                        break;
+                    case UP:
+                        if (upC && !upP) {
+                            //robot.cascadeOutputSystem.outputArmServo.setPosition(robot.cascadeOutputSystem.ARM_EXTENDED_DOWN); //down
+                            robot.cascadeOutputSystem.stepArmTowardTarget(CascadeOutputSystem.OutputArmPosition.DOWN);
+                        } else if (downC && !downP) {
+                            //robot.cascadeOutputSystem.outputArmServo.setPosition(robot.cascadeOutputSystem.ARM_EXTENDED_MIDDLE); //MIDDLE
+                            robot.cascadeOutputSystem.stepArmTowardTarget(CascadeOutputSystem.OutputArmPosition.MIDDLE);
+                        } else if (yC && !yP) {
+                            //robot.cascadeOutputSystem.outputArmServo.setPosition(robot.cascadeOutputSystem.ARM_RETRACTED); //retract
+                            robot.cascadeOutputSystem.stepArmTowardTarget(CascadeOutputSystem.OutputArmPosition.RETRACTED);
+                        }
+                        break;
+                    case MIDDLE:
+                        if (upC && !upP) {
+                            //robot.cascadeOutputSystem.outputArmServo.setPosition(robot.cascadeOutputSystem.ARM_EXTENDED_UP); //up
+                            robot.cascadeOutputSystem.stepArmTowardTarget(CascadeOutputSystem.OutputArmPosition.UP);
+                        } else if (downC && !downP) {
+                            //robot.cascadeOutputSystem.outputArmServo.setPosition(robot.cascadeOutputSystem.ARM_EXTENDED_DOWN); //down
+                            robot.cascadeOutputSystem.stepArmTowardTarget(CascadeOutputSystem.OutputArmPosition.DOWN);
+                        } else if (yC && !yP) {
+                            //robot.cascadeOutputSystem.outputArmServo.setPosition(robot.cascadeOutputSystem.ARM_RETRACTED); //retract
+                            robot.cascadeOutputSystem.stepArmTowardTarget(CascadeOutputSystem.OutputArmPosition.RETRACTED);
+                        }
+                        break;
+                    case DOWN:
+                        if (upC && !upP) {
+                            //robot.cascadeOutputSystem.outputArmServo.setPosition(robot.cascadeOutputSystem.ARM_EXTENDED_MIDDLE); //MIDDLE
+                            robot.cascadeOutputSystem.stepArmTowardTarget(CascadeOutputSystem.OutputArmPosition.MIDDLE);
+                        } else if (downC && !downP) {
+                            //robot.cascadeOutputSystem.outputArmServo.setPosition(robot.cascadeOutputSystem.ARM_EXTENDED_UP); //up
+                            robot.cascadeOutputSystem.stepArmTowardTarget(CascadeOutputSystem.OutputArmPosition.UP);
+                        } else if (yC && !yP) {
+                            //robot.cascadeOutputSystem.outputArmServo.setPosition(robot.cascadeOutputSystem.ARM_RETRACTED); //retract
+                            robot.cascadeOutputSystem.stepArmTowardTarget(CascadeOutputSystem.OutputArmPosition.RETRACTED);
+                        }
+                        break;
+                    default:
+                        //should never be reached, output flipper state should never be null
                         //robot.cascadeOutputSystem.outputArmServo.setPosition(robot.cascadeOutputSystem.ARM_RETRACTED); //retract
-                        outputArmServoMovementProcess = OutputArmServoMovementProcess.MOVING_TO_RETRACTED;
-                        outputArmState = OutputArmState.RETRACTED;
-                    }
-                    break;
-                case MIDDLE:
-                    if (upC&&!upP) {
-                        //robot.cascadeOutputSystem.outputArmServo.setPosition(robot.cascadeOutputSystem.ARM_EXTENDED_UP); //up
-                        outputArmServoMovementProcess = OutputArmServoMovementProcess.MOVING_TO_UP;
-                        outputArmState = OutputArmState.UP;
-                    } else if (downC&&!downP) {
-                        //robot.cascadeOutputSystem.outputArmServo.setPosition(robot.cascadeOutputSystem.ARM_EXTENDED_DOWN); //down
-                        outputArmServoMovementProcess = OutputArmServoMovementProcess.MOVING_TO_DOWN;
-                        outputArmState = OutputArmState.DOWN;
-                    } else if (yC&&!yP) {
-                        //robot.cascadeOutputSystem.outputArmServo.setPosition(robot.cascadeOutputSystem.ARM_RETRACTED); //retract
-                        outputArmServoMovementProcess = OutputArmServoMovementProcess.MOVING_TO_RETRACTED;
-                        outputArmState = OutputArmState.RETRACTED;
-                    }
-                    break;
-                case DOWN:
-                    if (upC&&!upP) {
-                        //robot.cascadeOutputSystem.outputArmServo.setPosition(robot.cascadeOutputSystem.ARM_EXTENDED_MIDDLE); //MIDDLE
-                        outputArmServoMovementProcess = OutputArmServoMovementProcess.MOVING_TO_MIDDLE;
-                        outputArmState = OutputArmState.MIDDLE;
-                    } else if (downC&&!downP) {
-                        //robot.cascadeOutputSystem.outputArmServo.setPosition(robot.cascadeOutputSystem.ARM_EXTENDED_UP); //up
-                        outputArmServoMovementProcess = OutputArmServoMovementProcess.MOVING_TO_UP;
-                        outputArmState = OutputArmState.UP;
-                    } else if (yC&&!yP) {
-                        //robot.cascadeOutputSystem.outputArmServo.setPosition(robot.cascadeOutputSystem.ARM_RETRACTED); //retract
-                        outputArmServoMovementProcess = OutputArmServoMovementProcess.MOVING_TO_RETRACTED;
-                        outputArmState = OutputArmState.RETRACTED;
-                    }
-                    break;
-                case RESTRICTED:
-                    break;
-                default:
-                    //should never be reached, output flipper state should never be null
-                    //robot.cascadeOutputSystem.outputArmServo.setPosition(robot.cascadeOutputSystem.ARM_RETRACTED); //retract
-                    outputArmServoMovementProcess = OutputArmServoMovementProcess.MOVING_TO_RETRACTED;
-                    outputArmState = OutputArmState.RETRACTED;
-                    break;
+                        robot.cascadeOutputSystem.stepArmTowardTarget(CascadeOutputSystem.OutputArmPosition.RETRACTED);
+                        break;
+                }
             }
 
             //LEFT
@@ -356,58 +330,8 @@ public class   MecanumTeleNoCascade  extends LinearOpMode {
             }
             else robot.turntableMotor.setPower(0);
 
-            //TODO: maybe extract this to the cascadeOutputSystem.java class
-            //switch that handles stepping of servo movement
-            switch (outputArmServoMovementProcess) {
-                case AT_TARGET_POSITION:
-                    break;
-                case MOVING_TO_RETRACTED:
-                    if ((int)servoTimer.milliseconds() >= robot.SERVO_STEP_TIME) { //step time elapsed
-                        //do next step (in if header)
-                        if (robot.stepServoTowardTarget(robot.cascadeOutputSystem.outputArmServo,robot.cascadeOutputSystem.ARM_RETRACTED,robot.SERVO_STEP_SIZE)) {
-                            //if at final position
-                            outputArmServoMovementProcess = OutputArmServoMovementProcess.ENDING;
-                        } else servoTimer.reset();
-                        break;
-                    }
-                    break;
-                case MOVING_TO_UP:
-                    if ((int)servoTimer.milliseconds() >= robot.SERVO_STEP_TIME) { //step time elapsed
-                        //do next step (in if header)
-                        if (robot.stepServoTowardTarget(robot.cascadeOutputSystem.outputArmServo,robot.cascadeOutputSystem.ARM_EXTENDED_UP,robot.SERVO_STEP_SIZE)) {
-                            //if at final position
-                            outputArmServoMovementProcess = OutputArmServoMovementProcess.ENDING;
-                        } else servoTimer.reset();
-                        break;
-                    }
-                    break;
-                case MOVING_TO_MIDDLE:
-                    if ((int)servoTimer.milliseconds() >= robot.SERVO_STEP_TIME) { //step time elapsed
-                        //do next step (in if header)
-                        if (robot.stepServoTowardTarget(robot.cascadeOutputSystem.outputArmServo,robot.cascadeOutputSystem.ARM_EXTENDED_MIDDLE,robot.SERVO_STEP_SIZE)) {
-                            //if at final position
-                            outputArmServoMovementProcess = OutputArmServoMovementProcess.ENDING;
-                        } else servoTimer.reset();
-                        break;
-                    }
-                    break;
-                case MOVING_TO_DOWN:
-                    if ((int)servoTimer.milliseconds() >= robot.SERVO_STEP_TIME) { //step time elapsed
-                        //do next step (in if header)
-                        if (robot.stepServoTowardTarget(robot.cascadeOutputSystem.outputArmServo,robot.cascadeOutputSystem.ARM_EXTENDED_DOWN,robot.SERVO_STEP_SIZE)) {
-                            //if at final position
-                            outputArmServoMovementProcess = OutputArmServoMovementProcess.ENDING;
-                        } else servoTimer.reset();
-                        break;
-                    }
-                    break;
-                case ENDING:
-                    outputArmServoMovementProcess = OutputArmServoMovementProcess.AT_TARGET_POSITION;
-                    break;
-            }
-
             //telemetry on robot state
-            runTelemetry(outputArmState, outputState, inputState, aState, bState);
+            runTelemetry(robot.cascadeOutputSystem.getOutputArmPosition(), outputState, inputState, aState, bState);
 
             //update button locks
             aP=aC;
@@ -422,7 +346,7 @@ public class   MecanumTeleNoCascade  extends LinearOpMode {
     }
 
     ////////////other methods and whatnot below here////////////
-    public void runTelemetry(OutputArmState outputArmState, IOState outputState, IOState inputState, AProcess aState, BProcess bState) {
+    public void runTelemetry(CascadeOutputSystem.OutputArmPosition outputArmState, IOState outputState, IOState inputState, AProcess aState, BProcess bState) {
         telemetry.addLine("---====STATES====---");
         telemetry.addData("Output Arm: ", outputArmState.toString());
         telemetry.addData("Output: ", outputState.toString());

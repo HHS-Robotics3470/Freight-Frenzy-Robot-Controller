@@ -1,14 +1,13 @@
 package org.firstinspires.ftc.teamcode.Components;
 
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareDevice;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.MotorControlAlgorithm;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.Utility.Util;
+import org.firstinspires.ftc.teamcode.Hardware;
+import org.firstinspires.ftc.teamcode.MecanumTeleNoCascade;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -16,6 +15,13 @@ import java.util.List;
 public class CascadeOutputSystem implements Component {
     //TODO: encapsulation, and integrate the state enums from MecanumTeleOp.java
     ////////////////////////////// class variables //////////////////////////////
+    public enum OutputArmPosition {
+        RETRACTED,
+        UP,
+        MIDDLE,
+        DOWN
+    }
+
     //**info, measurements, known positions, etc.**//
     //cascade kit / linear extrusion
     public final int CASCADE_EXTENDED = 2150;
@@ -39,13 +45,17 @@ public class CascadeOutputSystem implements Component {
     //Default:
     // p: 10
     // i: 3
-    public PIDFCoefficients velocityPIDFCoefficients = new PIDFCoefficients(1.3884311033898306,0.13884311033898306,0,13.884311033898306); //using values from drivetrain rn
-    public PIDFCoefficients positionPIDFCoefficients = new PIDFCoefficients(5,0,0,0); //TODO: initialize this once PIDF coefficients are known
-    public int targetPositionTolerance = 25;
+    //public PIDFCoefficients velocityPIDFCoefficients = new PIDFCoefficients(1.3884311033898306,0.13884311033898306,0,13.884311033898306); //using values from drivetrain rn
+    //public PIDFCoefficients positionPIDFCoefficients = new PIDFCoefficients(5,0,0,0); //TODO: initialize this once PIDF coefficients are known
+    //public int targetPositionTolerance = 25;
 
     /* --Public OpMode members.-- */
-    public Servo outputGrabberServo, outputArmServo;
-    public DcMotorEx cascadeLiftMotor;
+    public Servo outputGrabberServo;
+    private Servo outputArmServo; //private so that it can only be controlled with stepper methods
+    //public DcMotorEx cascadeLiftMotor;
+    private OutputArmPosition outputArmPosition;
+    public ElapsedTime servoTimer;
+
 
     /* --local OpMode members.-- */
     HardwareMap hwMap = null;
@@ -58,6 +68,11 @@ public class CascadeOutputSystem implements Component {
     public void init(HardwareMap ahwMap) {
         // Save reference to Hardware map
         hwMap = ahwMap;
+
+        //timer and state stuff
+        servoTimer = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
+        servoTimer.reset();
+        outputArmPosition = OutputArmPosition.RETRACTED;
 
         /*initialize hardware components*/
         //SERVOS:
@@ -95,13 +110,54 @@ public class CascadeOutputSystem implements Component {
     public List<HardwareDevice> getAll() {
         List<HardwareDevice> hardwareDeviceList = new LinkedList<>();
         //add all hardware devices in component to hardwareDeviceList
-        hardwareDeviceList.add(cascadeLiftMotor);
+        //hardwareDeviceList.add(cascadeLiftMotor);
         hardwareDeviceList.add(outputGrabberServo);
         hardwareDeviceList.add(outputArmServo);
         return hardwareDeviceList;
     }
 
     ////////////////////////////// Methods //////////////////////////////
+    /**
+     * moves the servo toward target by step, each delayed by stepTime
+     * @param target target position, an enum
+     */
+    public void moveArmToPosition(OutputArmPosition target) {
+        while (!stepArmTowardTarget(target)) {
+            //do nothing, wait
+        }
+    }
+
+
+    /**
+     * steps servo toward the target by 1 step, used in a loop like so:
+     * //in game loop
+     * while (!stepArmTowardTarget(target)) {}
+     * @param targetArmPosition target position
+     * @return true if at target position, false otherwise or if step time (defined in Hardware.java) hasn't elapsed since last call
+     */
+    public boolean stepArmTowardTarget(OutputArmPosition targetArmPosition) {
+        double target;
+        //translate passed targetPosition to corresponding position values
+        switch (targetArmPosition) {
+            case UP: target = ARM_EXTENDED_UP;break;
+            case MIDDLE: target = ARM_EXTENDED_MIDDLE;break;
+            case DOWN: target = ARM_EXTENDED_DOWN;break;
+            case RETRACTED:
+            default: target = ARM_RETRACTED; break;
+        }
+
+        if ((int)servoTimer.milliseconds() >= Hardware.SERVO_STEP_TIME) { //step time elapsed since last call
+            //do next step (in if header)
+            if (Hardware.stepServoTowardTarget(outputArmServo,target,Hardware.SERVO_STEP_SIZE)) {
+                //if at final position
+                outputArmPosition = targetArmPosition;
+                return true;
+            } else servoTimer.reset(); //reset timer for next step
+        }
+        return false;
+    }
+
+    /*
     public void setCascadePower(double power) {
         cascadeLiftMotor.setPower(power);
     }
@@ -112,11 +168,16 @@ public class CascadeOutputSystem implements Component {
         //run motor to target position
         Util.runMotorToPosition(cascadeLiftMotor, targetPosition, power);
     }
-
+    */
     ////////////////////////////// Set Methods //////////////////////////////
 
 
     ////////////////////////////// Get Methods //////////////////////////////
 
-
+    /**
+     * @return outputArmPosition
+     */
+    public OutputArmPosition getOutputArmPosition() {
+        return outputArmPosition;
+    }
 }

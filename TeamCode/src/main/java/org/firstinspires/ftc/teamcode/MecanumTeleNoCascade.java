@@ -95,7 +95,7 @@ public class   MecanumTeleNoCascade  extends LinearOpMode {
             triggers and bumpers: unassigned
 
             ABXY: special functions
-                A: grab item w/ input servo (open/close input servo)
+                A: grab item w/ input servo, press and hold to lower intake and open grip, release to close grip and raise input
                 B: flip intake and drop off in output basket (retract if necessary)
                 X: drop item off (open/close output servo)
                 Y: if output flipper is extended, retract, otherwise extend to MIDDLE
@@ -138,26 +138,19 @@ public class   MecanumTeleNoCascade  extends LinearOpMode {
             //A input
             switch (aState) {
                 case NOT_STARTED:
-                    if (aC&&!aP) {
-                        switch (inputState) {
-                            case OPEN:
-                                robot.intakeSystem.intakeGrabberServo.setPosition(robot.intakeSystem.GRABBER_CLOSED);
-                                inputState = IOState.CLOSED;
-                                //set up for rest of the states
-                                aState = AProcess.IN_PROGRESS;
-                                inputTimer.reset();
-                                break;
-                            case CLOSED:
-                                robot.intakeSystem.intakeGrabberServo.setPosition(robot.intakeSystem.GRABBER_FULL_OPEN);
-                                inputState = IOState.OPEN;
-                                //skip to end
-                                robot.intakeSystem.intakeArmServo.setPosition(robot.intakeSystem.ARM_DOWN);
-                                aState = AProcess.ENDED;
-                                break;
-                            default:
-                                break;
-                        }
-
+                    if (aC&&!aP) { //on button press, lower arm
+                        robot.intakeSystem.intakeGrabberServo.setPosition(robot.intakeSystem.GRABBER_FULL_OPEN);
+                        inputState = IOState.OPEN;
+                        //skip to end
+                        robot.intakeSystem.intakeArmServo.setPosition(robot.intakeSystem.ARM_DOWN);
+                        aState = AProcess.ENDED;
+                    }
+                    else if (aP&&!aC) { //on button release, raise arm again
+                        robot.intakeSystem.intakeGrabberServo.setPosition(robot.intakeSystem.GRABBER_CLOSED);
+                        inputState = IOState.CLOSED;
+                        //set up for rest of the states
+                        aState = AProcess.IN_PROGRESS;
+                        inputTimer.reset();
                     }
                     break;
                 case IN_PROGRESS:

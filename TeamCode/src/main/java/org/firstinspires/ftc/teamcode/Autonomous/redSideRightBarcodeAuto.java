@@ -13,7 +13,7 @@ import org.firstinspires.ftc.teamcode.Components.CascadeOutputSystem;
  */
 @Autonomous(name="remote comp auto EXP", group="Needs Calibration" )
 //@Disabled //this line disables the autonomous from appearing on the driver station, remove it for your code
-public class remoteEventNoCascadeAuto  extends org.firstinspires.ftc.teamcode.Autonomous.Autonomous {
+public class redSideRightBarcodeAuto extends org.firstinspires.ftc.teamcode.Autonomous.Autonomous {
 
     /*declare OpMode members, initialize some classes*/
     //Hardware robot          = new Hardware(); // moved to superclass

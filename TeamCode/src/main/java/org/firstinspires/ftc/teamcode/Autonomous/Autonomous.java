@@ -29,51 +29,27 @@ public abstract class Autonomous extends LinearOpMode {
     }
     Hardware robot          = new Hardware();
 
-    //gameplan
-    //TODO: there is not frieght on the other barcodes, remove references to it
+    //game-plan
     /*
-    assuming we start in the spot closer to the warehouse:
-    1) (freight) max 26pts
-    6pts for delivering the pre-loaded box to the shipping hub + (10pts if we use the duck, 20pts if we use the team-shipping element (we choose if they use the duck or the team shipping element to determine the level))
-    -using vuforia, determine which level the pre-loaded element needs to be put onto
-    -move to the shipping hub
-    -place the pre-load box onto the shipping hub, on the level previously determined
-
-    2) other freight, max 12 pts
-    -move up to first piece of freight
-    -collect
-    -move equivalent distance as step 2.1, but opposite direction, back to in line w/ shipping hub
-    -move over to shipping hub and deposit (6pts each time)
-    -move equivalent distance as step 2.4, but opposite direction
-    -repeat 2.1-2.5 but for second piece of freight
-
-
-    3) (parking) max 10pts
-    -park COMPLETELY in the warehouse closest to our alliance shipping hub (10pts) NOTE:
-
     autonomous steps:
-    assuming we start in the spot closer to the carousel:
     1) (freight) max 26pts
     6pts for delivering the pre-loaded box to the shipping hub + (10pts if we use the duck, 20pts if we use the team-shipping element (we choose if they use the duck or the team shipping element to determine the level))
     -using vuforia, determine which level the pre-loaded element needs to be put onto
     -move to the shipping hub
     -place the pre-load box onto the shipping hub, on the level previously determined
 
-    2) other freight, max 4 pts
-    -move up to first piece of freight
-    -collect
-    -move equivalent distance as step 2.1, but opposite direction, back to in line w/ shipping hub
-    -move over to shipping hub and deposit
-    -move equivalent distance as step 2.4, but opposite direction
-    -repeat 2.1-2.5 but for second piece of freight
+    2) turntable, max 10 pts
+    -strafe to the turntable
+    -turn turntable
 
-    3) (carousel) max 10 pts
-    -move to the corner w/ the carousel
-    -spin the carousel until the duck comes off
-
-    4) (parking) max 6pts
-    -park COMPLETELY in the alliance storage unit (6pts) NOTE: one of the vu-marks is in the middle of the storage unit (on the wall)
-     */
+    if going to park in warehouse:
+        -strafe back
+        3) (parking) max 10pts
+        -park COMPLETELY in the warehouse closest to our alliance shipping hub (10pts)
+    else:
+        4) (parking) max 6pts
+        -park COMPLETELY in the alliance storage unit (6pts) NOTE: one of the vu-marks is in the middle of the storage unit (on the wall)
+*/
 
 
     ///Methods///

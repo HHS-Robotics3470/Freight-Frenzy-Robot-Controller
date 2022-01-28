@@ -41,6 +41,11 @@ public class redWareSideWarehouseParkAuto extends org.firstinspires.ftc.teamcode
         double driveXLevel2   = 0.4056+.1;
         double driveXStep1_3   = 0.2032; //around 8 in
 
+        double rotateStep2_1 = pi; //180 degrees
+        double driveXStep2_1 = 0.6;// go up to wall
+        double driveYStep2_1 = 1.8288; //strafe to turntable
+        double driveYStep2_2 = 0.05; //final touches, get right up to the turntable, slower
+
         double driveYStep3_1 = 1.8288;//6 ft
 
         //directions for various movements
@@ -150,7 +155,12 @@ public class redWareSideWarehouseParkAuto extends org.firstinspires.ftc.teamcode
 
         /*step 2*/
         //step 2.1
+        //facing: -> needs to face: <-
+        robot.driveTrain.rotateByAngle(rotateStep2_1, movementSpeed/3.0);
+        //facing <= needs to move =>
+        robot.driveTrain.strafeToDistance(movementSpeed,-pi/2.0,driveXStep2_1);
 
+        robot.driveTrain.strafeToDistance(movementSpeed,pi,driveYStep2_1);
         //step 2.2
 
         //step 2.3
@@ -163,7 +173,7 @@ public class redWareSideWarehouseParkAuto extends org.firstinspires.ftc.teamcode
         //strafe into the warehouse and end
         //rotate to face warehouse
         //robot facing: ->      needs to face:  ^
-        robot.driveTrain.rotateByAngle(pi/2.0, movementSpeed/4);
+        robot.driveTrain.rotateByAngle(pi/2.0, movementSpeed/4.0);
 
         //y+ movement into warehouse
         //robot facing: ^       needs to move:  ^

@@ -54,6 +54,7 @@ public class CascadeOutputSystem implements Component {
     private Servo outputArmServo; //private so that it can only be controlled with stepper methods
     //public DcMotorEx cascadeLiftMotor;
     private OutputArmPosition outputArmPosition;
+    private OutputArmPosition outputArmTarget;
     public ElapsedTime servoTimer;
 
 
@@ -73,6 +74,7 @@ public class CascadeOutputSystem implements Component {
         servoTimer = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
         servoTimer.reset();
         outputArmPosition = OutputArmPosition.RETRACTED;
+        outputArmTarget = OutputArmPosition.RETRACTED;
 
         /*initialize hardware components*/
         //SERVOS:
@@ -117,17 +119,32 @@ public class CascadeOutputSystem implements Component {
     }
 
     ////////////////////////////// Methods //////////////////////////////
+
+    /**
+     * moves the servo toward a previously set target by step, each delayed by stepTime
+     */
+    public void moveArmToTarget() {
+        moveArmToTarget(outputArmTarget);
+    }
     /**
      * moves the servo toward target by step, each delayed by stepTime
      * @param target target position, an enum
      */
-    public void moveArmToPosition(OutputArmPosition target) {
+    public void moveArmToTarget(OutputArmPosition target) {
         while (!stepArmTowardTarget(target)) {
             //do nothing, wait
         }
     }
 
 
+    /**
+     * steps servo toward a previously set target by 1 step, used in a loop like so: while (!stepArmTowardTarget()) {}
+     * use the setTarget() method to set the target
+     * @return true if at target position, false otherwise or if step time (defined in Hardware.java) hasn't elapsed since last call
+     */
+    public boolean stepArmTowardTarget() {
+        return stepArmTowardTarget(outputArmTarget);
+    }
     /**
      * steps servo toward the target by 1 step, used in a loop like so:
      * //in game loop
@@ -151,6 +168,7 @@ public class CascadeOutputSystem implements Component {
             if (Hardware.stepServoTowardTarget(outputArmServo,target,Hardware.SERVO_STEP_SIZE)) {
                 //if at final position
                 outputArmPosition = targetArmPosition;
+
                 return true;
             } else servoTimer.reset(); //reset timer for next step
         }
@@ -171,11 +189,24 @@ public class CascadeOutputSystem implements Component {
     */
     ////////////////////////////// Set Methods //////////////////////////////
 
+    /**
+     * @param outputArmTarget new target state for the servo
+     */
+    public void setOutputArmTarget(OutputArmPosition outputArmTarget) {
+        this.outputArmTarget = outputArmTarget;
+    }
 
     ////////////////////////////// Get Methods //////////////////////////////
 
     /**
-     * @return outputArmPosition
+     * @return outputArmTarget, target state of the servo
+     */
+    public OutputArmPosition getOutputArmTarget() {
+        return outputArmTarget;
+    }
+
+    /**
+     * @return outputArmPosition, current state of the servo
      */
     public OutputArmPosition getOutputArmPosition() {
         return outputArmPosition;

@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.Autonomous;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.Components.CascadeOutputSystem;
 
@@ -112,13 +111,13 @@ public class redSideRightBarcodeAuto extends org.firstinspires.ftc.teamcode.Auto
         //extend output flipping arm to proper level
         switch (level) {
             case 1: //middle
-                robot.cascadeOutputSystem.moveArmToPosition(CascadeOutputSystem.OutputArmPosition.MIDDLE);
+                robot.cascadeOutputSystem.moveArmToTarget(CascadeOutputSystem.OutputArmPosition.MIDDLE);
                 //robot facing: =>      needs to move:  <=
                 robot.driveTrain.strafeToDistance(movementSpeed, -pi/2, driveXLevel1);
                 break;
             case 2: //top
                 //move servo to position
-                robot.cascadeOutputSystem.moveArmToPosition(CascadeOutputSystem.OutputArmPosition.UP);
+                robot.cascadeOutputSystem.moveArmToTarget(CascadeOutputSystem.OutputArmPosition.UP);
                 //move forward a bit to reach the top thing
                 //robot facing =>   needs to move <=
                 robot.driveTrain.strafeToDistance(movementSpeed, -pi/2, driveXLevel2);
@@ -130,7 +129,7 @@ public class redSideRightBarcodeAuto extends org.firstinspires.ftc.teamcode.Auto
             case 0: //bottom and default
             default:
                 //move servo to position
-                robot.cascadeOutputSystem.moveArmToPosition(CascadeOutputSystem.OutputArmPosition.DOWN);
+                robot.cascadeOutputSystem.moveArmToTarget(CascadeOutputSystem.OutputArmPosition.DOWN);
                 //robot facing =>   needs to move <=
                 robot.driveTrain.strafeToDistance(movementSpeed, -pi/2, driveXLevel0);
                 break;
@@ -149,7 +148,7 @@ public class redSideRightBarcodeAuto extends org.firstinspires.ftc.teamcode.Auto
         robot.intakeSystem.intakeArmServo.setPosition(robot.intakeSystem.ARM_RAISED);
         robot.intakeSystem.intakeGrabberServo.setPosition(robot.intakeSystem.GRABBER_FULL_OPEN);
         //move servo to position
-        robot.cascadeOutputSystem.moveArmToPosition(CascadeOutputSystem.OutputArmPosition.RETRACTED);
+        robot.cascadeOutputSystem.moveArmToTarget(CascadeOutputSystem.OutputArmPosition.RETRACTED);
 
         /*step 2*/
         //step 2.1

@@ -67,6 +67,7 @@ public class   MecanumTeleNoCascade  extends LinearOpMode {
         //other
         //CascadeOutputSystem.OutputArmPosition tempOutArmPos;
         boolean outputArmRestricted = false;
+        boolean outputArmAtTarget = false; //output of robot.cascadeOutputSystem.stepArmTowardTarget()
         //int cascadeCount = 0;
 
         /* Initialize the hardware variables.
@@ -180,7 +181,7 @@ public class   MecanumTeleNoCascade  extends LinearOpMode {
 
                         //retract
                         //robot.cascadeOutputSystem.outputArmServo.setPosition(robot.cascadeOutputSystem.ARM_RETRACTED);//fold back
-                        robot.cascadeOutputSystem.stepArmTowardTarget(CascadeOutputSystem.OutputArmPosition.RETRACTED);
+                        robot.cascadeOutputSystem.setOutputArmTarget(CascadeOutputSystem.OutputArmPosition.RETRACTED);
 
                         //restrict relevant systems
                         inputState = IOState.RESTRICTED;
@@ -192,7 +193,7 @@ public class   MecanumTeleNoCascade  extends LinearOpMode {
                     break;
                 case STAGE_ONE:
                     //wait for retraction
-                    if (robot.cascadeOutputSystem.stepArmTowardTarget(CascadeOutputSystem.OutputArmPosition.RETRACTED)) {
+                    if (outputArmAtTarget) {
                         //raise front input flipper to drop off element
                         robot.intakeSystem.intakeArmServo.setPosition(robot.intakeSystem.ARM_UP);
                         bState = BProcess.STAGE_TWO; //go to next stage
@@ -216,7 +217,7 @@ public class   MecanumTeleNoCascade  extends LinearOpMode {
                         robot.intakeSystem.intakeGrabberServo.setPosition(robot.intakeSystem.GRABBER_FULL_OPEN); //fully open input
 
                         //re-extend output flipper
-                        robot.cascadeOutputSystem.stepArmTowardTarget(CascadeOutputSystem.OutputArmPosition.MIDDLE);
+                        robot.cascadeOutputSystem.setOutputArmTarget(CascadeOutputSystem.OutputArmPosition.MIDDLE);
 
                         bState = BProcess.ENDING; //go to next stage
                         bProcessTimer.reset();
@@ -224,7 +225,7 @@ public class   MecanumTeleNoCascade  extends LinearOpMode {
                     break;
                 case ENDING:
                     //wait for re-extension, then ...
-                    if (robot.cascadeOutputSystem.stepArmTowardTarget(CascadeOutputSystem.OutputArmPosition.MIDDLE)) {
+                    if (outputArmAtTarget) {
                         //update robot state
                         outputArmRestricted = false;
                         outputState = IOState.CLOSED;
@@ -266,52 +267,54 @@ public class   MecanumTeleNoCascade  extends LinearOpMode {
                     case RETRACTED:
                         if (yC && !yP) {
                             //robot.cascadeOutputSystem.outputArmServo.setPosition(robot.cascadeOutputSystem.ARM_EXTENDED_MIDDLE); //extend MIDDLE
-                            robot.cascadeOutputSystem.stepArmTowardTarget(CascadeOutputSystem.OutputArmPosition.MIDDLE);
+                            robot.cascadeOutputSystem.setOutputArmTarget(CascadeOutputSystem.OutputArmPosition.MIDDLE);
                         }
                         break;
                     case UP:
                         if (upC && !upP) {
                             //robot.cascadeOutputSystem.outputArmServo.setPosition(robot.cascadeOutputSystem.ARM_EXTENDED_DOWN); //down
-                            robot.cascadeOutputSystem.stepArmTowardTarget(CascadeOutputSystem.OutputArmPosition.DOWN);
+                            robot.cascadeOutputSystem.setOutputArmTarget(CascadeOutputSystem.OutputArmPosition.DOWN);
                         } else if (downC && !downP) {
                             //robot.cascadeOutputSystem.outputArmServo.setPosition(robot.cascadeOutputSystem.ARM_EXTENDED_MIDDLE); //MIDDLE
-                            robot.cascadeOutputSystem.stepArmTowardTarget(CascadeOutputSystem.OutputArmPosition.MIDDLE);
+                            robot.cascadeOutputSystem.setOutputArmTarget(CascadeOutputSystem.OutputArmPosition.MIDDLE);
                         } else if (yC && !yP) {
                             //robot.cascadeOutputSystem.outputArmServo.setPosition(robot.cascadeOutputSystem.ARM_RETRACTED); //retract
-                            robot.cascadeOutputSystem.stepArmTowardTarget(CascadeOutputSystem.OutputArmPosition.RETRACTED);
+                            robot.cascadeOutputSystem.setOutputArmTarget(CascadeOutputSystem.OutputArmPosition.RETRACTED);
                         }
                         break;
                     case MIDDLE:
                         if (upC && !upP) {
                             //robot.cascadeOutputSystem.outputArmServo.setPosition(robot.cascadeOutputSystem.ARM_EXTENDED_UP); //up
-                            robot.cascadeOutputSystem.stepArmTowardTarget(CascadeOutputSystem.OutputArmPosition.UP);
+                            robot.cascadeOutputSystem.setOutputArmTarget(CascadeOutputSystem.OutputArmPosition.UP);
                         } else if (downC && !downP) {
                             //robot.cascadeOutputSystem.outputArmServo.setPosition(robot.cascadeOutputSystem.ARM_EXTENDED_DOWN); //down
-                            robot.cascadeOutputSystem.stepArmTowardTarget(CascadeOutputSystem.OutputArmPosition.DOWN);
+                            robot.cascadeOutputSystem.setOutputArmTarget(CascadeOutputSystem.OutputArmPosition.DOWN);
                         } else if (yC && !yP) {
                             //robot.cascadeOutputSystem.outputArmServo.setPosition(robot.cascadeOutputSystem.ARM_RETRACTED); //retract
-                            robot.cascadeOutputSystem.stepArmTowardTarget(CascadeOutputSystem.OutputArmPosition.RETRACTED);
+                            robot.cascadeOutputSystem.setOutputArmTarget(CascadeOutputSystem.OutputArmPosition.RETRACTED);
                         }
                         break;
                     case DOWN:
                         if (upC && !upP) {
                             //robot.cascadeOutputSystem.outputArmServo.setPosition(robot.cascadeOutputSystem.ARM_EXTENDED_MIDDLE); //MIDDLE
-                            robot.cascadeOutputSystem.stepArmTowardTarget(CascadeOutputSystem.OutputArmPosition.MIDDLE);
+                            robot.cascadeOutputSystem.setOutputArmTarget(CascadeOutputSystem.OutputArmPosition.MIDDLE);
                         } else if (downC && !downP) {
                             //robot.cascadeOutputSystem.outputArmServo.setPosition(robot.cascadeOutputSystem.ARM_EXTENDED_UP); //up
-                            robot.cascadeOutputSystem.stepArmTowardTarget(CascadeOutputSystem.OutputArmPosition.UP);
+                            robot.cascadeOutputSystem.setOutputArmTarget(CascadeOutputSystem.OutputArmPosition.UP);
                         } else if (yC && !yP) {
                             //robot.cascadeOutputSystem.outputArmServo.setPosition(robot.cascadeOutputSystem.ARM_RETRACTED); //retract
-                            robot.cascadeOutputSystem.stepArmTowardTarget(CascadeOutputSystem.OutputArmPosition.RETRACTED);
+                            robot.cascadeOutputSystem.setOutputArmTarget(CascadeOutputSystem.OutputArmPosition.RETRACTED);
                         }
                         break;
                     default:
                         //should never be reached, output flipper state should never be null
                         //robot.cascadeOutputSystem.outputArmServo.setPosition(robot.cascadeOutputSystem.ARM_RETRACTED); //retract
-                        robot.cascadeOutputSystem.stepArmTowardTarget(CascadeOutputSystem.OutputArmPosition.RETRACTED);
+                        robot.cascadeOutputSystem.setOutputArmTarget(CascadeOutputSystem.OutputArmPosition.RETRACTED);
                         break;
                 }
             }
+            //step output arm toward target
+            outputArmAtTarget = robot.cascadeOutputSystem.stepArmTowardTarget();
 
             //LEFT
             if (gamepad1.dpad_left) {

@@ -49,7 +49,24 @@ public abstract class Autonomous extends LinearOpMode {
     else:
         4) (parking) max 6pts
         -park COMPLETELY in the alliance storage unit (6pts) NOTE: one of the vu-marks is in the middle of the storage unit (on the wall)
-*/
+    */
+    //auto naming conventions
+    /*
+    [alliance][barcode set][parking location]Auto
+
+    [alliance]:
+        -red        : red alliance
+        -blue       : blue alliance
+
+    [barcode set]:
+        -WareSide   : barcode closer to warehouse
+        -ShipSide   : barcode closer to team storage unit
+
+    [parking location]:
+        -WarehousePark  : park in the warehouse
+        -StoragePark    : park in the team storage unit
+
+     */
 
 
     ///Methods///

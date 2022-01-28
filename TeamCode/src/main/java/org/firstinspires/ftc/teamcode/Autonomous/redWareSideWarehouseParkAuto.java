@@ -5,14 +5,14 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import org.firstinspires.ftc.teamcode.Components.CascadeOutputSystem;
 
 /**
- * copied version of BlueWarehouseSideAutonomous.java, changed up to work for the other side,
+ * auto used at remote events, and when we're red alliance, starting on the barcode closest to the warehouse, and parking in the warehouse
  * TODO: calibrate every distance, angle, etc. to be accurate
  * we use this at the remote events
  * @author Anthony Rubick
  */
-@Autonomous(name="remote comp auto EXP", group="Needs Calibration" )
+@Autonomous(name="red WarehouseSide WarehousePark", group="Needs Calibration" )
 //@Disabled //this line disables the autonomous from appearing on the driver station, remove it for your code
-public class blueSideRightBarcodeAuto extends org.firstinspires.ftc.teamcode.Autonomous.Autonomous {
+public class redWareSideWarehouseParkAuto extends org.firstinspires.ftc.teamcode.Autonomous.Autonomous {
 
     /*declare OpMode members, initialize some classes*/
     //Hardware robot          = new Hardware(); // moved to superclass
@@ -27,8 +27,6 @@ public class blueSideRightBarcodeAuto extends org.firstinspires.ftc.teamcode.Aut
         //Variables
         double pi = Math.PI;
         double movementSpeed = 0.8;
-        //TODO: all of these need to be calibrated, measured, tested, etc.
-        // currently they are all either guesses, or make nothing happen
         //level of the shipping hub that the preloaded freight needs to be moved to
         int level; // 0 == bottom, 1 == middle, 2 == top    see appendix D (pg 42) of gm2 for details
         //boolean[] barcodes = {true, true, true};   //is there a freight element in each barcode
@@ -164,11 +162,11 @@ public class blueSideRightBarcodeAuto extends org.firstinspires.ftc.teamcode.Aut
         telemetry.update();
         //strafe into the warehouse and end
         //rotate to face warehouse
-        //robot facing: ->      needs to face:  ▼
-        robot.driveTrain.rotateByAngle(-pi/2.0, movementSpeed/4);
+        //robot facing: ->      needs to face:  ^
+        robot.driveTrain.rotateByAngle(pi/2.0, movementSpeed/4);
 
         //y+ movement into warehouse
-        //robot facing: ▼       needs to move:  ▼
+        //robot facing: ^       needs to move:  ^
         robot.driveTrain.strafeToDistance(movementSpeed, pi/2.0, driveYStep3_1);
 
         while (opModeIsActive()) {}

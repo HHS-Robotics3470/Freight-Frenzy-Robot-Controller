@@ -5,14 +5,14 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import org.firstinspires.ftc.teamcode.Components.CascadeOutputSystem;
 
 /**
- * copied version of BlueWarehouseSideAutonomous.java, changed up to work for the other side,
- * TODO: calibrate every distance, angle, etc. to be accurate
+ * copied version of redWareSideWareHouseParkAuto, changed up to work for the other side,
+ * TODO: change a few things to account for changed field orientation
  * we use this at the remote events
  * @author Anthony Rubick
  */
-@Autonomous(name="remote comp auto EXP", group="Needs Calibration" )
+@Autonomous(name="blue WarehouseSide WarehousePark", group="Needs Calibration" )
 //@Disabled //this line disables the autonomous from appearing on the driver station, remove it for your code
-public class redSideLeftBarcodeAuto extends org.firstinspires.ftc.teamcode.Autonomous.Autonomous {
+public class blueWareSideWarehouseParkAuto extends org.firstinspires.ftc.teamcode.Autonomous.Autonomous {
 
     /*declare OpMode members, initialize some classes*/
     //Hardware robot          = new Hardware(); // moved to superclass
@@ -22,7 +22,7 @@ public class redSideLeftBarcodeAuto extends org.firstinspires.ftc.teamcode.Auton
     @Override
     public void runOpMode()
     {
-        super.setStartPos(StartPos.RED_WAREHOUSE);
+        super.setStartPos(StartPos.BLUE_WAREHOUSE);
         ////////////before driver presses play////////////
         //Variables
         double pi = Math.PI;
@@ -37,7 +37,7 @@ public class redSideLeftBarcodeAuto extends org.firstinspires.ftc.teamcode.Auton
         //index 2, farthest from shipping hub
 
         //distances, in meters, needed for specific movements
-        double driveYStep1_2   = -0.9144;//m
+        double driveYStep1_2   = 0.9144;//m
         double driveXLevel0   = 0.4056;   //m
         double driveXLevel1   = 0.4056;
         double driveXLevel2   = 0.4056+.1;
@@ -164,11 +164,11 @@ public class redSideLeftBarcodeAuto extends org.firstinspires.ftc.teamcode.Auton
         telemetry.update();
         //strafe into the warehouse and end
         //rotate to face warehouse
-        //robot facing: ->      needs to face:  ^
-        robot.driveTrain.rotateByAngle(pi/2.0, movementSpeed/4);
+        //robot facing: ->      needs to face:  ▼
+        robot.driveTrain.rotateByAngle(-pi/2.0, movementSpeed/4);
 
         //y+ movement into warehouse
-        //robot facing: ^       needs to move:  ^
+        //robot facing: ▼       needs to move:  ▼
         robot.driveTrain.strafeToDistance(movementSpeed, pi/2.0, driveYStep3_1);
 
         while (opModeIsActive()) {}

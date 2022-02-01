@@ -112,6 +112,7 @@ public class Hardware implements Component {
 
     //**Motors**//
     public DcMotor turntableMotor; //other motors
+    public static final double TURNTABLE_SPEED = 0.5;
 
     //**Servos**//
 

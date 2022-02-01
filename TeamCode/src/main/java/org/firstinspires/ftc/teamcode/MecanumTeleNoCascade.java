@@ -318,11 +318,11 @@ public class   MecanumTeleNoCascade  extends LinearOpMode {
 
             //LEFT
             if (gamepad1.dpad_left) {
-                robot.turntableMotor.setPower(0.5);
+                robot.turntableMotor.setPower(Hardware.TURNTABLE_SPEED);
             }
             //RIGHT
             else if (gamepad1.dpad_right) {
-                robot.turntableMotor.setPower(-0.5);
+                robot.turntableMotor.setPower(-Hardware.TURNTABLE_SPEED);
             }
             else robot.turntableMotor.setPower(0);
 

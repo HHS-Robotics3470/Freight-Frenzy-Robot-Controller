@@ -78,7 +78,7 @@ public class ServoTester extends LinearOpMode {
             {
                 // set currentServo to the previous index in servo list
                 currIndex--;
-                if (currIndex <= 0) //lower bound
+                if (currIndex < 0) //lower bound
                     currIndex = listSize;
 
                 currentServo = servoList.get(currIndex);
@@ -87,7 +87,7 @@ public class ServoTester extends LinearOpMode {
             {
                 // set currentServo to the next index in servo list
                 currIndex++;
-                if (currIndex >= listSize)
+                if (currIndex > listSize)
                     currIndex = 0;
 
                 currentServo = servoList.get(currIndex);

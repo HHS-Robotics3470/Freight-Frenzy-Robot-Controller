@@ -92,7 +92,7 @@ public class EncoderTester extends LinearOpMode {
             {
                 // set currentMotor to the previous index in motor list
                 currIndex--;
-                if (currIndex <= 0) //lower bound
+                if (currIndex < 0) //lower bound
                     currIndex = listSize;
 
                 currentMotor = motorList.get(currIndex);
@@ -101,7 +101,7 @@ public class EncoderTester extends LinearOpMode {
             {
                 // set currentMotor to the next index in motor list
                 currIndex++;
-                if (currIndex >= listSize)
+                if (currIndex > listSize)
                     currIndex = 0;
 
                 currentMotor = motorList.get(currIndex);

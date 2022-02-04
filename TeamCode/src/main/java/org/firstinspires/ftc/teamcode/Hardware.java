@@ -147,7 +147,7 @@ public class Hardware implements Component {
             (NADO_WHEEL_DIAMETER_METERS * Math.PI);
     public static final double NADO_METERS_PER_COUNT = 1.0 / NADO_COUNTS_PER_METER;
     public static final double SERVO_STEP_SIZE = 0.01; //step size of steps to take [0.0,1.0]
-    public static final int SERVO_STEP_TIME = 100; //time between steps (ms)
+    public static final int SERVO_STEP_TIME = 50; //time between steps (ms)
 
     /* --local OpMode members.-- */
     HardwareMap hwMap           =  null;

@@ -38,7 +38,7 @@ public abstract class Autonomous extends LinearOpMode {
     -move to the shipping hub
     -place the pre-load box onto the shipping hub, on the level previously determined
 
-    2) turntable, max 10 pts
+    2) turntable, max 10 pts NO TURNTABLE IN WAREHOUSE-SIDE START
     -strafe to the turntable
     -turn turntable
 

@@ -83,7 +83,7 @@ public class redWareSideWarehouseParkAuto extends org.firstinspires.ftc.teamcode
         -move to the shipping hub
         -place the pre-load box onto the shipping hub, on the level previously determined
 
-        2) turntable
+        2) turntable NO TURNTABLE IN WAREHOUSE PARK
         -strafe to the turntable
         -turn turntable
         -use wall to re-align
@@ -160,51 +160,6 @@ public class redWareSideWarehouseParkAuto extends org.firstinspires.ftc.teamcode
         //move servo to position
         robot.cascadeOutputSystem.moveArmToTarget(CascadeOutputSystem.OutputArmPosition.RETRACTED);
 
-        /*step 2*/
-        //step 2.1
-        telemetry.addData("level: ", level);
-        telemetry.addData("step: ",2.1);
-        telemetry.update();
-        //facing: -> needs to face: <-
-        robot.driveTrain.rotateByAngle(rotateStep2_1, movementSpeed/3.0);
-        //facing <= needs to move =>
-        robot.driveTrain.strafeToDistance(movementSpeed,-pi/2.0,driveXStep2_1);
-        //facing <= moving V
-        robot.driveTrain.strafeToDistance(movementSpeed,pi,driveYStep2_1);
-
-        //step 2.2
-        telemetry.addData("level: ", level);
-        telemetry.addData("step: ",2.2);
-        telemetry.update();
-        robot.turntableMotor.setPower(Hardware.TURNTABLE_SPEED/2.0);
-        //facing <= moving V
-        robot.driveTrain.strafeToDistance(movementSpeed/2,pi,driveYStep2_2);
-        //turn turntable
-        robot.turntableMotor.setPower(Hardware.TURNTABLE_SPEED);
-        sleep(turntableTimeMS);
-
-        robot.turntableMotor.setPower(0);
-
-        //step 2.3, re-align robot to park in warehouse
-        telemetry.addData("level: ", level);
-        telemetry.addData("step: ",2.3);
-        telemetry.update();
-        //move away from turntable
-        //facing <= moving <=
-        robot.driveTrain.strafeToDistance(movementSpeed,pi/2.0, driveXStep2_3);
-        //rotate
-        //facing <- needs to face ^
-        robot.driveTrain.rotateByAngle(rotateStep2_3,movementSpeed/3.0);
-        //bump into wall to re-align
-        //facing ^ moving v
-        robot.driveTrain.strafeToDistance(movementSpeed,-pi/2.0,driveYStep2_3);
-
-        //step 2.4, move back to middle
-        //facing ^ moving ^
-        robot.driveTrain.strafeToDistance(movementSpeed,pi/2.0,driveYstep2_4);
-        //if parking in storage unit, don't rotate, strafe x- here and end
-
-
         //3.1
         telemetry.addData("level: ", level);
         telemetry.addData("step: ",3.1);
@@ -212,7 +167,7 @@ public class redWareSideWarehouseParkAuto extends org.firstinspires.ftc.teamcode
         //strafe into the warehouse and end
         //rotate to face warehouse
         //robot facing: ->      needs to face:  ^
-        //robot.driveTrain.rotateByAngle(pi/2.0, movementSpeed/4.0);
+        robot.driveTrain.rotateByAngle(pi/2.0, movementSpeed/4.0);
 
         //y+ movement into warehouse
         //robot facing: ^       needs to move:  ^

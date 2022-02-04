@@ -135,6 +135,6 @@ public abstract class Autonomous extends LinearOpMode {
         return level;
     }
 
-    //TODO: maybe something that uses vuforia to find the robots current position?
+    //TODO: vuforia navigation
 
 }

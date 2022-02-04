@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import org.firstinspires.ftc.teamcode.Components.CascadeOutputSystem;
+import org.firstinspires.ftc.teamcode.Hardware;
 
 /**
  * copied version of redWareSideWareHouseParkAuto.java, changed up to work for the other side,
@@ -43,7 +44,15 @@ public class redShipSideShippingParkAuto extends org.firstinspires.ftc.teamcode.
         double driveXLevel2   = 0.4056+.1;
         double driveXStep1_3   = 0.2032; //around 8 in
 
-        double driveYStep3_1 = 1.8288;//6 ft
+        double dist1_2;
+
+        double rotateStep2_1 = pi; //180 degrees
+        double driveYStep2_1 = 1.8288; //strafe to turntable
+        double driveYStep2_2 = 0.15; //final touches, get right up to the turntable, slower
+        int turntableTimeMS = 3000; //time, in ms, to turn the turntable
+        double driveXStep2_3 = 0.3;
+
+        double driveXStep3_1 = 0.9;//6 ft
 
         //directions for various movements
 
@@ -77,12 +86,9 @@ public class redShipSideShippingParkAuto extends org.firstinspires.ftc.teamcode.
         2) turntable
         -strafe to the turntable
         -turn turntable
-        -strafe back
 
         3) (parking) max 10pts
         -park COMPLETELY in the warehouse closest to our alliance shipping hub (10pts)
-
-        TODO: future, grab freight from warehouse and put it in shipping hub
          */
 
         // this one is assuming we start on the blue alliance, in the start position closed to the warehouse
@@ -100,7 +106,7 @@ public class redShipSideShippingParkAuto extends org.firstinspires.ftc.teamcode.
         //move to the shipping hub
 
         //y- movement to be in-line w/ shipping hub
-        //robot facing: =>      needs to move:  V
+        //robot facing: =>      needs to move:  ^
         robot.driveTrain.strafeToDistance(movementSpeed, 0, driveYStep1_2);
 
         //1.3
@@ -111,11 +117,13 @@ public class redShipSideShippingParkAuto extends org.firstinspires.ftc.teamcode.
         //extend output flipping arm to proper level
         switch (level) {
             case 1: //middle
+                dist1_2 = driveXLevel1;
                 robot.cascadeOutputSystem.moveArmToTarget(CascadeOutputSystem.OutputArmPosition.MIDDLE);
                 //robot facing: =>      needs to move:  <=
                 robot.driveTrain.strafeToDistance(movementSpeed, -pi/2, driveXLevel1);
                 break;
             case 2: //top
+                dist1_2 = driveXLevel2;
                 //move servo to position
                 robot.cascadeOutputSystem.moveArmToTarget(CascadeOutputSystem.OutputArmPosition.UP);
                 //move forward a bit to reach the top thing
@@ -128,6 +136,7 @@ public class redShipSideShippingParkAuto extends org.firstinspires.ftc.teamcode.
                 break;
             case 0: //bottom and default
             default:
+                dist1_2 = driveXLevel0;
                 //move servo to position
                 robot.cascadeOutputSystem.moveArmToTarget(CascadeOutputSystem.OutputArmPosition.DOWN);
                 //robot facing =>   needs to move <=
@@ -152,24 +161,43 @@ public class redShipSideShippingParkAuto extends org.firstinspires.ftc.teamcode.
 
         /*step 2*/
         //step 2.1
+        telemetry.addData("level: ", level);
+        telemetry.addData("step: ",2.1);
+        telemetry.update();
+        //y movement to get over to turntable
+        //robot facing: =>       needs to move:  v
+        robot.driveTrain.strafeToDistance(movementSpeed, 0, driveYStep2_1);
 
+        //rotate so wheel is in right place for rotation
+        //robot facing: ->      needs to face:  <-
+        robot.driveTrain.rotateByAngle(rotateStep2_1, movementSpeed/3.0);
+
+        //line up with wall
+        //lower arm so we don't break it
+        robot.intakeSystem.intakeArmServo.setPosition(robot.intakeSystem.ARM_DOWN);
+        //facing <= moving =>
+        robot.driveTrain.strafeToDistance(movementSpeed/2.0, -pi/2.0, dist1_2 - driveXStep1_3);
+
+        //final adjustments to turntable
+        //facing <= moving V
+        robot.driveTrain.strafeToDistance(movementSpeed/4.0, pi, driveYStep2_2);
         //step 2.2
-
-        //step 2.3
-
+        telemetry.addData("level: ", level);
+        telemetry.addData("step: ",2.2);
+        telemetry.update();
+        //turn turntable
+        robot.turntableMotor.setPower(Hardware.TURNTABLE_SPEED);
+        sleep(turntableTimeMS);
+        robot.turntableMotor.setPower(0);
 
         //3.1
         telemetry.addData("level: ", level);
         telemetry.addData("step: ",3.1);
         telemetry.update();
-        //strafe into the warehouse and end
-        //rotate to face warehouse
-        //robot facing: ->      needs to face:  ^
-        robot.driveTrain.rotateByAngle(pi/2.0, movementSpeed/4);
+        //park
+        //robot facing: <=      moving <=
+        robot.driveTrain.strafeToDistance(movementSpeed,pi/2.0,driveXStep2_3);
 
-        //y+ movement into warehouse
-        //robot facing: ^       needs to move:  ^
-        robot.driveTrain.strafeToDistance(movementSpeed, pi/2.0, driveYStep3_1);
 
         while (opModeIsActive()) {}
         ////////////after driver presses stop////////////

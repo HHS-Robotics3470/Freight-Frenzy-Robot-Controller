@@ -24,11 +24,10 @@ public class blueWareSideWarehouseParkAuto extends org.firstinspires.ftc.teamcod
     {
         super.setStartPos(StartPos.BLUE_WAREHOUSE);
         ////////////before driver presses play////////////
+        ////////////before driver presses play////////////
         //Variables
         double pi = Math.PI;
         double movementSpeed = 0.8;
-        //TODO: all of these need to be calibrated, measured, tested, etc.
-        // currently they are all either guesses, or make nothing happen
         //level of the shipping hub that the preloaded freight needs to be moved to
         int level; // 0 == bottom, 1 == middle, 2 == top    see appendix D (pg 42) of gm2 for details
         //boolean[] barcodes = {true, true, true};   //is there a freight element in each barcode
@@ -42,13 +41,27 @@ public class blueWareSideWarehouseParkAuto extends org.firstinspires.ftc.teamcod
         double driveXLevel1   = 0.4056;
         double driveXLevel2   = 0.4056+.1;
         double driveXStep1_3   = 0.2032; //around 8 in
-
-        double driveYStep3_1 = 1.8288;//6 ft
+        double driveYStep3_1 = 1.8288 + 0.2;//m
 
         //directions for various movements
 
 
         //distances, in encoder ticks, needed for specific movements
+
+        /* Initialize the hardware variables.
+         * The init() method of the hardware class does all the work here
+         */
+        robot.init(hardwareMap);
+        robot.initVuforiaAndTfod(hardwareMap);
+
+        // Wait for the game to start (driver presses PLAY)
+        sleep(3000);
+        telemetry.addData(">", "Press Play to start op mode");
+        telemetry.update();
+        waitForStart();
+        //runtime.reset();
+
+        ////////////after driver presses play////////////
 
         /* Initialize the hardware variables.
          * The init() method of the hardware class does all the work here
@@ -74,15 +87,14 @@ public class blueWareSideWarehouseParkAuto extends org.firstinspires.ftc.teamcod
         -move to the shipping hub
         -place the pre-load box onto the shipping hub, on the level previously determined
 
-        2) turntable
+        2) turntable NO TURNTABLE IN WAREHOUSE PARK
         -strafe to the turntable
         -turn turntable
+        -use wall to re-align
         -strafe back
 
         3) (parking) max 10pts
         -park COMPLETELY in the warehouse closest to our alliance shipping hub (10pts)
-
-        TODO: future, grab freight from warehouse and put it in shipping hub
          */
 
         // this one is assuming we start on the blue alliance, in the start position closed to the warehouse
@@ -100,8 +112,8 @@ public class blueWareSideWarehouseParkAuto extends org.firstinspires.ftc.teamcod
         //move to the shipping hub
 
         //y- movement to be in-line w/ shipping hub
-        //robot facing: =>      needs to move:  V
-        robot.driveTrain.strafeToDistance(movementSpeed, 0, driveYStep1_2);
+        //robot facing: <=      needs to move:  V
+        robot.driveTrain.strafeToDistance(movementSpeed, pi, driveYStep1_2);
 
         //1.3
         telemetry.addData("level: ", level);
@@ -112,14 +124,14 @@ public class blueWareSideWarehouseParkAuto extends org.firstinspires.ftc.teamcod
         switch (level) {
             case 1: //middle
                 robot.cascadeOutputSystem.moveArmToTarget(CascadeOutputSystem.OutputArmPosition.MIDDLE);
-                //robot facing: =>      needs to move:  <=
+                //robot facing: <=      needs to move:  =>
                 robot.driveTrain.strafeToDistance(movementSpeed, -pi/2, driveXLevel1);
                 break;
             case 2: //top
                 //move servo to position
                 robot.cascadeOutputSystem.moveArmToTarget(CascadeOutputSystem.OutputArmPosition.UP);
                 //move forward a bit to reach the top thing
-                //robot facing =>   needs to move <=
+                //robot facing <=   needs to move =>
                 robot.driveTrain.strafeToDistance(movementSpeed, -pi/2, driveXLevel2);
                 robot.cascadeOutputSystem.outputGrabberServo.setPosition(robot.cascadeOutputSystem.GRABBER_RECEIVE);
 
@@ -130,7 +142,7 @@ public class blueWareSideWarehouseParkAuto extends org.firstinspires.ftc.teamcod
             default:
                 //move servo to position
                 robot.cascadeOutputSystem.moveArmToTarget(CascadeOutputSystem.OutputArmPosition.DOWN);
-                //robot facing =>   needs to move <=
+                //robot facing <=   needs to move =>
                 robot.driveTrain.strafeToDistance(movementSpeed, -pi/2, driveXLevel0);
                 break;
         }
@@ -140,7 +152,7 @@ public class blueWareSideWarehouseParkAuto extends org.firstinspires.ftc.teamcod
         robot.cascadeOutputSystem.outputGrabberServo.setPosition(robot.cascadeOutputSystem.GRABBER_DROP);
         sleep(250); //give time to move
 
-        //robot facing =>   needs to move =>
+        //robot facing <=   needs to move <=
         robot.driveTrain.strafeToDistance(movementSpeed, pi/2, driveXStep1_3);
         sleep(500);
 
@@ -150,25 +162,17 @@ public class blueWareSideWarehouseParkAuto extends org.firstinspires.ftc.teamcod
         //move servo to position
         robot.cascadeOutputSystem.moveArmToTarget(CascadeOutputSystem.OutputArmPosition.RETRACTED);
 
-        /*step 2*/
-        //step 2.1
-
-        //step 2.2
-
-        //step 2.3
-
-
         //3.1
         telemetry.addData("level: ", level);
         telemetry.addData("step: ",3.1);
         telemetry.update();
         //strafe into the warehouse and end
         //rotate to face warehouse
-        //robot facing: ->      needs to face:  ▼
-        robot.driveTrain.rotateByAngle(-pi/2.0, movementSpeed/4);
+        //robot facing: <-      needs to face:  ^
+        robot.driveTrain.rotateByAngle(-pi/2.0, movementSpeed/4.0);
 
         //y+ movement into warehouse
-        //robot facing: ▼       needs to move:  ▼
+        //robot facing: ^       needs to move:  ^
         robot.driveTrain.strafeToDistance(movementSpeed, pi/2.0, driveYStep3_1);
 
         while (opModeIsActive()) {}

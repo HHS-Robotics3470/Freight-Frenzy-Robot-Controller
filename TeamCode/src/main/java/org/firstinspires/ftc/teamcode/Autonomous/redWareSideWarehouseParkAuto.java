@@ -52,7 +52,7 @@ public class redWareSideWarehouseParkAuto extends org.firstinspires.ftc.teamcode
         double driveYStep2_3 = 0.3;
         double driveYstep2_4 = 2; //distance from wall to middle
 
-        double driveYStep3_1 = 1.8288;//6 ft
+        double driveYStep3_1 = 1.8288 + 0.2;//m
 
         //directions for various movements
 
@@ -91,8 +91,6 @@ public class redWareSideWarehouseParkAuto extends org.firstinspires.ftc.teamcode
 
         3) (parking) max 10pts
         -park COMPLETELY in the warehouse closest to our alliance shipping hub (10pts)
-
-        TODO: future, grab freight from warehouse and put it in shipping hub
          */
 
         // this one is assuming we start on the blue alliance, in the start position closed to the warehouse

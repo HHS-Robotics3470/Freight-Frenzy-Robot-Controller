@@ -10,7 +10,7 @@ import org.firstinspires.ftc.teamcode.Components.CascadeOutputSystem;
  * we use this at the remote events
  * @author Anthony Rubick
  */
-@Autonomous(name="red ShippingSide ShippingPark", group="Needs Calibration" )
+@Autonomous(name="red ShippingSide ShippingPark", group="Needs coding" )
 //@Disabled //this line disables the autonomous from appearing on the driver station, remove it for your code
 public class redShipSideShippingParkAuto extends org.firstinspires.ftc.teamcode.Autonomous.Autonomous {
 

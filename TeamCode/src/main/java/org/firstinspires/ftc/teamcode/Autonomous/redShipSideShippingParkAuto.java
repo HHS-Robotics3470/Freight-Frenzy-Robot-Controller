@@ -50,9 +50,8 @@ public class redShipSideShippingParkAuto extends org.firstinspires.ftc.teamcode.
         double driveYStep2_1 = 1.8288; //strafe to turntable
         double driveYStep2_2 = 0.15; //final touches, get right up to the turntable, slower
         int turntableTimeMS = 3000; //time, in ms, to turn the turntable
-        double driveXStep2_3 = 0.3;
 
-        double driveXStep3_1 = 0.9;//6 ft
+        double driveXStep3_1 = 0.3;
 
         //directions for various movements
 
@@ -107,7 +106,7 @@ public class redShipSideShippingParkAuto extends org.firstinspires.ftc.teamcode.
 
         //y- movement to be in-line w/ shipping hub
         //robot facing: =>      needs to move:  ^
-        robot.driveTrain.strafeToDistance(movementSpeed, 0, driveYStep1_2);
+        robot.driveTrain.strafeToDistance(movementSpeed, pi, driveYStep1_2);
 
         //1.3
         telemetry.addData("level: ", level);
@@ -196,7 +195,7 @@ public class redShipSideShippingParkAuto extends org.firstinspires.ftc.teamcode.
         telemetry.update();
         //park
         //robot facing: <=      moving <=
-        robot.driveTrain.strafeToDistance(movementSpeed,pi/2.0,driveXStep2_3);
+        robot.driveTrain.strafeToDistance(movementSpeed,pi/2.0,driveXStep3_1);
 
 
         while (opModeIsActive()) {}

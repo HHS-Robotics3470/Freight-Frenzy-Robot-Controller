@@ -11,7 +11,7 @@ import org.firstinspires.ftc.teamcode.Hardware;
  * we use this at the remote events
  * @author Anthony Rubick
  */
-@Autonomous(name="blue ShippingSide ShippingPark", group="Needs coding" )
+@Autonomous(name="blue ShippingSide ShippingPark", group="Needs Calibration" )
 //@Disabled //this line disables the autonomous from appearing on the driver station, remove it for your code
 public class blueShipSideShippingParkAuto extends org.firstinspires.ftc.teamcode.Autonomous.Autonomous {
 

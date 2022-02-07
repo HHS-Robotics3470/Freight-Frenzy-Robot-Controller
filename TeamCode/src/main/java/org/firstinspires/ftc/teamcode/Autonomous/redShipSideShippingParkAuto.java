@@ -11,7 +11,7 @@ import org.firstinspires.ftc.teamcode.Hardware;
  * we use this at the remote events
  * @author Anthony Rubick
  */
-@Autonomous(name="red ShippingSide ShippingPark", group="Needs coding" )
+@Autonomous(name="red ShippingSide ShippingPark", group="Needs Calibration" )
 //@Disabled //this line disables the autonomous from appearing on the driver station, remove it for your code
 public class redShipSideShippingParkAuto extends org.firstinspires.ftc.teamcode.Autonomous.Autonomous {
 
@@ -39,16 +39,17 @@ public class redShipSideShippingParkAuto extends org.firstinspires.ftc.teamcode.
 
         //distances, in meters, needed for specific movements
         double driveYStep1_2   = 0.9144;//m
-        double driveXLevel0   = 0.4056;   //m
-        double driveXLevel1   = 0.4056;
-        double driveXLevel2   = 0.4056+.1;
+        double dist1_3Base   = 0.4056;
+        double driveXLevel0   = dist1_3Base;   //m
+        double driveXLevel1   = dist1_3Base;
+        double driveXLevel2   = dist1_3Base+.1;
         double driveXStep1_3   = 0.2032; //around 8 in
-
-        double dist1_2;
+        double dist1_3;
 
         double rotateStep2_1 = pi; //180 degrees
+        double rotateErrorStep2_1 = pi/6.0; //difference between desired rotation and actual rotation
         double driveYStep2_1 = 1.8288; //strafe to turntable
-        double driveYStep2_2 = 0.15; //final touches, get right up to the turntable, slower
+        double driveYStep2_2 = 0.2; //final touches, get right up to the turntable, slower
         int turntableTimeMS = 3000; //time, in ms, to turn the turntable
 
         double driveXStep3_1 = 0.3;
@@ -116,13 +117,13 @@ public class redShipSideShippingParkAuto extends org.firstinspires.ftc.teamcode.
         //extend output flipping arm to proper level
         switch (level) {
             case 1: //middle
-                dist1_2 = driveXLevel1;
+                dist1_3 = driveXLevel1;
                 robot.cascadeOutputSystem.moveArmToTarget(CascadeOutputSystem.OutputArmPosition.MIDDLE);
                 //robot facing: =>      needs to move:  <=
                 robot.driveTrain.strafeToDistance(movementSpeed, -pi/2, driveXLevel1);
                 break;
             case 2: //top
-                dist1_2 = driveXLevel2;
+                dist1_3 = driveXLevel2;
                 //move servo to position
                 robot.cascadeOutputSystem.moveArmToTarget(CascadeOutputSystem.OutputArmPosition.UP);
                 //move forward a bit to reach the top thing
@@ -135,7 +136,7 @@ public class redShipSideShippingParkAuto extends org.firstinspires.ftc.teamcode.
                 break;
             case 0: //bottom and default
             default:
-                dist1_2 = driveXLevel0;
+                dist1_3 = driveXLevel0;
                 //move servo to position
                 robot.cascadeOutputSystem.moveArmToTarget(CascadeOutputSystem.OutputArmPosition.DOWN);
                 //robot facing =>   needs to move <=
@@ -169,17 +170,18 @@ public class redShipSideShippingParkAuto extends org.firstinspires.ftc.teamcode.
 
         //rotate so wheel is in right place for rotation
         //robot facing: ->      needs to face:  <-
-        robot.driveTrain.rotateByAngle(rotateStep2_1, movementSpeed/3.0);
+        robot.driveTrain.rotateByAngle(rotateStep2_1-rotateErrorStep2_1, movementSpeed/3.0);
 
-        //line up with wall
+        //final adjustments to turntable
         //lower arm so we don't break it
         robot.intakeSystem.intakeArmServo.setPosition(robot.intakeSystem.ARM_DOWN);
         //facing <= moving =>
-        robot.driveTrain.strafeToDistance(movementSpeed/2.0, -pi/2.0, dist1_2 - driveXStep1_3);
+        robot.driveTrain.strafeToDistance(movementSpeed/2.0, -pi/2.0, dist1_3 - dist1_3Base + 0.2);
 
-        //final adjustments to turntable
         //facing <= moving V
         robot.driveTrain.strafeToDistance(movementSpeed/4.0, pi, driveYStep2_2);
+
+        /*
         //step 2.2
         telemetry.addData("level: ", level);
         telemetry.addData("step: ",2.2);
@@ -189,6 +191,7 @@ public class redShipSideShippingParkAuto extends org.firstinspires.ftc.teamcode.
         sleep(turntableTimeMS);
         robot.turntableMotor.setPower(0);
 
+        /*
         //3.1
         telemetry.addData("level: ", level);
         telemetry.addData("step: ",3.1);
@@ -196,7 +199,7 @@ public class redShipSideShippingParkAuto extends org.firstinspires.ftc.teamcode.
         //park
         //robot facing: <=      moving <=
         robot.driveTrain.strafeToDistance(movementSpeed,pi/2.0,driveXStep3_1);
-
+        */
 
         while (opModeIsActive()) {}
         ////////////after driver presses stop////////////

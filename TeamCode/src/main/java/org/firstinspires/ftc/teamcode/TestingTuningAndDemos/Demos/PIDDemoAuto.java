@@ -14,7 +14,7 @@ import org.firstinspires.ftc.teamcode.Hardware;
  * @author Anthony Rubick
  */
 @Autonomous(name = "PID Demo Auto", group = "Demos")
-//@Disabled
+@Disabled
 public class PIDDemoAuto extends LinearOpMode {
     /*declare OpMode members, initialize some classes*/
     Hardware robot = new Hardware();

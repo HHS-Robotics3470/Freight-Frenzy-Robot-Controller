@@ -12,7 +12,7 @@ import org.firstinspires.ftc.teamcode.Hardware;
  * @author Anthony Rubick
  */
 @Autonomous(name="adeel competition auto", group="opmode group goes here" )
-//@Disabled //this line disables the autonomous from appearing on the driver station, remove it for your code
+@Disabled //this line disables the autonomous from appearing on the driver station, remove it for your code
 public class tableParkingAutonomous extends LinearOpMode{
     /*declare OpMode members, initialize some classes*/
     Hardware robot          = new Hardware();

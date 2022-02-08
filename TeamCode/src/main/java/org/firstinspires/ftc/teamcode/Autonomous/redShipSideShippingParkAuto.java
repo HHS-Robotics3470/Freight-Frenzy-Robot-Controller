@@ -49,10 +49,10 @@ public class redShipSideShippingParkAuto extends org.firstinspires.ftc.teamcode.
         double rotateStep2_1 = pi; //180 degrees
         double rotateErrorStep2_1 = pi/6.0; //difference between desired rotation and actual rotation
         double driveYStep2_1 = 1.8288; //strafe to turntable
-        double driveYStep2_2 = 0.2; //final touches, get right up to the turntable, slower
+        double driveYStep2_2 = 0.25; //final touches, get right up to the turntable, slower
         int turntableTimeMS = 3000; //time, in ms, to turn the turntable
 
-        double driveXStep3_1 = 0.3;
+        double driveXStep3_1 = 0.5;
 
         //directions for various movements
 
@@ -132,7 +132,7 @@ public class redShipSideShippingParkAuto extends org.firstinspires.ftc.teamcode.
                 robot.cascadeOutputSystem.outputGrabberServo.setPosition(robot.cascadeOutputSystem.GRABBER_RECEIVE);
 
                 //open output all the way (receive) then let the normal opening effectively close it
-                sleep(250);
+                sleep(200);
                 break;
             case 0: //bottom and default
             default:
@@ -144,18 +144,18 @@ public class redShipSideShippingParkAuto extends org.firstinspires.ftc.teamcode.
                 break;
         }
 
-        robot.intakeSystem.intakeArmServo.setPosition(robot.intakeSystem.ARM_RAISED);//raise the arm while in transit
+        //robot.intakeSystem.intakeArmServo.setPosition(robot.intakeSystem.ARM_RAISED);//raise the arm while in transit
         //drop off element
         robot.cascadeOutputSystem.outputGrabberServo.setPosition(robot.cascadeOutputSystem.GRABBER_DROP);
         sleep(250); //give time to move
 
         //robot facing =>   needs to move =>
-        robot.driveTrain.strafeToDistance(movementSpeed, pi/2, driveXStep1_3);
-        sleep(500);
+        robot.driveTrain.strafeToDistance(movementSpeed*0.8, pi/2, driveXStep1_3);
+        //sleep(500);
 
         //retract output flipping arm, and prep for movement
-        robot.intakeSystem.intakeArmServo.setPosition(robot.intakeSystem.ARM_RAISED);
-        robot.intakeSystem.intakeGrabberServo.setPosition(robot.intakeSystem.GRABBER_FULL_OPEN);
+        //robot.intakeSystem.intakeArmServo.setPosition(robot.intakeSystem.ARM_RAISED);
+        //robot.intakeSystem.intakeGrabberServo.setPosition(robot.intakeSystem.GRABBER_FULL_OPEN);
         //move servo to position
         robot.cascadeOutputSystem.moveArmToTarget(CascadeOutputSystem.OutputArmPosition.RETRACTED);
 
@@ -168,30 +168,33 @@ public class redShipSideShippingParkAuto extends org.firstinspires.ftc.teamcode.
         //robot facing: =>       needs to move:  v
         robot.driveTrain.strafeToDistance(movementSpeed, 0, driveYStep2_1);
 
+        //lower arm so we don't break it
+        //robot.intakeSystem.intakeArmServo.setPosition(robot.intakeSystem.ARM_DOWN);
         //rotate so wheel is in right place for rotation
         //robot facing: ->      needs to face:  <-
         robot.driveTrain.rotateByAngle(rotateStep2_1-rotateErrorStep2_1, movementSpeed/3.0);
 
         //final adjustments to turntable
-        //lower arm so we don't break it
-        robot.intakeSystem.intakeArmServo.setPosition(robot.intakeSystem.ARM_DOWN);
-        //facing <= moving =>
-        robot.driveTrain.strafeToDistance(movementSpeed/2.0, -pi/2.0, dist1_3 - dist1_3Base + 0.2);
-
         //facing <= moving V
         robot.driveTrain.strafeToDistance(movementSpeed/4.0, pi, driveYStep2_2);
+        //facing <= moving =>
+        if (level == 2) {
+            robot.driveTrain.strafeToDistance(movementSpeed / 4.0, -pi / 2.0, .25);
+        }
+        else {
+            robot.driveTrain.strafeToDistance(movementSpeed / 4.0, -pi / 2.0, .1);
+        }
 
-        /*
         //step 2.2
         telemetry.addData("level: ", level);
         telemetry.addData("step: ",2.2);
         telemetry.update();
         //turn turntable
-        robot.turntableMotor.setPower(Hardware.TURNTABLE_SPEED);
+        robot.turntableMotor.setPower(-Hardware.TURNTABLE_SPEED);
         sleep(turntableTimeMS);
         robot.turntableMotor.setPower(0);
+        sleep(500);
 
-        /*
         //3.1
         telemetry.addData("level: ", level);
         telemetry.addData("step: ",3.1);
@@ -199,7 +202,6 @@ public class redShipSideShippingParkAuto extends org.firstinspires.ftc.teamcode.
         //park
         //robot facing: <=      moving <=
         robot.driveTrain.strafeToDistance(movementSpeed,pi/2.0,driveXStep3_1);
-        */
 
         while (opModeIsActive()) {}
         ////////////after driver presses stop////////////

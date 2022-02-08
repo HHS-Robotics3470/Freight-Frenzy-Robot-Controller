@@ -15,7 +15,7 @@ import java.util.List;
  *
  * @author Anthony Rubick
  */
-public abstract class Autonomous extends LinearOpMode {
+public abstract class AutonomousRed extends LinearOpMode {
     //DATA
     public enum StartPos {
         BLUE_WAREHOUSE,

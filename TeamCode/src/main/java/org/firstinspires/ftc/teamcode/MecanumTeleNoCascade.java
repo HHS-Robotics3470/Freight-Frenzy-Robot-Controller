@@ -215,11 +215,8 @@ public class   MecanumTeleNoCascade  extends LinearOpMode {
                     //wait 300ms to give time for the game element to transfer before re-extending cascade
                     if (bProcessTimer.seconds() >= .300) {
                         robot.cascadeOutputSystem.outputGrabberServo.setPosition(robot.cascadeOutputSystem.GRABBER_CLOSED); //close output
-                        robot.intakeSystem.intakeArmServo.setPosition(robot.intakeSystem.ARM_DOWN);
-                        robot.intakeSystem.intakeGrabberServo.setPosition(robot.intakeSystem.GRABBER_FULL_OPEN); //fully open input
-
-                        //re-extend output flipper
-                        robot.cascadeOutputSystem.setOutputArmPosition(CascadeOutputSystem.OutputArmPosition.MIDDLE);
+                        robot.intakeSystem.intakeArmServo.setPosition(robot.intakeSystem.ARM_RAISED);
+                        robot.intakeSystem.intakeGrabberServo.setPosition(robot.intakeSystem.GRABBER_CLOSED);
 
                         bState = BProcess.ENDING; //go to next stage
                         bProcessTimer.reset();
@@ -231,7 +228,7 @@ public class   MecanumTeleNoCascade  extends LinearOpMode {
                         //update robot state
                         outputArmRestricted = false;
                         outputState = IOState.CLOSED;
-                        inputState = IOState.OPEN;
+                        inputState = IOState.CLOSED;
                         bState = BProcess.NOT_STARTED; //back to start
                         bProcessTimer.reset();
                     }

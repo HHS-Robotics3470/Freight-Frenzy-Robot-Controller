@@ -49,10 +49,11 @@ public class redShipSideShippingParkAuto extends org.firstinspires.ftc.teamcode.
         double rotateStep2_1 = pi; //180 degrees
         double rotateErrorStep2_1 = pi/6.0; //difference between desired rotation and actual rotation
         double driveYStep2_1 = 1.8288; //strafe to turntable
-        double driveYStep2_2 = 0.25; //final touches, get right up to the turntable, slower
+        double driveYStep2_2 = 0.4; //final touches, get right up to the turntable, slower
+        double driveXStep2_2 = 0.2;
         int turntableTimeMS = 3000; //time, in ms, to turn the turntable
 
-        double driveXStep3_1 = 0.5;
+        double driveXStep3_1 = 0.53;
 
         //directions for various movements
 
@@ -174,24 +175,35 @@ public class redShipSideShippingParkAuto extends org.firstinspires.ftc.teamcode.
         //robot facing: ->      needs to face:  <-
         robot.driveTrain.rotateByAngle(rotateStep2_1-rotateErrorStep2_1, movementSpeed/3.0);
 
-        //final adjustments to turntable
+        //bump into wall
+        //facing <= moving <=
+        robot.driveTrain.strafeToDistance(movementSpeed/2.0, pi/2.0, driveXStep2_2);
         //facing <= moving V
-        robot.driveTrain.strafeToDistance(movementSpeed/4.0, pi, driveYStep2_2);
+        robot.driveTrain.strafeToDistance(movementSpeed/2.0, pi, driveYStep2_2);
+        //final adjustments to turntable
         //facing <= moving =>
         if (level == 2) {
-            robot.driveTrain.strafeToDistance(movementSpeed / 4.0, -pi / 2.0, .25);
+            robot.driveTrain.strafeToDistance(movementSpeed / 2.0, -pi / 2.0, driveXStep2_2+0.1); //0.3
         }
         else {
-            robot.driveTrain.strafeToDistance(movementSpeed / 4.0, -pi / 2.0, .1);
+            robot.driveTrain.strafeToDistance(movementSpeed / 2.0, -pi / 2.0, driveXStep2_2); //0.2
         }
 
         //step 2.2
         telemetry.addData("level: ", level);
         telemetry.addData("step: ",2.2);
         telemetry.update();
+
         //turn turntable
         robot.turntableMotor.setPower(-Hardware.TURNTABLE_SPEED);
+        //move back slowly while turning turntable to regain contact if its lost
+        //facing <= moving =>
+        robot.driveTrain.setPower(-0.025);
+        //robot.driveTrain.strafeDirection(0.02, -pi/2.0);
+        //wait
         sleep(turntableTimeMS);
+        //stop motors
+        robot.driveTrain.setPower(0);
         robot.turntableMotor.setPower(0);
         sleep(500);
 

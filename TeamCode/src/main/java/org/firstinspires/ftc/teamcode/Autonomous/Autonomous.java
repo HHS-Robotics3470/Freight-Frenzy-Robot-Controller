@@ -15,7 +15,7 @@ import java.util.List;
  *
  * @author Anthony Rubick
  */
-public abstract class AutonomousRed extends LinearOpMode {
+public abstract class Autonomous extends LinearOpMode {
     //DATA
     public enum StartPos {
         BLUE_WAREHOUSE,
@@ -111,23 +111,51 @@ public abstract class AutonomousRed extends LinearOpMode {
         if (robot.tfod != null) {
             List<Recognition> updatedRecognitions = robot.tfod.getUpdatedRecognitions();
             if (updatedRecognitions != null) {
-                for (Recognition recognition : updatedRecognitions) {
-                    if (!recognition.getLabel().equals("Marker")) {
-                        double loc = (recognition.getLeft()+recognition.getRight())/2.0;
-                        if (loc < val1){
-                            level = 0;
+                switch (startPos) {
+                    case RED_SHIPPING:
+                    case RED_WAREHOUSE:
+                        for (Recognition recognition : updatedRecognitions) {
+                            if (!recognition.getLabel().equals("Marker")) {
+                                double loc = (recognition.getLeft()+recognition.getRight())/2.0;
+                                if (loc < val1){
+                                    level = 0;
+                                }
+                                else if (loc < val2 && loc > val1){
+                                    level = 1;
+                                }
+                                else if (loc > val2){
+                                    level = 2;
+                                }
+                                else {
+                                    level = -1;
+                                }
+                                //break;
+                            }
                         }
-                        else if (loc < val2 && loc > val1){
-                            level = 1;
+                        break;
+                    case BLUE_SHIPPING:
+                    case BLUE_WAREHOUSE:
+                        for (Recognition recognition : updatedRecognitions) {
+                            if (!recognition.getLabel().equals("Marker")) {
+                                double loc = (recognition.getLeft()+recognition.getRight())/2.0;
+                                if (loc < val1){
+                                    level = 2;
+                                }
+                                else if (loc < val2 && loc > val1){
+                                    level = 1;
+                                }
+                                else if (loc > val2){
+                                    level = 0;
+                                }
+                                else {
+                                    level = -1;
+                                }
+                                //break;
+                            }
                         }
-                        else if (loc > val2){
-                            level = 2;
-                        }
-                        else {
-                            level = -1;
-                        }
-                        //break;
-                    }
+                        break;
+                    default:
+                        break;
                 }
             }
         }

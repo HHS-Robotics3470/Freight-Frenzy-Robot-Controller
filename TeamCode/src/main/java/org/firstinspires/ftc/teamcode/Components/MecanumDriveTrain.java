@@ -150,7 +150,7 @@ public class MecanumDriveTrain implements Component {
         }
 
         power = Math.abs(power);
-        if (power < 0.4) power = 0.4;
+        //if (power < 0.4) power = 0.4;
         targetDistance = Math.abs(targetDistance)* Hardware.NADO_COUNTS_PER_METER; //make positive, and convert to counts
         //DATA
         boolean moving = true;
@@ -165,10 +165,6 @@ public class MecanumDriveTrain implements Component {
         //scale power appropriately, and ensure it's positive
         FrBlPairPower = Math.abs(FrBlPairPower) * power;
         FlBrPairPower = Math.abs(FlBrPairPower) * power;
-
-        //make sure are not set to zero power, that causes an error where the robot gets to its position and then freezes indefinitely because there are motors with a target being told to get to that target w/o moving
-        //if (FrBlPairPower <= 0.3) FrBlPairPower = 0.3;
-        //if (FlBrPairPower <= 0.3) FrBlPairPower = 0.3;
 
         //stop and prep
         setPower(0);

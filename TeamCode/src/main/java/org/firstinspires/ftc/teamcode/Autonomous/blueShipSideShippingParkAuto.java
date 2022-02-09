@@ -44,11 +44,13 @@ public class blueShipSideShippingParkAuto extends org.firstinspires.ftc.teamcode
         double driveXLevel2   = 0.4056+.1;
         double driveXStep1_3   = 0.2032; //around 8 in
 
-        double dist1_2;
+        double dist1_3;
 
-        double rotateStep2_1 = -pi/2.0; //90 degrees
+        double rotateStep2_1 = pi/2.0; //90 degrees
+        double rotateErrorStep2_1 = pi/12.0; //difference between desired rotation and actual rotation
         double driveYStep2_1 = 1.8288; //strafe to turntable
-        double driveYStep2_2 = 0.15; //final touches, get right up to the turntable, slower
+        double driveYStep2_2 = 0.4; //final touches, get right up to the turntable, slower
+        double driveXStep2_2 = 0.2;
         int turntableTimeMS = 3000; //time, in ms, to turn the turntable
 
         double driveXStep3_1 = 0.3;
@@ -116,13 +118,13 @@ public class blueShipSideShippingParkAuto extends org.firstinspires.ftc.teamcode
         //extend output flipping arm to proper level
         switch (level) {
             case 1: //middle
-                dist1_2 = driveXLevel1;
+                dist1_3 = driveXLevel1;
                 robot.cascadeOutputSystem.moveArmToTarget(CascadeOutputSystem.OutputArmPosition.MIDDLE);
                 //robot facing: <=      needs to move:  =>
                 robot.driveTrain.strafeToDistance(movementSpeed, -pi/2, driveXLevel1);
                 break;
             case 2: //top
-                dist1_2 = driveXLevel2;
+                dist1_3 = driveXLevel2;
                 //move servo to position
                 robot.cascadeOutputSystem.moveArmToTarget(CascadeOutputSystem.OutputArmPosition.UP);
                 //move forward a bit to reach the top thing
@@ -135,7 +137,7 @@ public class blueShipSideShippingParkAuto extends org.firstinspires.ftc.teamcode
                 break;
             case 0: //bottom and default
             default:
-                dist1_2 = driveXLevel0;
+                dist1_3 = driveXLevel0;
                 //move servo to position
                 robot.cascadeOutputSystem.moveArmToTarget(CascadeOutputSystem.OutputArmPosition.DOWN);
                 //robot facing <=   needs to move =>
@@ -150,11 +152,11 @@ public class blueShipSideShippingParkAuto extends org.firstinspires.ftc.teamcode
 
         //robot facing <=   needs to move <=
         robot.driveTrain.strafeToDistance(movementSpeed, pi/2, driveXStep1_3);
-        sleep(500);
+        //sleep(500);
 
         //retract output flipping arm, and prep for movement
-        robot.intakeSystem.intakeArmServo.setPosition(robot.intakeSystem.ARM_RAISED);
-        robot.intakeSystem.intakeGrabberServo.setPosition(robot.intakeSystem.GRABBER_FULL_OPEN);
+        //robot.intakeSystem.intakeArmServo.setPosition(robot.intakeSystem.ARM_RAISED);
+        //robot.intakeSystem.intakeGrabberServo.setPosition(robot.intakeSystem.GRABBER_FULL_OPEN);
         //move servo to position
         robot.cascadeOutputSystem.moveArmToTarget(CascadeOutputSystem.OutputArmPosition.RETRACTED);
 
@@ -168,34 +170,47 @@ public class blueShipSideShippingParkAuto extends org.firstinspires.ftc.teamcode
         robot.driveTrain.strafeToDistance(movementSpeed, pi, driveYStep2_1);
 
         //rotate so wheel is in right place for rotation
-        //robot facing: <-      needs to face:  ^
-        robot.driveTrain.rotateByAngle(rotateStep2_1, movementSpeed/3.0);
+        //robot facing: <-      needs to face:  V
+        robot.driveTrain.rotateByAngle(rotateStep2_1-rotateErrorStep2_1, movementSpeed/3.0);
 
-        //line up with wall
-        //lower arm so we don't break it
-        robot.intakeSystem.intakeArmServo.setPosition(robot.intakeSystem.ARM_DOWN);
-        //facing ^ moving <=
-        robot.driveTrain.strafeToDistance(movementSpeed/2.0, pi, dist1_2 - driveXStep1_3);
-
+        //bump into wall
+        //facing V moving =>
+        robot.driveTrain.strafeToDistance(movementSpeed/2.0, pi, driveXStep2_2);
+        //facing V moving V
+        robot.driveTrain.strafeToDistance(movementSpeed/2.0, pi, driveYStep2_2);
         //final adjustments to turntable
-        //facing ^ moving V
-        robot.driveTrain.strafeToDistance(movementSpeed/4.0, -pi/2.0, driveYStep2_2);
+        //facing V moving <=
+        if (level == 2) {
+            robot.driveTrain.strafeToDistance(movementSpeed / 2.0, 0, driveXStep2_2+0.1); //0.3
+        }
+        else {
+            robot.driveTrain.strafeToDistance(movementSpeed / 2.0, 0, driveXStep2_2); //0.2
+        }
+
         //step 2.2
         telemetry.addData("level: ", level);
         telemetry.addData("step: ",2.2);
         telemetry.update();
+
         //turn turntable
         robot.turntableMotor.setPower(Hardware.TURNTABLE_SPEED);
+        //move back slowly while turning turntable to regain contact if its lost
+        //facing V moving <=
+        robot.driveTrain.strafeDirection(0.025, 0);
+        //wait
         sleep(turntableTimeMS);
+        //stop motors
+        robot.driveTrain.setPower(0);
         robot.turntableMotor.setPower(0);
+        sleep(500);
 
         //3.1
         telemetry.addData("level: ", level);
         telemetry.addData("step: ",3.1);
         telemetry.update();
         //park
-        //robot facing: ^      moving =>
-        robot.driveTrain.strafeToDistance(movementSpeed,0,driveXStep3_1);
+        //robot facing: V      moving =>
+        robot.driveTrain.strafeToDistance(movementSpeed,pi,driveXStep3_1);
 
         while (opModeIsActive()) {}
         ////////////after driver presses stop////////////

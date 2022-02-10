@@ -183,7 +183,7 @@ public class redShipSideShippingParkAuto extends org.firstinspires.ftc.teamcode.
         //final adjustments to turntable
         //facing <= moving =>
         if (level == 2) {
-            robot.driveTrain.strafeToDistance(movementSpeed / 2.0, -pi / 2.0, driveXStep2_2+0.1); //0.3
+            robot.driveTrain.strafeToDistance(movementSpeed / 2.0, -pi / 2.0, driveXStep2_2+0.15); //0.35
         }
         else {
             robot.driveTrain.strafeToDistance(movementSpeed / 2.0, -pi / 2.0, driveXStep2_2); //0.2

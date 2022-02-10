@@ -11,7 +11,7 @@ import org.firstinspires.ftc.teamcode.Hardware;
  * we use this at the remote events
  * @author Anthony Rubick
  */
-@Autonomous(name="red ShippingSide ShippingPark", group="Needs Calibration" )
+@Autonomous(name="red ShippingSide ShippingPark", group="Comp Ready" )
 //@Disabled //this line disables the autonomous from appearing on the driver station, remove it for your code
 public class redShipSideShippingParkAuto extends org.firstinspires.ftc.teamcode.Autonomous.Autonomous {
 
@@ -199,7 +199,7 @@ public class redShipSideShippingParkAuto extends org.firstinspires.ftc.teamcode.
         //move back slowly while turning turntable to regain contact if its lost
         //facing <= moving =>
         robot.driveTrain.setPower(-0.025);
-        //robot.driveTrain.strafeDirection(0.02, -pi/2.0);
+        //robot.driveTrain.strafeDirection(0.025, -pi/2.0);
         //wait
         sleep(turntableTimeMS);
         //stop motors

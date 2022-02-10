@@ -39,9 +39,10 @@ public class blueShipSideShippingParkAuto extends org.firstinspires.ftc.teamcode
 
         //distances, in meters, needed for specific movements
         double driveYStep1_2   = 0.9144;//m
-        double driveXLevel0   = 0.4056;   //m
-        double driveXLevel1   = 0.4056;
-        double driveXLevel2   = 0.4056+.1;
+        double dist1_3Base   = 0.4056;
+        double driveXLevel0   = dist1_3Base;   //m
+        double driveXLevel1   = dist1_3Base;
+        double driveXLevel2   = dist1_3Base+.1;
         double driveXStep1_3   = 0.2032; //around 8 in
 
         double dist1_3;

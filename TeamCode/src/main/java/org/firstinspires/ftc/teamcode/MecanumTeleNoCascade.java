@@ -266,7 +266,7 @@ public class   MecanumTeleNoCascade  extends LinearOpMode {
                     case RETRACTED:
                         if (yC && !yP) {
                             //robot.cascadeOutputSystem.outputArmServo.setPosition(robot.cascadeOutputSystem.ARM_EXTENDED_MIDDLE); //extend MIDDLE
-                            robot.cascadeOutputSystem.setOutputArmPosition(CascadeOutputSystem.OutputArmPosition.MIDDLE);
+                            robot.cascadeOutputSystem.setOutputArmPosition(CascadeOutputSystem.OutputArmPosition.UP); //extend to the up position
                         }
                         break;
                     case UP:

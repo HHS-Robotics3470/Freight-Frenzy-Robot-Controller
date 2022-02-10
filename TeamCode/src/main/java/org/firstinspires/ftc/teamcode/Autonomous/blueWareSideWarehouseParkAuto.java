@@ -41,7 +41,8 @@ public class blueWareSideWarehouseParkAuto extends org.firstinspires.ftc.teamcod
         double driveXLevel1   = 0.4056;
         double driveXLevel2   = 0.4056+.1;
         double driveXStep1_3   = 0.2032; //around 8 in
-        double driveYStep3_1 = 1.8288 + 0.2;//m
+        double driveYStep3_1 = 1.8288;//m
+        double driveXStep3_1 = 0.2;
 
         //directions for various movements
 
@@ -174,6 +175,8 @@ public class blueWareSideWarehouseParkAuto extends org.firstinspires.ftc.teamcod
         //y+ movement into warehouse
         //robot facing: ^       needs to move:  ^
         robot.driveTrain.strafeToDistance(movementSpeed, pi/2.0, driveYStep3_1);
+        //robot facing ^ moving =>
+        robot.driveTrain.strafeToDistance(movementSpeed*0.8, 0, driveXStep3_1);
 
         while (opModeIsActive()) {}
         ////////////after driver presses stop////////////

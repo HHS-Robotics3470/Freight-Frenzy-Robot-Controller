@@ -7,7 +7,6 @@ import org.firstinspires.ftc.teamcode.Hardware;
 
 /**
  * auto used at remote events, and when we're red alliance, starting on the barcode closest to the warehouse, and parking in the warehouse
- * TODO: calibrate every distance, angle, etc. to be accurate
  * we use this at the remote events
  * @author Anthony Rubick
  */
@@ -41,18 +40,8 @@ public class redWareSideWarehouseParkAuto extends org.firstinspires.ftc.teamcode
         double driveXLevel1   = 0.4056;
         double driveXLevel2   = 0.4056+.1;
         double driveXStep1_3   = 0.2032; //around 8 in
-
-        double rotateStep2_1 = pi; //180 degrees
-        double driveXStep2_1 = 0.4;// go up to wall
-        double driveYStep2_1 = 1.8288; //strafe to turntable
-        double driveYStep2_2 = 0.05; //final touches, get right up to the turntable, slower
-        int turntableTimeMS = 2000; //time, in ms, to turn the turntable
-        double driveXStep2_3 = 0.3;
-        double rotateStep2_3 = -pi/2.0; //90 degrees
-        double driveYStep2_3 = 0.3;
-        double driveYstep2_4 = 2; //distance from wall to middle
-
-        double driveYStep3_1 = 1.8288 + 0.2;//m
+        double driveYStep3_1 = 1.8288;//m
+        double driveXStep3_1 = 0.25;
 
         //directions for various movements
 
@@ -170,6 +159,8 @@ public class redWareSideWarehouseParkAuto extends org.firstinspires.ftc.teamcode
         //y+ movement into warehouse
         //robot facing: ^       needs to move:  ^
         robot.driveTrain.strafeToDistance(movementSpeed, pi/2.0, driveYStep3_1);
+        //robot facing ^ moving <=
+        robot.driveTrain.strafeToDistance(movementSpeed, pi, driveXStep3_1);
 
         while (opModeIsActive()) {}
         ////////////after driver presses stop////////////

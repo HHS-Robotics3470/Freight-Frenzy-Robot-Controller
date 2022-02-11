@@ -103,11 +103,17 @@ public abstract class Autonomous extends LinearOpMode {
         RED_SHIPPING
         W - O + S
 
-         */
+        */
 
         //TODO: add logic to determine the level from the webcame using vuforia
-        double val1 = 245; //mm relative to camera
-        double val2 = 468; //mm relative to camera
+        //set up val1 val2 differently depending on start position
+        double val1, val2;
+        val1 = 245; //mm relative to camera
+        val2 = 468; //mm relative to camera
+        //val1 = 397.5;
+        //val2 = 457;
+
+        //detect the level differently depending on start position
         if (robot.tfod != null) {
             List<Recognition> updatedRecognitions = robot.tfod.getUpdatedRecognitions();
             if (updatedRecognitions != null) {

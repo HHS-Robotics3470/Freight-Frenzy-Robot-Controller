@@ -18,7 +18,7 @@ import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
  */
 
 @Autonomous(name = "Vuforia Object Detection", group = "AI")
-public class VuforiaObjectDetection extends LinearOpMode {
+public class VuforiaObjectDetection extends LinearOpMode{
 
     /*declare OpMode members, initialize some classes*/
     Hardware robot          = new Hardware();
@@ -67,6 +67,8 @@ public class VuforiaObjectDetection extends LinearOpMode {
             int level;
             double val1 = 245; //mm relative to camera
             double val2 = 468; //mm relative to camera
+            //val1 = 397.5;
+            //val2 = 457;
             if (tfod != null) {
                 List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
                 if (updatedRecognitions != null) {
@@ -80,6 +82,7 @@ public class VuforiaObjectDetection extends LinearOpMode {
                                 recognition.getRight(), recognition.getBottom());
                         if (!recognition.getLabel().equals("Marker")) {
                             double loc = (recognition.getLeft()+recognition.getRight())/2.0;
+                            ///*
                             if (loc < val1){
                                 level = 0;
                             }
@@ -92,6 +95,21 @@ public class VuforiaObjectDetection extends LinearOpMode {
                             else {
                                 level = -1;
                             }
+                            //*/
+                            /*
+                            if (loc < val1){
+                                level = 2;
+                            }
+                            else if (loc < val2 && loc > val1){
+                                level = 1;
+                            }
+                            else if (loc > val2){
+                                level = 0;
+                            }
+                            else {
+                                level = -1;
+                            }
+                            //*/
                             telemetry.addData("level: ", level);
                             //break;
                         }
@@ -130,14 +148,15 @@ public class VuforiaObjectDetection extends LinearOpMode {
         /*
          * Configure Vuforia by creating a Parameter object, and passing it to the Vuforia engine.
          */
-        VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters();
+        // TODO: the R.id.cameraMonitorViewId shows what the camera sees on the driver station, remove it or comment out when not needed bc it drains battery fast
+        VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters(R.id.cameraMonitorViewId);
 
         parameters.vuforiaLicenseKey = VUFORIA_KEY;
         parameters.cameraName = hardwareMap.get(WebcamName.class, "vuforia_webcam");
+        parameters.cameraMonitorFeedback = VuforiaLocalizer.Parameters.CameraMonitorFeedback.AXES;
 
         //  Instantiate the Vuforia engine
         vuforia = ClassFactory.getInstance().createVuforia(parameters);
-
         // Loading trackables is not necessary for the TensorFlow Object Detection engine.
     }
 

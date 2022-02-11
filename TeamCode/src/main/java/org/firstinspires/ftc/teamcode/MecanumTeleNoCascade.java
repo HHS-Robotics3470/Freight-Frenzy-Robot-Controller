@@ -216,7 +216,7 @@ public class   MecanumTeleNoCascade  extends LinearOpMode {
                     if (bProcessTimer.seconds() >= .300) {
                         robot.cascadeOutputSystem.outputGrabberServo.setPosition(robot.cascadeOutputSystem.GRABBER_CLOSED); //close output
                         robot.intakeSystem.intakeArmServo.setPosition(robot.intakeSystem.ARM_RAISED);
-                        robot.intakeSystem.intakeGrabberServo.setPosition(robot.intakeSystem.GRABBER_CLOSED);
+                        robot.intakeSystem.intakeGrabberServo.setPosition(robot.intakeSystem.GRABBER_FULL_OPEN);
 
                         bState = BProcess.ENDING; //go to next stage
                         bProcessTimer.reset();
@@ -228,7 +228,7 @@ public class   MecanumTeleNoCascade  extends LinearOpMode {
                         //update robot state
                         outputArmRestricted = false;
                         outputState = IOState.CLOSED;
-                        inputState = IOState.CLOSED;
+                        inputState = IOState.OPEN;
                         bState = BProcess.NOT_STARTED; //back to start
                         bProcessTimer.reset();
                     }

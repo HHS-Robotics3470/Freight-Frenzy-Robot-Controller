@@ -41,28 +41,13 @@ public class blueWareSideWarehouseParkAuto extends org.firstinspires.ftc.teamcod
         double driveXLevel1   = 0.4056;
         double driveXLevel2   = 0.4056+.1;
         double driveXStep1_3   = 0.2032; //around 8 in
-        double driveYStep3_1 = 1.8288;//m
-        double driveXStep3_1 = 0.25;
+        double driveYStep3_1 = 1.8288+0.2;//m
+        double driveXStep3_1 = 0.2;
 
         //directions for various movements
 
 
         //distances, in encoder ticks, needed for specific movements
-
-        /* Initialize the hardware variables.
-         * The init() method of the hardware class does all the work here
-         */
-        robot.init(hardwareMap);
-        robot.initVuforiaAndTfod(hardwareMap);
-
-        // Wait for the game to start (driver presses PLAY)
-        sleep(3000);
-        telemetry.addData(">", "Press Play to start op mode");
-        telemetry.update();
-        waitForStart();
-        //runtime.reset();
-
-        ////////////after driver presses play////////////
 
         /* Initialize the hardware variables.
          * The init() method of the hardware class does all the work here

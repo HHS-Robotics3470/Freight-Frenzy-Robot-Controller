@@ -40,8 +40,8 @@ public class redWareSideWarehouseParkAuto extends org.firstinspires.ftc.teamcode
         double driveXLevel1   = 0.4056;
         double driveXLevel2   = 0.4056+.1;
         double driveXStep1_3   = 0.2032; //around 8 in
-        double driveYStep3_1 = 1.8288;//m
-        double driveXStep3_1 = 0.25;
+        double driveYStep3_1 = 1.8288+0.2;//m
+        double driveXStep3_1 = 0.2;
 
         //directions for various movements
 

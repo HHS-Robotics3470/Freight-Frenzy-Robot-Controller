@@ -56,7 +56,7 @@ public class VuforiaObjectDetection extends LinearOpMode{
             // to artificially zoom in to the center of image.  For best results, the "aspectRatio" argument
             // should be set to the value of the images used to create the TensorFlow Object Detection model
             // (typically 16/9).
-            tfod.setZoom(1.25, 12.0/4.0);//16.0/9.0);
+            tfod.setZoom(1.2, 16.0/9.0);
         }
 
         telemetry.addData(">", "Press Play to start op mode");
@@ -128,7 +128,7 @@ public class VuforiaObjectDetection extends LinearOpMode{
         int tfodMonitorViewId = hardwareMap.appContext.getResources().getIdentifier(
             "tfodMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
-       tfodParameters.minResultConfidence = 0.55f;
+       tfodParameters.minResultConfidence = 0.4f;//0.55f;
        tfodParameters.isModelTensorFlow2 = true;
        tfodParameters.inputSize = 320;
        tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);

@@ -205,7 +205,7 @@ public class blueShipSideShippingParkAuto extends org.firstinspires.ftc.teamcode
         //stop motors
         robot.driveTrain.setPower(0);
         robot.turntableMotor.setPower(0);
-        sleep(500);
+        sleep(200);
 
         //3.1
         telemetry.addData("level: ", level);

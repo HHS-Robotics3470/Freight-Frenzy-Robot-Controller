@@ -157,7 +157,7 @@ public abstract class Autonomous extends LinearOpMode {
                 case BLUE_SHIPPING:
                     //facing <= moving ^
                     robot.driveTrain.strafeToDistance(speed, 0, dist);
-                    sleep(200);
+                    sleep(500);
                     if (markerVisible()) {
                         level = 2;
                     } else level = 0;
@@ -168,7 +168,7 @@ public abstract class Autonomous extends LinearOpMode {
                 case RED_SHIPPING:
                     //facing => moving ^
                     robot.driveTrain.strafeToDistance(speed, pi, dist);
-                    sleep(200);
+                    sleep(500);
                     if (markerVisible()) {
                         level = 0;
                     } else level = 2;

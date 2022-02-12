@@ -147,7 +147,7 @@ public abstract class Autonomous extends LinearOpMode {
      */
     public int levelByMarker() {
         int level = -1;
-        double dist = 0.5;
+        double dist = 0.4;
         double speed = 0.4;
         double pi = Math.PI;
         if (markerVisible()) {
@@ -176,7 +176,7 @@ public abstract class Autonomous extends LinearOpMode {
                     break;
             }
         } else level = 1;
-        robot.driveTrain.strafeToDistance(0.4, pi/2.0, 0.2);
+        robot.driveTrain.strafeToDistance(0.4, pi/2.0, 0.1);
         return level;
     }
 

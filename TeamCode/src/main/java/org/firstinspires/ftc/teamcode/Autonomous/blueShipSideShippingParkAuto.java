@@ -51,7 +51,7 @@ public class blueShipSideShippingParkAuto extends org.firstinspires.ftc.teamcode
         double rotateErrorStep2_1 = pi/12.0; //difference between desired rotation and actual rotation
         double driveYStep2_1 = 1.8288; //strafe to turntable
         double driveYStep2_2 = 0.4; //final touches, get right up to the turntable, slower
-        double driveXStep2_2 = 0.2;
+        double driveXStep2_2 = 0.25;
         int turntableTimeMS = 3000; //time, in ms, to turn the turntable
 
         double driveXStep3_1 = 0.3;

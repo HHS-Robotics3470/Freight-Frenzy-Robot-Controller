@@ -89,7 +89,7 @@ public class blueWareSideWarehouseParkAuto extends org.firstinspires.ftc.teamcod
         /*step 1*/
         //1.1
         sleep(1000); //give it time to find it
-        level = super.determineLevel();
+        level = super.levelByMarker();
 
         //1.2
         telemetry.addData("level: ", level);

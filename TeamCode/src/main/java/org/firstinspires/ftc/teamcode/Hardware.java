@@ -268,7 +268,7 @@ public class Hardware implements Component {
         int tfodMonitorViewId = hwMap.appContext.getResources().getIdentifier(
                 "tfodMonitorViewId", "id", hwMap.appContext.getPackageName());
         TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
-        tfodParameters.minResultConfidence = 0.4f; //TODO: update and tune this value
+        tfodParameters.minResultConfidence = 0.55f;//0.4f; //TODO: update and tune this value
         tfodParameters.isModelTensorFlow2 = true;
         tfodParameters.inputSize = 320;
 
@@ -286,7 +286,8 @@ public class Hardware implements Component {
         // to artificially zoom in to the center of image.  For best results, the "aspectRatio" argument
         // should be set to the value of the images used to create the TensorFlow Object Detection model
         // (typically 16/9).
-        tfod.setZoom(1, 16.0/9.0);
+        tfod.setZoom(1.25, 16.0/9.0);
+        //tfod.setZoom(1, 16.0/9.0);
 
 
     }

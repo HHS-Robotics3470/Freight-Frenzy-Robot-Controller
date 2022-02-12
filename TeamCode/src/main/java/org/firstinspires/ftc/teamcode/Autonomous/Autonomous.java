@@ -74,7 +74,8 @@ public abstract class Autonomous extends LinearOpMode {
     //vuforia bits
 
     /**
-     * depending on the startPos, use vuforia to figure out which position the pre-loaded element needs to be delivered to, assign it to level
+     * depending on the startPos, use vuforia to figure out which position
+     * the pre-loaded element needs to be delivered to, assign it to level
      * @return level, 0 == bottom, 1 == middle, 2 == top    see appendix D (pg 42) of gm2 for details
      */
     public int determineLevel() {
@@ -139,6 +140,64 @@ public abstract class Autonomous extends LinearOpMode {
         return level;
     }
 
+    /**
+     * depending on the startPos, use vuforia to figure out which position
+     * the pre-loaded element needs to be delivered to, assign it to level
+     * @return level, 0 == bottom, 1 == middle, 2 == top    see appendix D (pg 42) of gm2 for details
+     */
+    public int levelByMarker() {
+        int level = -1;
+        double dist = 0.5;
+        double speed = 0.4;
+        double pi = Math.PI;
+        if (markerVisible()) {
+            switch (startPos) {
+                case RED_WAREHOUSE:
+                    //facing => moving V
+                case BLUE_SHIPPING:
+                    //facing <= moving ^
+                    robot.driveTrain.strafeToDistance(speed, 0, dist);
+                    if (markerVisible()) {
+                        level = 2;
+                    } else level = 0;
+                    robot.driveTrain.strafeToDistance(speed, pi, dist);
+                    break;
+                case BLUE_WAREHOUSE:
+                    //facing <= moving V
+                case RED_SHIPPING:
+                    //facing => moving ^
+                    robot.driveTrain.strafeToDistance(speed, pi, dist);
+                    if (markerVisible()) {
+                        level = 0;
+                    } else level = 2;
+                    robot.driveTrain.strafeToDistance(speed, 0, dist);
+                    break;
+                default:
+                    break;
+            }
+        } else level = 1;
+        robot.driveTrain.strafeToDistance(0.4, pi/2.0, 0.2);
+        return level;
+    }
+
+    /**
+     * checks if a marker is in view
+     * @return true if marker is visible, false if no markers are visible
+     */
+    public boolean markerVisible() {
+        //look for a marker, return true if it's seen
+        if (robot.tfod != null) {
+            List<Recognition> updatedRecognitions = robot.tfod.getUpdatedRecognitions();
+            if (updatedRecognitions != null) {
+                for (Recognition recognition : updatedRecognitions) {
+                    if (recognition.getLabel().equals("Marker")) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
     //TODO: vuforia navigation
 
 }

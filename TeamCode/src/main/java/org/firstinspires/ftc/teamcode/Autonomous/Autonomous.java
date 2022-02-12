@@ -110,8 +110,6 @@ public abstract class Autonomous extends LinearOpMode {
         double val1, val2;
         val1 = 245; //mm relative to camera
         val2 = 468; //mm relative to camera
-        //val1 = 397.5;
-        //val2 = 457;
 
         //detect the level differently depending on start position
         if (robot.tfod != null) {

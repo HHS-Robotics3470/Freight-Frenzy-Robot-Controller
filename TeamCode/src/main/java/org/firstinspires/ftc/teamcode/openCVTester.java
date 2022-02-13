@@ -12,8 +12,8 @@ import org.firstinspires.ftc.teamcode.Hardware;
  * Template for Autonomous routines
  * @author Anthony Rubick
  */
-@Autonomous(name="Auto Name goes here", group="opmode group goes here" )
-@Disabled //this line disables the autonomous from appearing on the driver station, remove it for your code
+@Autonomous(name="openCV tester", group="Testing" )
+//@Disabled //this line disables the autonomous from appearing on the driver station, remove it for your code
 public class openCVTester  extends LinearOpMode{
     /*declare OpMode members, initialize some classes*/
     Hardware robot          = new Hardware();

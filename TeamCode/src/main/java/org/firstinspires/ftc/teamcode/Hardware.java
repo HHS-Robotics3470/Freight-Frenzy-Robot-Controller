@@ -7,7 +7,6 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareDevice;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
@@ -22,7 +21,7 @@ import org.firstinspires.ftc.teamcode.Components.CascadeOutputSystem;
 import org.firstinspires.ftc.teamcode.Components.Component;
 import org.firstinspires.ftc.teamcode.Components.IntakeSystem;
 import org.firstinspires.ftc.teamcode.Components.MecanumDriveTrain;
-import org.firstinspires.ftc.vision.DuckPipeline;
+import org.firstinspires.ftc.teamcode.Components.vision.DuckPipeline;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;

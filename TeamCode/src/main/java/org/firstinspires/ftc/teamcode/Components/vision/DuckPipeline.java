@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.vision;
+package org.firstinspires.ftc.teamcode.Components.vision;
 
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
@@ -64,7 +64,7 @@ public class DuckPipeline extends OpenCvPipeline
 
     /**
      * initialize the ... something
-     * @param firstFrame
+     * @param firstFrame idk, but doesn't seem like we need to call this anyway
      */
     @Override
     public void init(Mat firstFrame)
@@ -140,7 +140,7 @@ public class DuckPipeline extends OpenCvPipeline
 
     /**
      * reads from TSEPosition and returns the corresponding integer
-     * @return integer represing the state of the position enum
+     * @return integer representing the state of the position enum
      */
     public int getAnalysis()
     {

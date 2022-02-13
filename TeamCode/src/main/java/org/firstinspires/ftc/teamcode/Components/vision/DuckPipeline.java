@@ -44,8 +44,8 @@ public class DuckPipeline extends OpenCvPipeline
 
     //matrixes
     Mat center_region_Cb, right_region_Cb;//center and right boxes?
-    Mat YCrCb = new Mat(); // no idea
-    Mat Cb = new Mat(); // no idea
+    Mat YCrCb = new Mat(); // the input image in the YCrCb color space
+    Mat Cb = new Mat(); // the Cb channel of the above image
 
     private volatile TSEPosition position = TSEPosition.LEFT; // default position
 
@@ -53,23 +53,26 @@ public class DuckPipeline extends OpenCvPipeline
     private volatile int centerAvg; //average reading from left box
 
     /**
-     * no idea
+     * converts input to the YCrCb color space, and saves the new image to the YCrCb matrix
+     * then extracts the Cb color channel from the YCrCb matrix and saves it to the Cb matrix
      * @param input
      */
     void inputToCb(Mat input)
     {
-        Imgproc.cvtColor(input, YCrCb, Imgproc.COLOR_RGB2YCrCb); // last one is the color scheme
-        Core.extractChannel(YCrCb, Cb, 2); // no idea
+        Imgproc.cvtColor(input, YCrCb, Imgproc.COLOR_RGB2YCrCb);    // last one is the color scheme
+                                                                    // take the input, convert it to the YCrCb color space, and save the new image to the YCrCb array
+        Core.extractChannel(YCrCb, Cb, 2); // take the contents of channel 2 from YCrCb and copy it into CB
+                                                // take the Cb channel from YCrCb and copy it to the Cb matrix
     }
 
     /**
-     * initialize the ... something
-     * @param firstFrame idk, but doesn't seem like we need to call this anyway
+     * initialize the pipeline
+     * @param firstFrame the first frame that the camera sees
      */
     @Override
     public void init(Mat firstFrame)
     {
-        inputToCb(firstFrame); // no idea
+        inputToCb(firstFrame); // take the first frame, and convert it to the YCrCb color space, also extract the Cb channel from it
 
         center_region_Cb = Cb.submat(new Rect(center_region_pointA, center_region_pointB)); //this holds the pixels within the center box
         right_region_Cb = Cb.submat(new Rect(right_region_pointA, right_region_pointB)); //this holds the pixels within the right box
@@ -78,24 +81,24 @@ public class DuckPipeline extends OpenCvPipeline
     /**
      * seems like this is run asynchronously or something, and we access the results of this through other methods like getAnalysis()
      * kinda like the runOpMode of an opMode
-     * @param input not sure, you don't call this though,
-     * @return don't know
+     * @param input the image that the camera sees
+     * @return the input, not sure why
      */
     @Override
     public Mat processFrame(Mat input)
     {
-        inputToCb(input);
+        inputToCb(input);// take the input frame, and convert it to the YCrCb color space, also extract the Cb channel from it
 
         centerAvg = (int) Core.mean(center_region_Cb).val[0]; // average the colors, get a scalar, access the value at index 0 (red?)
         rightAvg = (int) Core.mean(right_region_Cb).val[0]; // average the colors, get a scalar, access the value at index 0 (red?)
 
         //draw center box
         Imgproc.rectangle(
-                input,
-                center_region_pointA,
-                center_region_pointB,
-                BLUE,
-                2);
+                input, //image the rectangle is on
+                center_region_pointA, // top left corner of image
+                center_region_pointB, // bottom right corner of image
+                BLUE, //color of border
+                2); //thickness of border
 
         //draw right box
         Imgproc.rectangle(

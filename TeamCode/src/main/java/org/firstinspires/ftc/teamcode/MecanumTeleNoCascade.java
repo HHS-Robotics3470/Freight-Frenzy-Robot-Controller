@@ -88,6 +88,7 @@ public class   MecanumTeleNoCascade  extends LinearOpMode {
         //raise arm
         robot.intakeSystem.intakeGrabberServo.setPosition(robot.intakeSystem.GRABBER_CLOSED);
         robot.intakeSystem.intakeArmServo.setPosition(robot.intakeSystem.ARM_RAISED);
+        inputState = IOState.CLOSED;
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
             /* CONTROLS

@@ -89,9 +89,7 @@ public class redWareSideWarehouseParkAuto extends org.firstinspires.ftc.teamcode
         //1.1
         sleep(1000); //give it time to find it
 
-        level = super.determineLevel();
-        if (level == -1) level = super.levelByMarker();
-
+        level = robot.pipeline.getAnalysis();
 
         //1.2
         telemetry.addData("level: ", level);

@@ -22,6 +22,10 @@ import org.firstinspires.ftc.teamcode.Components.CascadeOutputSystem;
 import org.firstinspires.ftc.teamcode.Components.Component;
 import org.firstinspires.ftc.teamcode.Components.IntakeSystem;
 import org.firstinspires.ftc.teamcode.Components.MecanumDriveTrain;
+import org.firstinspires.ftc.vision.DuckPipeline;
+import org.openftc.easyopencv.OpenCvCamera;
+import org.openftc.easyopencv.OpenCvCameraFactory;
+import org.openftc.easyopencv.OpenCvCameraRotation;
 
 import java.util.List;
 /*
@@ -109,6 +113,10 @@ public class Hardware implements Component {
     public MecanumDriveTrain driveTrain = new MecanumDriveTrain();
     public IntakeSystem intakeSystem = new IntakeSystem();
     public CascadeOutputSystem cascadeOutputSystem = new CascadeOutputSystem();
+
+    //**openCV**//
+    public OpenCvCamera webcam;
+    public DuckPipeline pipeline;
 
     //**Motors**//
     public DcMotor turntableMotor; //other motors
@@ -244,10 +252,30 @@ public class Hardware implements Component {
         //webcam
         vuforiaWebcam = hwMap.get(WebcamName.class, "vuforia_webcam");
 
+        int cameraMonitorViewId = hwMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hwMap.appContext.getPackageName());
+        webcam = OpenCvCameraFactory.getInstance().createWebcam(hwMap.get(WebcamName.class, "vuforia_webcam"), cameraMonitorViewId);
+        pipeline = new DuckPipeline();
+        webcam.setPipeline(pipeline);
+        webcam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener()
+        {
+            @Override
+            public void onOpened()
+            {
+                webcam.startStreaming(1280,960, OpenCvCameraRotation.UPRIGHT);
+            }
+
+            @Override
+            public void onError(int errorCode) { }
+        });
+
+
+        /*
         //vuforia and tensorflow
         initVuforia();
         initTfod();
         vuforiaEnabled = true;
+
+         */
     }
     private void initVuforia() {
         /*

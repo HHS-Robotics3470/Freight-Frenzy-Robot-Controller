@@ -85,7 +85,7 @@ public class DuckPipeline extends OpenCvPipeline
                 BLUE,
                 2);
 
-        if(centerAvg < 145)
+        if(rightAvg > 120 && rightAvg < 130)
         {
             position = TSEPosition.CENTER;
 
@@ -96,7 +96,7 @@ public class DuckPipeline extends OpenCvPipeline
                     GREEN,
                     -1);
         }
-        else if(rightAvg < 140)
+        else if(rightAvg > 130)
         {
             position = TSEPosition.RIGHT;
 

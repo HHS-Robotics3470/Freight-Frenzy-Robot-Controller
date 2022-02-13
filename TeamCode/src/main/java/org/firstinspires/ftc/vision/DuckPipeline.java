@@ -76,7 +76,7 @@ public class DuckPipeline extends OpenCvPipeline
     }
 
     /**
-     * seems like this is run assynchronously or something, and we access the results of this through other methods like getAnalysis()
+     * seems like this is run asynchronously or something, and we access the results of this through other methods like getAnalysis()
      * kinda like the runOpMode of an opMode
      * @param input not sure, you don't call this though,
      * @return don't know

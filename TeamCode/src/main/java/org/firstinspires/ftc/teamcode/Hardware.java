@@ -261,7 +261,7 @@ public class Hardware implements Component {
             @Override
             public void onOpened()
             {
-                webcam.startStreaming(1280,960, OpenCvCameraRotation.UPRIGHT);
+                webcam.startStreaming(1280,960, OpenCvCameraRotation.UPRIGHT); //resolution and orientation of camera
             }
 
             @Override

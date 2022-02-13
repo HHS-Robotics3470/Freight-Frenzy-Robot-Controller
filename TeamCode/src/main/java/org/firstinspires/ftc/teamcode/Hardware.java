@@ -114,8 +114,8 @@ public class Hardware implements Component {
     public CascadeOutputSystem cascadeOutputSystem = new CascadeOutputSystem();
 
     //**openCV**//
-    public OpenCvCamera webcam;
-    public DuckPipeline pipeline;
+    public OpenCvCamera opencvWebcam;
+    public DuckPipeline opencvPipeline;
 
     //**Motors**//
     public DcMotor turntableMotor; //other motors
@@ -161,6 +161,10 @@ public class Hardware implements Component {
     //private ElapsedTime runtime  = new ElapsedTime();
     private static final String VUFORIA_KEY = "AW/D8Tv/////AAABmaz//hdMn0Nmm2YoSrW8emZqrSTAb26m/pJRCgy4GeNX6aO6frTzk1FQ/y8IC0mbDWke8NXa87KACa/HR1kVRqaamTM60GJcobyaZaK1k0NAkVZ94iJY/RlWsIzESF3hql3ADHV9oHUuSvZWAVkF8f01xr4bzFtLrXgORIxOFKsT4TWSfHIr1pZel50uC0psgWIWpcDFGY3wTHlcfahX93OY8rqz98vwZC6b2u0MiikDwFjzKD2zxtSvQkYyIogyccKwZrC4z432K1GwxSvUanLJVsNypOcDqVrXWJdHKSmJSuQ8Zrl5SDvPXFewBpBYUTacsrdIx6bUykW+hSTcMxFzMo8MHjrv+FYgtJwaVsFT";
     private boolean vuforiaEnabled = false;
+    private boolean openCvEnabled = false;
+
+
+
     /* --Constructors-- */
     public Hardware(){
 
@@ -240,9 +244,45 @@ public class Hardware implements Component {
         imu.initialize(parameters);
     }
 
+    ////////CV///////
+    //Open CV
+    //OpenCV
+    public void initOpenCV(HardwareMap ahwMap) {
+        //if vuforia already enabled, disable then re-enable
+        if (vuforiaEnabled) {
+            vuforia.close();
+            tfod.deactivate();
+        }
+
+        if (hwMap == null) {
+            hwMap=ahwMap;// Save reference to Hardware map
+        }
+
+        //open CV innit stuff
+        int cameraMonitorViewId = hwMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hwMap.appContext.getPackageName());
+        opencvWebcam = OpenCvCameraFactory.getInstance().createWebcam(hwMap.get(WebcamName.class, "vuforia_webcam"), cameraMonitorViewId);
+        opencvPipeline = new DuckPipeline();
+        opencvWebcam.setPipeline(opencvPipeline);
+        opencvWebcam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener()
+        {
+            @Override
+            public void onOpened()
+            {
+                opencvWebcam.startStreaming(1280,960, OpenCvCameraRotation.UPRIGHT); //resolution and orientation of camera
+            }
+
+            @Override
+            public void onError(int errorCode) { }
+        });
+
+        openCvEnabled = true;
+    }
+
     //vuforia stuff
     public void initVuforiaAndTfod(HardwareMap ahwMap) {
-        //if vuforia already enabled, disable then re-enable
+        if (openCvEnabled) {
+            opencvWebcam.closeCameraDevice();
+        }
 
         if (hwMap == null) {
             hwMap=ahwMap;// Save reference to Hardware map
@@ -251,30 +291,11 @@ public class Hardware implements Component {
         //webcam
         vuforiaWebcam = hwMap.get(WebcamName.class, "vuforia_webcam");
 
-        int cameraMonitorViewId = hwMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hwMap.appContext.getPackageName());
-        webcam = OpenCvCameraFactory.getInstance().createWebcam(hwMap.get(WebcamName.class, "vuforia_webcam"), cameraMonitorViewId);
-        pipeline = new DuckPipeline();
-        webcam.setPipeline(pipeline);
-        webcam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener()
-        {
-            @Override
-            public void onOpened()
-            {
-                webcam.startStreaming(1280,960, OpenCvCameraRotation.UPRIGHT); //resolution and orientation of camera
-            }
-
-            @Override
-            public void onError(int errorCode) { }
-        });
-
-
-        /*
         //vuforia and tensorflow
         initVuforia();
         initTfod();
         vuforiaEnabled = true;
 
-         */
     }
     private void initVuforia() {
         /*

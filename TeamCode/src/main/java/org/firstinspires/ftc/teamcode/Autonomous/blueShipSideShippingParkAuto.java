@@ -65,7 +65,7 @@ public class blueShipSideShippingParkAuto extends org.firstinspires.ftc.teamcode
          * The init() method of the hardware class does all the work here
          */
         robot.init(hardwareMap);
-        robot.initVuforiaAndTfod(hardwareMap);
+        robot.initOpenCV(hardwareMap);
 
         // Wait for the game to start (driver presses PLAY)
         sleep(3000);
@@ -99,7 +99,7 @@ public class blueShipSideShippingParkAuto extends org.firstinspires.ftc.teamcode
         /*step 1*/
         //1.1
         sleep(1000); //give it time to find it
-        level = robot.pipeline.getAnalysis();
+        level = robot.opencvPipeline.getAnalysis();
         //1.2
         telemetry.addData("level: ", level);
         telemetry.addData("step: ",1.2);

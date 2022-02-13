@@ -1,12 +1,8 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
-
-import org.firstinspires.ftc.robotcore.internal.hardware.android.GpioPin;
-import org.firstinspires.ftc.teamcode.Hardware;
 
 /**
  * Template for Autonomous routines
@@ -31,7 +27,7 @@ public class openCVTester  extends LinearOpMode{
          * The init() method of the hardware class does all the work here
          */
         robot.init(hardwareMap);
-        robot.initVuforiaAndTfod(hardwareMap); //uncomment if necessary
+        robot.initOpenCV(hardwareMap); //uncomment if necessary
 
 
         // Wait for the game to start (driver presses PLAY)
@@ -42,10 +38,10 @@ public class openCVTester  extends LinearOpMode{
 
         //autonomous routine goes here step by step
         while (opModeIsActive()) {
-            int level = robot.pipeline.getAnalysis();
-            telemetry.addData("Position", robot.pipeline.getAnalysis());
-            telemetry.addData("Center Average", robot.pipeline.getAnalysis());
-            telemetry.addData("Right Average", robot.pipeline.getRightAvg());
+            int level = robot.opencvPipeline.getAnalysis();
+            telemetry.addData("Position", robot.opencvPipeline.getAnalysis());
+            telemetry.addData("Center Average", robot.opencvPipeline.getAnalysis());
+            telemetry.addData("Right Average", robot.opencvPipeline.getRightAvg());
             telemetry.update();
         }
 

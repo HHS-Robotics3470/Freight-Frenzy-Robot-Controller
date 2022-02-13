@@ -5,8 +5,6 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.Hardware;
-
 /**
  * Template for Autonomous routines
  * @author Anthony Rubick
@@ -38,7 +36,7 @@ public class tableParkingAutonomous extends LinearOpMode{
          * The init() method of the hardware class does all the work here
          */
         robot.init(hardwareMap);
-        robot.initVuforiaAndTfod(hardwareMap);
+        robot.initOpenCV(hardwareMap);
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();

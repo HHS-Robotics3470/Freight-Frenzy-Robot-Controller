@@ -3,7 +3,6 @@ package org.firstinspires.ftc.teamcode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import org.firstinspires.ftc.teamcode.Components.CascadeOutputSystem;
-import org.firstinspires.ftc.teamcode.Hardware;
 
 /**
  * auto used at remote events, and when we're red alliance, starting on the barcode closest to the warehouse, and parking in the warehouse
@@ -52,7 +51,7 @@ public class redWareSideWarehouseParkAuto extends org.firstinspires.ftc.teamcode
          * The init() method of the hardware class does all the work here
          */
         robot.init(hardwareMap);
-        robot.initVuforiaAndTfod(hardwareMap);
+        robot.initOpenCV(hardwareMap);
 
         // Wait for the game to start (driver presses PLAY)
         sleep(3000);
@@ -89,7 +88,7 @@ public class redWareSideWarehouseParkAuto extends org.firstinspires.ftc.teamcode
         //1.1
         sleep(1000); //give it time to find it
 
-        level = robot.pipeline.getAnalysis();
+        level = robot.opencvPipeline.getAnalysis();
 
         //1.2
         telemetry.addData("level: ", level);

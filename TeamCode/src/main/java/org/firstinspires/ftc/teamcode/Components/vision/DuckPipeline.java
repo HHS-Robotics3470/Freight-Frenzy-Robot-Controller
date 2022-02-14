@@ -10,6 +10,7 @@ import org.openftc.easyopencv.OpenCvPipeline;
 
 public class DuckPipeline extends OpenCvPipeline
 {
+    /* enums */
     //possible positions of the team game element
     public enum TSEPosition
     {
@@ -18,6 +19,8 @@ public class DuckPipeline extends OpenCvPipeline
         RIGHT
     }
 
+
+    /* general constants */
     //resolution of input stream
     public static final int resWidth = 1280;
     public static final int resHeight = 960;
@@ -25,6 +28,8 @@ public class DuckPipeline extends OpenCvPipeline
     static final Scalar BLUE = new Scalar(0, 0, 255); //color blue
     static final Scalar GREEN = new Scalar(0, 255, 0); //color green
 
+
+    /* Center and Right regions */
     static final Point CENTER_REGION_TOPLEFT_ANCHOR_POINT = new Point(540,310); //top left corner of the center box
     static final Point RIGHT_REGION_TOPLEFT_ANCHOR_POINT = new Point(1040,280); //top left corner of the right box
     static final int REGION_WIDTH = 200; //width of boxes
@@ -37,7 +42,6 @@ public class DuckPipeline extends OpenCvPipeline
     Point center_region_pointB = new Point(
             CENTER_REGION_TOPLEFT_ANCHOR_POINT.x + REGION_WIDTH,
             CENTER_REGION_TOPLEFT_ANCHOR_POINT.y + REGION_HEIGHT);
-
     //top left and bottom right corners of right box
     Point right_region_pointA = new Point(
             RIGHT_REGION_TOPLEFT_ANCHOR_POINT.x,
@@ -46,16 +50,18 @@ public class DuckPipeline extends OpenCvPipeline
             RIGHT_REGION_TOPLEFT_ANCHOR_POINT.x + REGION_WIDTH,
             RIGHT_REGION_TOPLEFT_ANCHOR_POINT.y + REGION_HEIGHT);
 
-    //matrixes
+
+    /*readings from image*/
     Mat center_region_Cb, right_region_Cb;//Cb values of the center and right regions of the input image
     Mat YCrCb = new Mat(); // the input image in the YCrCb color space
     Mat Cb = new Mat(); // the Cb channel of the YCrCb image (blue)
 
     private volatile TSEPosition position = TSEPosition.LEFT; // default position
 
-    private volatile int rightAvg; //average reading from right box
-    private volatile int centerAvg; //average reading from left box
+    private volatile int rightAvg; //average reading from right region
+    private volatile int centerAvg; //average reading from left region
 
+    /* methods */
     /**
      * converts input to the YCrCb color space, and saves the new image to the YCrCb matrix
      * then extracts the Cb color channel from the YCrCb matrix and saves it to the Cb matrix
@@ -164,7 +170,7 @@ public class DuckPipeline extends OpenCvPipeline
     }
 
     /**
-     * @return average reading of center box
+     * @return average reading of center region
      */
     public int getCenterAvg()
     {
@@ -172,7 +178,7 @@ public class DuckPipeline extends OpenCvPipeline
     }
 
     /**
-     * @return average reading of right box
+     * @return average reading of right region
      */
     public int getRightAvg()
     {

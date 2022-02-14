@@ -41,17 +41,12 @@ public class openCVTester  extends LinearOpMode{
         robot.init(hardwareMap);
         initOpencvTestPipeline();
 
-        // Wait for the game to start (driver presses PLAY)
-        waitForStart();
-        runtime.reset();
-
-        ////////////after driver presses play////////////
-
-        //autonomous routine goes here step by step
-        while (opModeIsActive()) {
+        //remove this if it doesn't show up while camera stream is running
+        while (!opModeIsActive()) {
             int level = pipeline.getAnalysis();
             Scalar centerAvg = pipeline.getCenterAvg();
             Scalar rightAvg = pipeline.getRightAvg();
+            Scalar bottomAvg = pipeline.getBottomAvg();
             telemetry.addData("Position: ", level);
             telemetry.addLine(String.format("Center Averages: \n\tY: %d\tCr: %d\tCb: %d",
                     (int) centerAvg.val[0],
@@ -62,6 +57,42 @@ public class openCVTester  extends LinearOpMode{
                     (int) rightAvg.val[0],
                     (int) rightAvg.val[1],
                     (int) rightAvg.val[2]
+            ));
+            telemetry.addLine(String.format("Bottom Averages: \n\tY: %d\tCr: %d\tCb: %d",
+                    (int) bottomAvg.val[0],
+                    (int) bottomAvg.val[1],
+                    (int) bottomAvg.val[2]
+            ));
+            telemetry.update();
+        }
+        // Wait for the game to start (driver presses PLAY)
+        waitForStart();
+        runtime.reset();
+
+        ////////////after driver presses play////////////
+
+        //autonomous routine goes here step by step
+        //remove contents of this if previous while loop functions properly
+        while (opModeIsActive()) {
+            int level = pipeline.getAnalysis();
+            Scalar centerAvg = pipeline.getCenterAvg();
+            Scalar rightAvg = pipeline.getRightAvg();
+            Scalar bottomAvg = pipeline.getBottomAvg();
+            telemetry.addData("Position: ", level);
+            telemetry.addLine(String.format("Center Averages: \n\tY: %d\tCr: %d\tCb: %d",
+                    (int) centerAvg.val[0],
+                    (int) centerAvg.val[1],
+                    (int) centerAvg.val[2]
+            ));
+            telemetry.addLine(String.format("Right Averages: \n\tY: %d\tCr: %d\tCb: %d",
+                    (int) rightAvg.val[0],
+                    (int) rightAvg.val[1],
+                    (int) rightAvg.val[2]
+            ));
+            telemetry.addLine(String.format("Bottom Averages: \n\tY: %d\tCr: %d\tCb: %d",
+                    (int) bottomAvg.val[0],
+                    (int) bottomAvg.val[1],
+                    (int) bottomAvg.val[2]
             ));
             telemetry.update();
         }

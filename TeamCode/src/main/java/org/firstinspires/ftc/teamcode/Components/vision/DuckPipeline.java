@@ -89,6 +89,11 @@ public class DuckPipeline extends OpenCvPipeline
     {
         inputToCb(firstFrame); // take the first frame, and convert it to the YCrCb color space, also extract the Cb channel from it
 
+        /*
+         * Submats are a persistent reference to a region of the parent
+         * buffer. Any changes to the child affect the parent, and the
+         * reverse also holds true.
+         */
         center_region_Cb = Cb.submat(new Rect(center_region_pointA, center_region_pointB)); //this holds the Cb of pixels within the center box
         right_region_Cb = Cb.submat(new Rect(right_region_pointA, right_region_pointB)); //this holds the Cb of pixels within the right box
     }

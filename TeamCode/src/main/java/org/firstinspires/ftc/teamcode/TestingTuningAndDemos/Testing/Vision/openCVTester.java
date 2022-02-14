@@ -41,24 +41,36 @@ public class openCVTester  extends LinearOpMode{
         robot.init(hardwareMap);
         initOpencvTestPipeline();
 
-        //remove this if it doesn't show up while camera stream is running
+        //uncomment this if camera stream isn't available after init
         while (!opModeIsActive()) {
             int level = pipeline.getAnalysis();
             Scalar centerAvg = pipeline.getCenterAvg();
             Scalar rightAvg = pipeline.getRightAvg();
             Scalar bottomAvg = pipeline.getBottomAvg();
+
+
+            telemetry.addLine(String.format("FPS: %5.2f / MAX: %d",
+                    webcam.getFps(),
+                    webcam.getCurrentPipelineMaxFps()
+            ));
+            telemetry.addLine(String.format("Frame time: %4d ms | Pipeline time: %4d ms",
+                    webcam.getOverheadTimeMs(),
+                    webcam.getOverheadTimeMs()
+            ));
+
+            telemetry.addLine();
             telemetry.addData("Position: ", level);
-            telemetry.addLine(String.format("Center Averages: \n\tY: %d\tCr: %d\tCb: %d",
+            telemetry.addLine(String.format("Center Averages: \n\tY-(%d)  Cr-(%d)  Cb-(%d)",
                     (int) centerAvg.val[0],
                     (int) centerAvg.val[1],
                     (int) centerAvg.val[2]
             ));
-            telemetry.addLine(String.format("Right Averages: \n\tY: %d\tCr: %d\tCb: %d",
+            telemetry.addLine(String.format("Right Averages: \n\tY-(%d)  Cr-(%d)  Cb-(%d)",
                     (int) rightAvg.val[0],
                     (int) rightAvg.val[1],
                     (int) rightAvg.val[2]
             ));
-            telemetry.addLine(String.format("Bottom Averages: \n\tY: %d\tCr: %d\tCb: %d",
+            telemetry.addLine(String.format("Bottom Averages: \n\tY-(%d)  Cr-(%d)  Cb-(%d)",
                     (int) bottomAvg.val[0],
                     (int) bottomAvg.val[1],
                     (int) bottomAvg.val[2]

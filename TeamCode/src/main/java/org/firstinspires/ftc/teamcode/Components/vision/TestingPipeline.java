@@ -149,6 +149,12 @@ public class TestingPipeline extends OpenCvPipeline
     {
         extractChannels(firstFrame);
 
+
+        /*
+         * Submats are a persistent reference to a region of the parent
+         * buffer. Any changes to the child affect the parent, and the
+         * reverse also holds true.
+         */
         center_region = YCrCb.submat(centerRectangle); //holds the YCrCb values of the pixels within the center box
         right_region = YCrCb.submat(rightRectangle); //holds the YCrCb values of the pixels within the center box
         bottom_region = YCrCb.submat(bottomRectangle);

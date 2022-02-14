@@ -27,6 +27,16 @@ public class TestingPipeline extends OpenCvPipeline
         RIGHT
     }
 
+    /**
+     * what view is returned to the viewport
+     */
+    private enum Viewtype {
+        FULL_COLOR, //standard, shows what the camera sees with overlay
+        Y_MASK, //shows the Y channel of what the camera sees in the YCrCb color space
+        Cr_MASK, //shows the Cr channel of what the camera sees in the YCrCb color space
+        Cb_MASK //shows the Cb channel of what the camera sees in the YCrCb color space
+    }
+
 
     //TODO idea:
     // 1 Add a third region below the current 2,
@@ -53,6 +63,9 @@ public class TestingPipeline extends OpenCvPipeline
 
     static final Scalar BLUE = new Scalar(0, 0, 255); //color blue
     static final Scalar GREEN = new Scalar(0, 255, 0); //color green
+
+    private Viewtype viewToRenderToViewport = Viewtype.FULL_COLOR;
+    private Viewtype[] views = Viewtype.values();
 
 
     /* Center and Right regions */
@@ -127,7 +140,8 @@ public class TestingPipeline extends OpenCvPipeline
     }
 
     /**
-     * initialize the pipeline
+     * initialize the pipeline, don't need to call this anywhere,
+     * it runs automatically
      * @param firstFrame the first frame that the camera sees
      */
     @Override
@@ -141,10 +155,35 @@ public class TestingPipeline extends OpenCvPipeline
     }
 
     /**
-     * seems like this is run asynchronously or something, and we access the results of this through other methods like getAnalysis()
-     * kinda like the runOpMode of an opMode
+     * cycle the value assigned to viewToRenderToViewport
+     * run in the UI thread
+     * runs automatically when the viewport is tapped
+     */
+    @Override
+    public void onViewportTapped()
+    {
+        /*
+         * Note that this method is invoked from the UI thread
+         * so whatever we do here, we must do quickly.
+         */
+
+        int currentViewNum = viewToRenderToViewport.ordinal();
+
+        int nextViewNum = currentViewNum + 1;
+
+        if(nextViewNum >= views.length)
+        {
+            nextViewNum = 0;
+        }
+
+        viewToRenderToViewport = views[nextViewNum];
+    }
+
+    /**
+     * runs in its own thread (pre-defined and managed by the library).
+     * extracts and processes frames, returning whatever you want to show up on the viewport / camera stream.
      * @param input the image that the camera sees
-     * @return the input, not sure why
+     * @return the image shown on the viewport
      */
     @Override
     public Mat processFrame(Mat input)
@@ -231,7 +270,25 @@ public class TestingPipeline extends OpenCvPipeline
             position = TSEPosition.LEFT;
         }
 
-        return input;
+
+        //return view
+        switch (viewToRenderToViewport) {
+            case Y_MASK:
+                Mat Y = new Mat();
+                Core.extractChannel(YCrCb, Y, 0);
+                return Y;
+            case Cr_MASK:
+                Mat Cr = new Mat();
+                Core.extractChannel(YCrCb, Cr, 1);
+                return Cr;
+            case Cb_MASK:
+                Mat Cb = new Mat();
+                Core.extractChannel(YCrCb, Cb, 2);
+                return Cb;
+            case FULL_COLOR:
+            default:
+                return input;
+        }
     }
 
     /**

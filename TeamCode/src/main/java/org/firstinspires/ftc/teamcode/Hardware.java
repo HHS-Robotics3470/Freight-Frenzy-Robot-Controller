@@ -287,6 +287,7 @@ public class Hardware implements Component {
     public void initVuforiaAndTfod(HardwareMap ahwMap) {
         //if openCV is already running, stop it
         if (openCvEnabled) {
+            opencvWebcam.stopStreaming();
             opencvWebcam.closeCameraDevice();
         }
 

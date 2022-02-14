@@ -80,7 +80,8 @@ public class DuckPipeline extends OpenCvPipeline
     }
 
     /**
-     * initialize the pipeline
+     * initialize the pipeline, don't need to call this anywhere,
+     * it runs automatically
      * @param firstFrame the first frame that the camera sees
      */
     @Override
@@ -93,10 +94,10 @@ public class DuckPipeline extends OpenCvPipeline
     }
 
     /**
-     * seems like this is run asynchronously or something, and we access the results of this through other methods like getAnalysis()
-     * kinda like the runOpMode of an opMode
+     * runs in its own thread (pre-defined and managed by the library).
+     * extracts and processes frames, returning whatever you want to show up on the viewport / camera stream.
      * @param input the image that the camera sees
-     * @return the input, not sure why
+     * @return the image shown on the viewport
      */
     @Override
     public Mat processFrame(Mat input)

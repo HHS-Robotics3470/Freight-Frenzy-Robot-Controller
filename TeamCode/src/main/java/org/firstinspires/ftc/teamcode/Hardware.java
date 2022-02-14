@@ -113,9 +113,7 @@ public class Hardware implements Component {
     public IntakeSystem intakeSystem = new IntakeSystem();
     public CascadeOutputSystem cascadeOutputSystem = new CascadeOutputSystem();
 
-    //**openCV**//
-    public OpenCvCamera opencvWebcam;
-    public DuckPipeline opencvPipeline;
+
 
     //**Motors**//
     public DcMotor turntableMotor; //other motors
@@ -141,6 +139,9 @@ public class Hardware implements Component {
             "Duck",
             "Marker"
     };
+    //openCV
+    public OpenCvCamera opencvWebcam;
+    public DuckPipeline opencvPipeline;
     //expansion hubs
     List<LynxModule> allHubs;
 
@@ -248,7 +249,7 @@ public class Hardware implements Component {
     //Open CV
     //OpenCV
     public void initOpenCV(HardwareMap ahwMap) {
-        //if vuforia already enabled, disable then re-enable
+        //if vuforia already enabled, disable
         if (vuforiaEnabled) {
             vuforia.close();
             tfod.deactivate();
@@ -268,7 +269,11 @@ public class Hardware implements Component {
             @Override
             public void onOpened()
             {
-                opencvWebcam.startStreaming(1280,960, OpenCvCameraRotation.UPRIGHT); //resolution and orientation of camera
+                opencvWebcam.startStreaming(
+                        DuckPipeline.resWidth,
+                        DuckPipeline.resHeight,
+                        OpenCvCameraRotation.UPRIGHT
+                ); //resolution and orientation of camera
             }
 
             @Override
@@ -280,6 +285,7 @@ public class Hardware implements Component {
 
     //vuforia stuff
     public void initVuforiaAndTfod(HardwareMap ahwMap) {
+        //if openCV is already running, stop it
         if (openCvEnabled) {
             opencvWebcam.closeCameraDevice();
         }

@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.TestingTuningAndDemos.Testing.Vision;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
@@ -11,13 +11,15 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
+import org.firstinspires.ftc.teamcode.Hardware;
+import org.firstinspires.ftc.teamcode.R;
 
 
 /**
  * @author Adeel Ahmad
  */
 
-@Autonomous(name = "Vuforia Object Detection", group = "AI")
+@Autonomous(name = "Vuforia Object Detection", group = "Testing")
 public class VuforiaObjectDetection extends LinearOpMode{
 
     /*declare OpMode members, initialize some classes*/

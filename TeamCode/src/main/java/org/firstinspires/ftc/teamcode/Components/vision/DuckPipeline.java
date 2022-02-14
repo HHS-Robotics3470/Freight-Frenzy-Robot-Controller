@@ -8,6 +8,10 @@ import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 import org.openftc.easyopencv.OpenCvPipeline;
 
+/**
+ * pipeline for OpenCV for the Freight Frenzy season
+ * @author Anthony Rubick
+ */
 public class DuckPipeline extends OpenCvPipeline
 {
     /* enums */

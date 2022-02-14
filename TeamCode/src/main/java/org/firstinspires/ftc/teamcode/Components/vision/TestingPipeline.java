@@ -14,7 +14,7 @@ import org.openftc.easyopencv.OpenCvPipeline;
  *
  * NOTES when transferring things from this pipeline to the main pipeline:
  *  -keep in mind that a lot of stuff is unoptimized to increase amount of available data, in practice DO NOT store any data that isn't used (this includes color channels of regions that aren't read from)
- *
+ * @author Anthony Rubick
  */
 public class TestingPipeline extends OpenCvPipeline
 {

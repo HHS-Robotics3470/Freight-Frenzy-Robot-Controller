@@ -47,7 +47,7 @@ public class DuckPipeline extends OpenCvPipeline
             RIGHT_REGION_TOPLEFT_ANCHOR_POINT.y + REGION_HEIGHT);
 
     //matrixes
-    Mat center_region_Cb, right_region_Cb;//center and right boxes?
+    Mat center_region_Cb, right_region_Cb;//Cb values of the center and right regions of the input image
     Mat YCrCb = new Mat(); // the input image in the YCrCb color space
     Mat Cb = new Mat(); // the Cb channel of the YCrCb image (blue)
 
@@ -64,7 +64,7 @@ public class DuckPipeline extends OpenCvPipeline
     private void inputToCb(Mat input)
     {
         Imgproc.cvtColor(input, YCrCb, Imgproc.COLOR_RGB2YCrCb);    // last one is the color scheme
-                                                                    // take the input, convert it to the YCrCb color space, and save the new image to the YCrCb array
+                                                                    // take the input, convert it to the YCrCb color space, and save the new image to the YCrCb matrix
         Core.extractChannel(YCrCb, Cb, 2); // take the contents of channel 2 from YCrCb and copy it into CB
                                                 // take the Cb channel from YCrCb and copy it to the Cb matrix
     }
@@ -98,7 +98,7 @@ public class DuckPipeline extends OpenCvPipeline
 
         //draw center box
         Imgproc.rectangle(
-                input, //image the rectangle is on
+                input, //image the rectangle is drawn on
                 center_region_pointA, // top left corner of image
                 center_region_pointB, // bottom right corner of image
                 BLUE, //color of border
@@ -113,7 +113,7 @@ public class DuckPipeline extends OpenCvPipeline
                 2);
 
         //logic to determine the level
-        if(rightAvg > 120 && rightAvg < 130)
+        if(centerAvg < 145)
         {
             position = TSEPosition.CENTER;
 
@@ -125,7 +125,7 @@ public class DuckPipeline extends OpenCvPipeline
                     GREEN,
                     -1);
         }
-        else if(rightAvg > 130)
+        else if(rightAvg < 130)
         {
             position = TSEPosition.RIGHT;
 

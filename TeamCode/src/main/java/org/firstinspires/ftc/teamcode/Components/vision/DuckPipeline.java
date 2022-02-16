@@ -23,6 +23,24 @@ public class DuckPipeline extends OpenCvPipeline
         RIGHT
     }
 
+       /*
+    camera resolution thing
+    note, origin in top left corner of screen
+    (0,0)------------------------------------------------------(1280,0)
+      |                                                            |
+      |                                                            |
+      |                                                            |
+      |                                                            |
+      |                                                            |
+      |                                                            |
+      |                                                            |
+      |                                                            |
+      |                                                            |
+      |                                                            |
+      |                                                            |
+      |                                                            |
+    (0,960)---------------------------------------------------(1280,960)
+     */
 
     /* general constants */
     //resolution of input stream

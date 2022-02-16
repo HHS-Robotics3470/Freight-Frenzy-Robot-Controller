@@ -18,7 +18,7 @@ import org.openftc.easyopencv.OpenCvCameraRotation;
  * Template for Autonomous routines
  * @author Anthony Rubick
  */
-@Autonomous(name="openCV tester", group="Testing" )
+@Autonomous(name="openCV tester", group="AI Testing" )
 //@Disabled //this line disables the autonomous from appearing on the driver station, remove it for your code
 public class openCVTester  extends LinearOpMode{
     /*declare OpMode members, initialize some classes*/
@@ -34,20 +34,28 @@ public class openCVTester  extends LinearOpMode{
     {
         ////////////before driver presses play////////////
         //Variables
+        //button lock
+        boolean ac, ap=false;
 
         /* Initialize the hardware variables.
          * The init() method of the hardware class does all the work here
          */
         robot.init(hardwareMap);
         initOpencvTestPipeline();
-
+        //sleep(1000);
         //uncomment this if camera stream isn't available after init
         while (!opModeIsActive()) {
+
             int level = pipeline.getAnalysis();
             Scalar centerAvg = pipeline.getCenterAvg();
             Scalar rightAvg = pipeline.getRightAvg();
             Scalar bottomAvg = pipeline.getBottomAvg();
 
+            ac=gamepad1.a;
+            if (ac && !ap) {
+                pipeline.cycleViewport();
+            }
+            ap=ac;
 
             telemetry.addLine(String.format("FPS: %5.2f / MAX: %d",
                     webcam.getFps(),
@@ -60,6 +68,7 @@ public class openCVTester  extends LinearOpMode{
 
             telemetry.addLine();
             telemetry.addData("Position: ", level);
+            telemetry.addData("viewport type: ", pipeline.getViewAsString());
             telemetry.addLine(String.format("Center Averages: \n\tY-(%d)  Cr-(%d)  Cb-(%d)",
                     (int) centerAvg.val[0],
                     (int) centerAvg.val[1],
@@ -86,27 +95,7 @@ public class openCVTester  extends LinearOpMode{
         //autonomous routine goes here step by step
         //remove contents of this if previous while loop functions properly
         while (opModeIsActive()) {
-            int level = pipeline.getAnalysis();
-            Scalar centerAvg = pipeline.getCenterAvg();
-            Scalar rightAvg = pipeline.getRightAvg();
-            Scalar bottomAvg = pipeline.getBottomAvg();
-            telemetry.addData("Position: ", level);
-            telemetry.addLine(String.format("Center Averages: \n\tY: %d\tCr: %d\tCb: %d",
-                    (int) centerAvg.val[0],
-                    (int) centerAvg.val[1],
-                    (int) centerAvg.val[2]
-            ));
-            telemetry.addLine(String.format("Right Averages: \n\tY: %d\tCr: %d\tCb: %d",
-                    (int) rightAvg.val[0],
-                    (int) rightAvg.val[1],
-                    (int) rightAvg.val[2]
-            ));
-            telemetry.addLine(String.format("Bottom Averages: \n\tY: %d\tCr: %d\tCb: %d",
-                    (int) bottomAvg.val[0],
-                    (int) bottomAvg.val[1],
-                    (int) bottomAvg.val[2]
-            ));
-            telemetry.update();
+
         }
 
         ////////////after driver presses stop////////////
@@ -124,6 +113,7 @@ public class openCVTester  extends LinearOpMode{
             @Override
             public void onOpened()
             {
+                //webcam.setViewportRenderer(OpenCvCamera.ViewportRenderer.GPU_ACCELERATED);
                 webcam.startStreaming(
                         TestingPipeline.resWidth,
                         TestingPipeline.resHeight,

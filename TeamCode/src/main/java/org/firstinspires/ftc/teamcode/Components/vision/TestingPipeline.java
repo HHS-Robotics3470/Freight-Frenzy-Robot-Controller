@@ -37,6 +37,24 @@ public class TestingPipeline extends OpenCvPipeline
         Cb_MASK //shows the Cb channel of what the camera sees in the YCrCb color space
     }
 
+    /*
+    camera resolution thing
+    note, origin in top left corner of screen
+    (0,0)------------------------------------------------------(1280,0)
+      |                                                            |
+      |                                                            |
+      |                                                            |
+      |                                                            |
+      |                                                            |
+      |                                                            |
+      |                                                            |
+      |                                                            |
+      |                                                            |
+      |                                                            |
+      |                                                            |
+      |                                                            |
+    (0,960)---------------------------------------------------(1280,960)
+     */
 
     //TODO idea:
     // 1 Add a third region below the current 2,
@@ -65,29 +83,29 @@ public class TestingPipeline extends OpenCvPipeline
     static final Scalar GREEN = new Scalar(0, 255, 0); //color green
 
     private Viewtype viewToRenderToViewport = Viewtype.FULL_COLOR;
-    private Viewtype[] views = Viewtype.values();
+    private final Viewtype[] views = Viewtype.values();
 
 
     /* Center and Right regions */
     //rectangle variables
-    static final Point CENTER_REGION_BOTTOMLEFT_ANCHOR_POINT = new Point(540,310); //bottom left corner of the center box
-    static final Point RIGHT_REGION_BOTTOMLEFT_ANCHOR_POINT = new Point(1040,280); //top left corner of the right box
-    static final int REGION_WIDTH = 200; //width of boxes
+    static final Point CENTER_REGION_TOPLEFT_ANCHOR_POINT = new Point(500,310); //bottom left corner of the center box
+    static final Point RIGHT_REGION_TOPLEFT_ANCHOR_POINT = new Point(1000,280); //top left corner of the right box
+    static final int REGION_WIDTH = 280; //width of boxes
     static final int REGION_HEIGHT = 375; //height of boxes
     //top left and bottom right corners of center box
     Point center_region_pointA = new Point(
-            CENTER_REGION_BOTTOMLEFT_ANCHOR_POINT.x,
-            CENTER_REGION_BOTTOMLEFT_ANCHOR_POINT.y);
+            CENTER_REGION_TOPLEFT_ANCHOR_POINT.x,
+            CENTER_REGION_TOPLEFT_ANCHOR_POINT.y);
     Point center_region_pointB = new Point(
-            CENTER_REGION_BOTTOMLEFT_ANCHOR_POINT.x + REGION_WIDTH,
-            CENTER_REGION_BOTTOMLEFT_ANCHOR_POINT.y + REGION_HEIGHT);
+            CENTER_REGION_TOPLEFT_ANCHOR_POINT.x + REGION_WIDTH,
+            CENTER_REGION_TOPLEFT_ANCHOR_POINT.y + REGION_HEIGHT);
     //top left and bottom right corners of right box
     Point right_region_pointA = new Point(
-            RIGHT_REGION_BOTTOMLEFT_ANCHOR_POINT.x,
-            RIGHT_REGION_BOTTOMLEFT_ANCHOR_POINT.y);
+            RIGHT_REGION_TOPLEFT_ANCHOR_POINT.x,
+            RIGHT_REGION_TOPLEFT_ANCHOR_POINT.y);
     Point right_region_pointB = new Point(
-            RIGHT_REGION_BOTTOMLEFT_ANCHOR_POINT.x + REGION_WIDTH,
-            RIGHT_REGION_BOTTOMLEFT_ANCHOR_POINT.y + REGION_HEIGHT);
+            RIGHT_REGION_TOPLEFT_ANCHOR_POINT.x + REGION_WIDTH,
+            RIGHT_REGION_TOPLEFT_ANCHOR_POINT.y + REGION_HEIGHT);
     //actual rectangles
     Rect centerRectangle = new Rect(center_region_pointA, center_region_pointB);
     Rect rightRectangle = new Rect(right_region_pointA, right_region_pointB);
@@ -96,8 +114,8 @@ public class TestingPipeline extends OpenCvPipeline
     //rectangle variables
     static final int BOTTOM_REGION_HEIGHT = 120;
     static final Point BOTTOM_REGION_TOPLEFT_ANCHOR_POINT = new Point(
-            CENTER_REGION_BOTTOMLEFT_ANCHOR_POINT.x,//left side of center box
-            Math.min(CENTER_REGION_BOTTOMLEFT_ANCHOR_POINT.y, RIGHT_REGION_BOTTOMLEFT_ANCHOR_POINT.y) - 50 // (lowest y of Center and Right regions) - 50
+            CENTER_REGION_TOPLEFT_ANCHOR_POINT.x,//left side of center box
+            Math.min(CENTER_REGION_TOPLEFT_ANCHOR_POINT.y+REGION_HEIGHT, RIGHT_REGION_TOPLEFT_ANCHOR_POINT.y+REGION_HEIGHT) + 50 // (lowest y of Center and Right regions) - 50
     );
     //top left and bottom right of calibration box (below center and right boxes)
     Point bottom_region_pointA = new Point(
@@ -105,8 +123,8 @@ public class TestingPipeline extends OpenCvPipeline
             BOTTOM_REGION_TOPLEFT_ANCHOR_POINT.y
     );
     Point bottom_region_pointB = new Point(
-            RIGHT_REGION_BOTTOMLEFT_ANCHOR_POINT.x, //right side of the right box
-            BOTTOM_REGION_TOPLEFT_ANCHOR_POINT.y - BOTTOM_REGION_HEIGHT //y of BOTTOM_REGION_TOPLEFT_ANCHOR_POINT - BOTTOM_REGION_HEIGHT
+            RIGHT_REGION_TOPLEFT_ANCHOR_POINT.x + REGION_WIDTH, //right side of the right box
+            BOTTOM_REGION_TOPLEFT_ANCHOR_POINT.y + BOTTOM_REGION_HEIGHT //y of BOTTOM_REGION_TOPLEFT_ANCHOR_POINT - BOTTOM_REGION_HEIGHT
     );
     //Rectangle
     Rect bottomRectangle = new Rect(bottom_region_pointA,bottom_region_pointB);
@@ -121,11 +139,11 @@ public class TestingPipeline extends OpenCvPipeline
     //scalar [ Y, Cr, Cb ]
     //       [ 0,  1,  2 ]
     //average reading from center region
-    private volatile Scalar centerAvg;
+    private volatile Scalar centerAvg = new Scalar(0,0,0);
     //average readings from right region
-    private volatile Scalar rightAvg;
+    private volatile Scalar rightAvg = new Scalar(0,0,0);
     //average readings from bottom region
-    private volatile Scalar bottomAvg;
+    private volatile Scalar bottomAvg = new Scalar(0,0,0);
 
 
     /* methods */
@@ -165,8 +183,7 @@ public class TestingPipeline extends OpenCvPipeline
      * run in the UI thread
      * runs automatically when the viewport is tapped
      */
-    @Override
-    public void onViewportTapped()
+    public void cycleViewport()
     {
         /*
          * Note that this method is invoked from the UI thread
@@ -214,7 +231,6 @@ public class TestingPipeline extends OpenCvPipeline
                 input,
                 center_region_pointA,
                 center_region_pointB,
-                4,
                 centerAvgRGB,
                 BLUE
         );
@@ -223,7 +239,6 @@ public class TestingPipeline extends OpenCvPipeline
                 input,
                 right_region_pointA,
                 right_region_pointB,
-                4,
                 rightAvgRGB,
                 BLUE
         );
@@ -239,9 +254,9 @@ public class TestingPipeline extends OpenCvPipeline
         //logic to determine the level
         int centerYDist = (int) (centerAvg.val[0] - bottomAvg.val[0]);
         int rightYDist = (int) (rightAvg.val[0] - bottomAvg.val[0]);
-        if(centerYDist >= 20) // if center is brighter than the bottom, todo: tune the value
+        //if(centerYDist >= 20) // if center is brighter than the bottom, todo: tune the value
         //if that doesn't work consistently in different lighting conditions, try this
-        //if ( 0.9*centerYDist > rightYDist ) // if center is more than 10% brighter than right compared to the bottom, todo: tune the value
+        if ( 0.75*centerYDist > rightYDist ) // if center is more than 25% brighter than right compared to the bottom, todo: tune the value
         {
             position = TSEPosition.CENTER;
 
@@ -250,14 +265,13 @@ public class TestingPipeline extends OpenCvPipeline
                     input,
                     center_region_pointA,
                     center_region_pointB,
-                    4,
                     centerAvgRGB,
                     GREEN
             );
         }
-        else if(rightYDist >= 20) // if right is MIN_Y_DIST_FOR_DETECTION brighter than bottom, todo: tune the value
+        //else if(rightYDist >= 20) // if right is MIN_Y_DIST_FOR_DETECTION brighter than bottom, todo: tune the value
         //if that doesn't work consistently in different lighting conditions, try this
-        //else if ( 0.9*rightYDist > centerYDist ) // if right is more than 10% brighter than center compared to the bottom, todo: tune the value
+        else if ( 0.75*rightYDist > centerYDist ) // if right is more than 25% brighter than center compared to the bottom, todo: tune the value
         {
             position = TSEPosition.RIGHT;
 
@@ -266,7 +280,6 @@ public class TestingPipeline extends OpenCvPipeline
                     input,
                     right_region_pointA,
                     right_region_pointB,
-                    4,
                     rightAvgRGB,
                     GREEN
             );
@@ -303,18 +316,17 @@ public class TestingPipeline extends OpenCvPipeline
      * @param input image to draw on
      * @param regionPointA top left corner of region
      * @param regionPointB bottom right corner of region
-     * @param borderThickness thickness of border
      * @param innerColor color of inner region of border
      * @param outerColor color of outer region of border
      */
-    private void drawDetailedBorderAroundRegion(Mat input, Point regionPointA, Point regionPointB, int borderThickness, Scalar innerColor, Scalar outerColor) {
+    private void drawDetailedBorderAroundRegion(Mat input, Point regionPointA, Point regionPointB, Scalar innerColor, Scalar outerColor) {
         //outer border
         Imgproc.rectangle(
                 input,
                 regionPointA,
                 regionPointB,
                 outerColor,
-                (int) (borderThickness * 0.75)
+                14
         );
         //middle
         Imgproc.rectangle(
@@ -322,16 +334,17 @@ public class TestingPipeline extends OpenCvPipeline
                 regionPointA,
                 regionPointB,
                 innerColor,
-                (int) (borderThickness * 0.5)
+                10
         );
         //inner border
-        Imgproc.rectangle(
+        /*Imgproc.rectangle(
                 input,
                 regionPointA,
                 regionPointB,
                 outerColor,
-                -(int) (borderThickness * 0.25)
+                4
         );
+         */
     }
 
 
@@ -377,5 +390,12 @@ public class TestingPipeline extends OpenCvPipeline
      */
     public Scalar getBottomAvg() {
         return bottomAvg;
+    }
+
+    /**
+     * @return string representation of view being rendered to viewport
+     */
+    public String getViewAsString() {
+        return viewToRenderToViewport.toString();
     }
 }

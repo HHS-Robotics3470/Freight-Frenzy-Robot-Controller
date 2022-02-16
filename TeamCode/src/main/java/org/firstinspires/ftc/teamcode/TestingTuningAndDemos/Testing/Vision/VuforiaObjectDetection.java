@@ -19,7 +19,8 @@ import org.firstinspires.ftc.teamcode.R;
  * @author Adeel Ahmad
  */
 
-@Autonomous(name = "Vuforia Object Detection", group = "Testing")
+@Autonomous(name = "Vuforia Object Detection", group = "AI Testing")
+//@Disabled //this line disables the autonomous from appearing on the driver station, remove it for your code
 public class VuforiaObjectDetection extends LinearOpMode{
 
     /*declare OpMode members, initialize some classes*/

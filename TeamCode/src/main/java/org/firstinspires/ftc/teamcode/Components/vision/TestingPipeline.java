@@ -89,8 +89,8 @@ public class TestingPipeline extends OpenCvPipeline
     /* Center and Right regions */
     //rectangle variables
     static final Point CENTER_REGION_TOPLEFT_ANCHOR_POINT = new Point(500,310); //bottom left corner of the center box
-    static final Point RIGHT_REGION_TOPLEFT_ANCHOR_POINT = new Point(1000,280); //top left corner of the right box
-    static final int REGION_WIDTH = 280; //width of boxes
+    static final Point RIGHT_REGION_TOPLEFT_ANCHOR_POINT = new Point(1040,280); //top left corner of the right box
+    static final int REGION_WIDTH = 240; //width of boxes
     static final int REGION_HEIGHT = 375; //height of boxes
     //top left and bottom right corners of center box
     Point center_region_pointA = new Point(
@@ -110,12 +110,16 @@ public class TestingPipeline extends OpenCvPipeline
     Rect centerRectangle = new Rect(center_region_pointA, center_region_pointB);
     Rect rightRectangle = new Rect(right_region_pointA, right_region_pointB);
 
-    /* bottom region */
+    /* top / bottom region */
     //rectangle variables
-    static final int BOTTOM_REGION_HEIGHT = 120;
+    static final int TOP_BOTTOM_REGION_HEIGHT = 120;
     static final Point BOTTOM_REGION_TOPLEFT_ANCHOR_POINT = new Point(
             CENTER_REGION_TOPLEFT_ANCHOR_POINT.x,//left side of center box
-            Math.min(CENTER_REGION_TOPLEFT_ANCHOR_POINT.y+REGION_HEIGHT, RIGHT_REGION_TOPLEFT_ANCHOR_POINT.y+REGION_HEIGHT) + 50 // (lowest y of Center and Right regions) - 50
+            Math.max(CENTER_REGION_TOPLEFT_ANCHOR_POINT.y+REGION_HEIGHT, RIGHT_REGION_TOPLEFT_ANCHOR_POINT.y+REGION_HEIGHT) + 50 // (bottom-most y of Center and Right regions) + 50
+    );
+    static final Point TOP_REGION_TOPLEFT_ANCHOR_POINT = new Point(
+            CENTER_REGION_TOPLEFT_ANCHOR_POINT.x,//left side of center box
+            Math.min(CENTER_REGION_TOPLEFT_ANCHOR_POINT.y, RIGHT_REGION_TOPLEFT_ANCHOR_POINT.y) - 50 - TOP_BOTTOM_REGION_HEIGHT // (top-most y of Center and Right regions) - 50 - region height
     );
     //top left and bottom right of calibration box (below center and right boxes)
     Point bottom_region_pointA = new Point(
@@ -124,16 +128,26 @@ public class TestingPipeline extends OpenCvPipeline
     );
     Point bottom_region_pointB = new Point(
             RIGHT_REGION_TOPLEFT_ANCHOR_POINT.x + REGION_WIDTH, //right side of the right box
-            BOTTOM_REGION_TOPLEFT_ANCHOR_POINT.y + BOTTOM_REGION_HEIGHT //y of BOTTOM_REGION_TOPLEFT_ANCHOR_POINT - BOTTOM_REGION_HEIGHT
+            BOTTOM_REGION_TOPLEFT_ANCHOR_POINT.y + TOP_BOTTOM_REGION_HEIGHT //y of BOTTOM_REGION_TOPLEFT_ANCHOR_POINT - TOP_BOTTOM_REGION_HEIGHT
+    );
+    Point top_region_pointA = new Point(
+            TOP_REGION_TOPLEFT_ANCHOR_POINT.x,
+            TOP_REGION_TOPLEFT_ANCHOR_POINT.y
+    );
+    Point top_region_pointB = new Point(
+            RIGHT_REGION_TOPLEFT_ANCHOR_POINT.x + REGION_WIDTH, //right side of the right box
+            TOP_REGION_TOPLEFT_ANCHOR_POINT.y + TOP_BOTTOM_REGION_HEIGHT //y of TOP_REGION_TOPLEFT_ANCHOR_POINT + TOP_BOTTOM_REGION_HEIGHT
     );
     //Rectangle
     Rect bottomRectangle = new Rect(bottom_region_pointA,bottom_region_pointB);
+    Rect topRectangle = new Rect(top_region_pointA,top_region_pointB);
 
 
     /*readings from image*/
     Mat YCrCb = new Mat(); // the input image in the YCrCb color space
-    Mat center_region, right_region, bottom_region; // various regions of YCrCb
+    Mat center_region, right_region, bottom_region, top_region; // various regions of YCrCb
 
+    // Volatile since accessed by OpMode thread w/o synchronization
     private volatile TSEPosition position = TSEPosition.LEFT; // default position
 
     //scalar [ Y, Cr, Cb ]
@@ -144,6 +158,8 @@ public class TestingPipeline extends OpenCvPipeline
     private volatile Scalar rightAvg = new Scalar(0,0,0);
     //average readings from bottom region
     private volatile Scalar bottomAvg = new Scalar(0,0,0);
+    //average readings from top region
+    private volatile Scalar topAvg = new Scalar(0,0,0);
 
 
     /* methods */
@@ -176,6 +192,7 @@ public class TestingPipeline extends OpenCvPipeline
         center_region = YCrCb.submat(centerRectangle); //holds the YCrCb values of the pixels within the center box
         right_region = YCrCb.submat(rightRectangle); //holds the YCrCb values of the pixels within the center box
         bottom_region = YCrCb.submat(bottomRectangle);
+        top_region = YCrCb.submat(topRectangle);
     }
 
     /**
@@ -218,6 +235,10 @@ public class TestingPipeline extends OpenCvPipeline
         centerAvg = Core.mean(center_region); // average YCrCb values of center_region
         rightAvg  = Core.mean(right_region); // average YCrCb values of right_region
         bottomAvg = Core.mean(bottom_region); // average YCrCb values of bottom_region
+        topAvg    = Core.mean(top_region);// average YCrCb values of top_region
+
+        int channelToCompare = 0; //0=Y  1=Cr  2=Cb
+        int ambience = (int)(bottomAvg.val[channelToCompare] + topAvg.val[channelToCompare]) / 2;
 
         //scalar [ Y, Cr, Cb ]
         //       [ 0,  1,  2 ]
@@ -250,13 +271,21 @@ public class TestingPipeline extends OpenCvPipeline
                 BLUE, //color of border
                 2//thickness of border
         );
+        //draw top box
+        Imgproc.rectangle(
+                input, //image the rectangle is drawn on
+                top_region_pointA, // top left corner of image
+                top_region_pointB, // bottom right corner of image
+                BLUE, //color of border
+                2//thickness of border
+        );
 
         //logic to determine the level
-        int centerYDist = (int) (centerAvg.val[0] - bottomAvg.val[0]);
-        int rightYDist = (int) (rightAvg.val[0] - bottomAvg.val[0]);
+        int centerYDist = (int) (centerAvg.val[channelToCompare] - ambience);
+        int rightYDist = (int) (rightAvg.val[channelToCompare] - ambience);
         //if(centerYDist >= 20) // if center is brighter than the bottom, todo: tune the value
         //if that doesn't work consistently in different lighting conditions, try this
-        if ( 0.75*centerYDist > rightYDist ) // if center is more than 25% brighter than right compared to the bottom, todo: tune the value
+        if ( 0.75*centerYDist > rightYDist ) // if center is more than 25% brighter than right compared to the bottom and top, todo: tune the value
         {
             position = TSEPosition.CENTER;
 
@@ -271,7 +300,7 @@ public class TestingPipeline extends OpenCvPipeline
         }
         //else if(rightYDist >= 20) // if right is MIN_Y_DIST_FOR_DETECTION brighter than bottom, todo: tune the value
         //if that doesn't work consistently in different lighting conditions, try this
-        else if ( 0.75*rightYDist > centerYDist ) // if right is more than 25% brighter than center compared to the bottom, todo: tune the value
+        else if ( 0.75*rightYDist > centerYDist ) // if right is more than 25% brighter than center compared to the bottom and top, todo: tune the value
         {
             position = TSEPosition.RIGHT;
 
@@ -390,6 +419,13 @@ public class TestingPipeline extends OpenCvPipeline
      */
     public Scalar getBottomAvg() {
         return bottomAvg;
+    }
+
+    /**
+     * @return average reading of top region
+     */
+    public Scalar getTopAvg() {
+        return topAvg;
     }
 
     /**

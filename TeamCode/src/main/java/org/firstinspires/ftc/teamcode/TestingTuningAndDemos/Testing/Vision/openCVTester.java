@@ -50,6 +50,7 @@ public class openCVTester  extends LinearOpMode{
             Scalar centerAvg = pipeline.getCenterAvg();
             Scalar rightAvg = pipeline.getRightAvg();
             Scalar bottomAvg = pipeline.getBottomAvg();
+            Scalar topAvg = pipeline.getTopAvg();
 
             ac=gamepad1.a;
             if (ac && !ap) {
@@ -83,6 +84,11 @@ public class openCVTester  extends LinearOpMode{
                     (int) bottomAvg.val[0],
                     (int) bottomAvg.val[1],
                     (int) bottomAvg.val[2]
+            ));
+            telemetry.addLine(String.format("Top Averages: \n\tY-(%d)  Cr-(%d)  Cb-(%d)",
+                    (int) topAvg.val[0],
+                    (int) topAvg.val[1],
+                    (int) topAvg.val[2]
             ));
             telemetry.update();
         }
